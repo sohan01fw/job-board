@@ -1,8 +1,19 @@
-export default async function dashboard() {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+import { Navigationtab } from "@/components/pages/dashboard/Navigationtab";
+
+export default async function Jobs() {
   return (
-    <div>
-      <h1>Hey welcome to the admin dashboard page</h1>
+    <div className="m-10">
+      <div className="">
+        <h1 className="text-4xl font-bold">Dashboard</h1>
+      </div>
+
+      <div className="">
+        <h1 className="text-sm font-semibold text-gray-400">Welcome,sohan</h1>
+      </div>
+
+      <div className="">
+        <Navigationtab />
+      </div>
     </div>
   );
 }

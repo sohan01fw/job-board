@@ -1,3 +1,3 @@
-export default async function loading() {
-  return <div>Loading.... </div>;
+export default function loading() {
+  return <div> loading.... </div>;
 }
