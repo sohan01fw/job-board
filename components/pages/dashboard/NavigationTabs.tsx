@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
 import {
   JobApplications,
   Jobs,
@@ -8,11 +7,9 @@ import {
 } from "@/components/pages/dashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function NavigationTabs() {
-  //  const [activeValue, setActiveValue] = useState<string>();
-  useEffect(() => {}, []);
   return (
     <div className="m-2">
-      <Tabs defaultValue="account" className="w-[400px]">
+      <Tabs defaultValue="overview" className="w-[400px]">
         <TabsList className="">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="jobs">Jobs</TabsTrigger>
