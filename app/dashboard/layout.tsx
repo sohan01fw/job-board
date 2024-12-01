@@ -12,7 +12,15 @@ export default function RootLayout({
 }>) {
   return (
     <div>
-      <main>{children}</main>
+      <div className="m-10">
+        <div className="">
+          <h1 className="text-4xl font-bold">Dashboard</h1>
+        </div>
+        <div className="">
+          <h1 className="text-sm font-semibold text-gray-400">Welcome,sohan</h1>
+        </div>
+        <main>{children}</main>
+      </div>
     </div>
   );
 }
