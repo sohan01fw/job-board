@@ -14,17 +14,58 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum JobType {
+  PARTTIME
+  FULLTIME
+  CONTRACT
+}
+
+enum JobLoc {
+  REMOTE
+  ONSITE
+  HYBRID
+}
+
+enum JobCatagory {
+  FINANCE
+  MARKETING
+  IT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model JobForm {
+  id          String   @id @default(uuid())
+  fname       String   @db.VarChar(255)
+  lname       String   @db.VarChar(255)
+  age         Int
+  gender      Gender
+  about       String
+  resume      Bytes
+  socialLinks String[]
+  jobType     JobType
+  createdAt   DateTime @default(now())
+}
+
 model JobApplication {
-  id           String   @id @default(uuid())
-  title        String   @db.VarChar(255)
+  id           String      @id @default(uuid())
+  title        String      @db.VarChar(255)
   desc         String
   requirements String
+  salary       Int
   joblimit     Int
+  jobType      JobType
+  jobLoc       JobLoc
+  links        String
+  jobCatagory  JobCatagory
   applied      Int
-  status       Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  status       Boolean     @default(true)
+  createdAt    DateTime    @default(now())
   userId       String
-  user         User     @relation(fields: [userId], references: [id])
+  user         User        @relation(fields: [userId], references: [id])
 }
 
 model Company {
