@@ -38,23 +38,24 @@ enum Gender {
 }
 
 model JobForm {
-  id          String   @id @default(uuid())
-  fname       String   @db.VarChar(255)
-  lname       String   @db.VarChar(255)
-  age         Int
-  gender      Gender
-  about       String
-  resume      Bytes
-  socialLinks String[]
-  jobType     JobType
-  createdAt   DateTime @default(now())
+  id              String           @id @default(uuid())
+  fname           String           @db.VarChar(255)
+  lname           String           @db.VarChar(255)
+  age             Int
+  gender          Gender
+  about           String
+  resume          Bytes
+  socialLinks     String[]
+  jobType         JobType
+  createdAt       DateTime         @default(now())
+  jobApplications JobApplication[]
 }
 
 model JobApplication {
   id           String      @id @default(uuid())
   title        String      @db.VarChar(255)
   desc         String
-  requirements String
+  requirements String[]
   salary       Int
   joblimit     Int
   jobType      JobType
@@ -62,10 +63,12 @@ model JobApplication {
   links        String
   jobCatagory  JobCatagory
   applied      Int
-  status       Boolean     @default(true)
+  status       Boolean     @default(false)
   createdAt    DateTime    @default(now())
   userId       String
   user         User        @relation(fields: [userId], references: [id])
+  jobformId    String
+  jobform      JobForm     @relation(fields: [jobformId], references: [id])
 }
 
 model Company {
