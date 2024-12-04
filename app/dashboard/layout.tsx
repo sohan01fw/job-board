@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function RootLayout({
           <h1 className="text-sm font-semibold text-gray-400">Welcome,sohan</h1>
         </div>
         <main>{children}</main>
+        <Toaster />
       </div>
     </div>
   );

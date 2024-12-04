@@ -22,8 +22,19 @@ import {
   jobLocArr,
   jobTypeArr,
 } from "@/lib/data";
-export function CreateJobForm() {
-  // 1. Define your form.
+import { CreateJobs } from "@/lib/Actions/Jobs";
+import useExportHooks from "@/lib/Hooks/useExportHooks";
+import { JobApp } from "@/types/Forms";
+import { ToastAction } from "@/components/ui/toast";
+export function CreateJobForm({
+  userEmail,
+  userId,
+}: {
+  userEmail: string;
+  userId: string;
+}) {
+  const { router, toast } = useExportHooks();
+
   const form = useForm<z.infer<typeof jobCreateSchema>>({
     resolver: zodResolver(jobCreateSchema),
     defaultValues: {
@@ -39,11 +50,23 @@ export function CreateJobForm() {
       Links: "",
     },
   });
-  console.log(form.getValues());
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof jobCreateSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof jobCreateSchema>) {
+    const res = await CreateJobs(values as JobApp, userEmail, userId);
+    if (!res?.error) {
+      toast({
+        title: "Successfully Create a job Application",
+      });
+      router.back();
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description:
+          "There was a problem with your request.Please Refresh the page",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+    }
   }
 
   return (

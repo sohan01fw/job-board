@@ -26,7 +26,7 @@ enum JobLoc {
   HYBRID
 }
 
-enum JobCatagory {
+enum JobCategory {
   FINANCE
   MARKETING
   IT
@@ -38,17 +38,18 @@ enum Gender {
 }
 
 model JobForm {
-  id              String           @id @default(uuid())
-  fname           String           @db.VarChar(255)
-  lname           String           @db.VarChar(255)
-  age             Int
-  gender          Gender
-  about           String
-  resume          Bytes
-  socialLinks     String[]
-  jobType         JobType
-  createdAt       DateTime         @default(now())
-  jobApplications JobApplication[]
+  id               String         @id @default(uuid())
+  fname            String         @db.VarChar(255)
+  lname            String         @db.VarChar(255)
+  age              Int
+  gender           Gender
+  about            String
+  resume           Bytes
+  socialLinks      String[]
+  jobType          JobType
+  createdAt        DateTime       @default(now())
+  jobApplicationId String
+  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id])
 }
 
 model JobApplication {
@@ -56,19 +57,18 @@ model JobApplication {
   title        String      @db.VarChar(255)
   desc         String
   requirements String[]
-  salary       Int
-  joblimit     Int
+  salary       Int?
+  joblimit     Int?        @default(99)
   jobType      JobType
   jobLoc       JobLoc
-  links        String
-  jobCatagory  JobCatagory
-  applied      Int
-  status       Boolean     @default(false)
+  links        String?
+  jobCategory  JobCategory
+  applied      Int?        @default(0)
+  status       Boolean     @default(true)
   createdAt    DateTime    @default(now())
   userId       String
   user         User        @relation(fields: [userId], references: [id])
-  jobformId    String
-  jobform      JobForm     @relation(fields: [jobformId], references: [id])
+  jobForm      JobForm[]
 }
 
 model Company {
@@ -81,7 +81,7 @@ model Company {
 
 model User {
   id             String           @id @default(uuid())
-  name           String           @db.VarChar(255)
+  name           String?          @db.VarChar(255)
   email          String           @unique
   createdAt      DateTime         @default(now())
   jobapplication JobApplication[]

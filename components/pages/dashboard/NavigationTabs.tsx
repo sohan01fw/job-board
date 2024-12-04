@@ -45,7 +45,7 @@ export default function NavigationTabs() {
           </TabsContent>
         </div>
       </Tabs>
-      {/* <Button onClick={signOut}>logOut</Button> */}
+      <Button onClick={signOut}>logOut</Button>
     </div>
   );
 }

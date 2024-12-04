@@ -7,8 +7,19 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { authUser } from "@/lib/Actions/Users";
+import { redirect } from "next/navigation";
 
 export default async function page() {
+  const authResponse = await authUser();
+
+  if (!authResponse || !authResponse.user) {
+    return redirect("/auth/login");
+  }
+
+  const email = authResponse.user.email ?? "";
+  const id = authResponse.user.id ?? "";
+
   return (
     <div className="m-2">
       <div>
@@ -26,7 +37,7 @@ export default async function page() {
       </div>
       <div className="border border-black flex justify-center">
         <div>
-          <CreateJobForm />
+          <CreateJobForm userEmail={email} userId={id} />
         </div>
       </div>
     </div>

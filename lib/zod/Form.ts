@@ -1,4 +1,5 @@
-import { optional, z } from "zod";
+import { Gender, JobCategory, JobLoc, JobType } from "@prisma/client";
+import { z } from "zod";
 
 export const jobCatagoryFormSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
@@ -17,9 +18,9 @@ export const jobCreateSchema = z.object({
 
   salary: z.number().optional(),
   joblimit: z.number().max(100),
-  jobType: z.enum(["PARTTIME", "FULLTIME", "CONTRACT"]),
-  jobLoc: z.enum(["REMOTE", "ONSITE", "HYBRID"]),
-  jobCategory: z.enum(["FINANCE", "MARKETING", "IT"]),
-  gender: z.enum(["MALE", "FEMALE"]),
+  jobType: z.nativeEnum(JobType),
+  jobLoc: z.nativeEnum(JobLoc),
+  jobCategory: z.nativeEnum(JobCategory),
+  gender: z.nativeEnum(Gender),
   Links: z.string().optional().nullable(),
 });

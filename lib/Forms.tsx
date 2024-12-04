@@ -17,10 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { JobAppSchemaType } from "@/types/Forms";
 import { UseFormReturn } from "react-hook-form";
-import { Badge } from "@/components/ui/badge";
 import { lang } from "./data";
-import { Button } from "@/components/ui/button";
-import { MouseEventHandler, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FormProps {
   form: UseFormReturn<JobAppSchemaType>;
@@ -92,7 +90,7 @@ export function MultiValueInputField({
       <FormField
         control={form.control}
         name={name}
-        render={({ field }) => (
+        render={({}) => (
           <FormItem>
             <FormLabel>{label}</FormLabel>
             <FormControl>
