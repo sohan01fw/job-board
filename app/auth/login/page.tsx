@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 export default async function LoginPage() {
   const data = await authUser();
   if (data.user !== null) {
-    return redirect("/dashboard");
+    return redirect("/auth/onboarding/user/profile");
   }
 
   return (

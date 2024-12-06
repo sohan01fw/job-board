@@ -13,6 +13,18 @@ export async function SupabaseMagicLinkLogin(emailValue: string | undefined) {
 
   return { data, error };
 }
+
+//supabase login through google link
+export async function SupabaseGoogleLogin() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: "http://localhost:3000/auth/callback",
+    },
+  });
+  return { data, error };
+}
+
 //get session after user login
 export async function LoginSession() {
   const {

@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SupabaseMagicLinkLogin } from "@/lib/process";
-import { LoadingBtn } from "@/lib/ui";
+import { toast } from "@/hooks/use-toast";
+import { SupabaseGoogleLogin, SupabaseMagicLinkLogin } from "@/lib/process";
+import { GoogleButtonIcon, LoadingBtn } from "@/lib/ui";
 import { emailschema } from "@/lib/zod/global";
 import Link from "next/link";
 import { useState } from "react";
@@ -58,21 +59,36 @@ export default function Login() {
       setEmailValue(inputvalue);
     }
   }
+  const handleLoginWithGoogle = async () => {
+    const { data, error } = await SupabaseGoogleLogin();
+
+    if (error) {
+      toast({ variant: "default", title: "Error,while login with google!" });
+    }
+    console.log("user", data);
+  };
   return (
     <div className="login-container flex justify-center">
       <div className="rounded-lg shadow-xl p-2 w-96 mt-16">
-        <form onSubmit={handleSubmit}>
-          <Input placeholder="write your email" onChange={handleChange} />
-          {EmailError && (
-            <p className="text-red-700 text-sm p-1">{EmailError}</p>
-          )}
-          {isLoadingBtn ? (
-            <LoadingBtn />
-          ) : (
-            <Button type="submit" className="m-2">
-              submit
-            </Button>
-          )}
+        <div className="m-5" onClick={handleLoginWithGoogle}>
+          <GoogleButtonIcon />
+        </div>
+        <form onSubmit={handleSubmit} className="">
+          <div className="m-2">
+            <Input placeholder="write your email" onChange={handleChange} />
+            {EmailError && (
+              <p className="text-red-700 text-sm p-1">{EmailError}</p>
+            )}
+          </div>
+          <div className="w-full flex justify-center">
+            {isLoadingBtn ? (
+              <LoadingBtn />
+            ) : (
+              <Button type="submit" className="m-2">
+                submit
+              </Button>
+            )}
+          </div>
         </form>
         <div className="m-3">{msg && <p>{msg}</p>}</div>
       </div>
