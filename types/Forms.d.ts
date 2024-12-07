@@ -46,3 +46,18 @@ export interface User {
   name?: string;
   img?: string;
 }
+export interface DataError {
+  error: boolean;
+  message: string;
+  status: number;
+}
+export type CheckUserData =
+  | { id: string; email: string }
+  | {
+      error: boolean;
+      message: string;
+      status: number;
+    };
+// Utility function to safely get keys
+export const getKey = <K extends keyof User>(key: K): User[K] | undefined =>
+  key in userData ? (userData as User)[key] : undefined;

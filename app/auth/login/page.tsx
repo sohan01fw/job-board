@@ -1,4 +1,4 @@
-import Login from "@/components/pages/Login";
+import Login from "@/components/pages/auth/Login";
 import { authUser } from "@/lib/Actions/Users";
 import { redirect } from "next/navigation";
 
