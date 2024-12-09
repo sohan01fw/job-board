@@ -1,6 +1,6 @@
 "use server";
 
-import { DataError, User } from "@/types/Forms";
+import { CheckUserData, DataError, User } from "@/types/Forms";
 import { prisma } from "../Prisma";
 import { createClient } from "../supabase/supabase_server";
 
@@ -82,7 +82,73 @@ export async function FetchUser(
       message: "Unexpected error occurred",
       status: 500,
     };
-    console.log("Unexpected error:", errorMessage);
+    return errorMessage; // Return only the necessary data
+  }
+}
+
+//update the user name and image
+export async function UpdateUserName(
+  email: string,
+  name?: string,
+): Promise<any> {
+  try {
+    //check user exists or not
+    const checkUser: User | DataError = await CheckUser(email);
+    if ("error" in checkUser) {
+      const { message, status, error } = checkUser; // Log and omit `error`
+      console.log("Error fetching user:", { error, message, status });
+      return { message, status };
+    }
+    if (!name) return {};
+    const updateName = await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        name: name,
+      },
+    });
+    return updateName; // Return the updated user data
+  } catch (error) {
+    const errorMessage = {
+      error: true,
+      message: "Unexpected error occurred",
+      status: 500,
+    };
+    console.log("Unexpected error:", error);
+    return errorMessage; // Return only the necessary data
+  }
+}
+
+export async function UpdateUserProfile(
+  email: string,
+  imgs: string,
+): Promise<any> {
+  try {
+    //check user exists or not
+    const checkUser: User | DataError = await CheckUser(email);
+    if ("error" in checkUser) {
+      const { message, status, error } = checkUser; // Log and omit `error`
+      console.log("Error fetching user:", { error, message, status });
+      return { message, status };
+    }
+    if (!imgs) return {};
+    const updateImg = await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        img: imgs,
+      },
+    });
+    return updateImg; // Return the updated user data
+  } catch (error) {
+    const errorMessage = {
+      error: true,
+      message: "Unexpected error occurred",
+      status: 500,
+    };
+    console.log("Unexpected error:", error);
     return errorMessage; // Return only the necessary data
   }
 }

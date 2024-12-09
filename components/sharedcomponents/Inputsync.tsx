@@ -5,16 +5,17 @@ import { Input } from "../ui/input";
 import { ZodError } from "zod";
 import { inputschema } from "@/lib/zod/global";
 import { debounce } from "@/lib/debounce";
+import { UpdateUserName } from "@/lib/Actions/Users";
 
-export const Inputsync = ({ name }: { name: string }) => {
+export const Inputsync = ({ email, name }: { email: string; name: string }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [fieldErrorMsg, setFieldErrorMsg] = useState<string>("");
   useEffect(() => {
     setInputValue(name);
   }, [name]);
   const debouncedLog = useCallback(
-    debounce((value: string) => {
-      console.log(value); // Only the log is debounced
+    debounce(async (value: string) => {
+      const resUpdatedData = await UpdateUserName(email, value);
     }, 1000),
     [],
   );

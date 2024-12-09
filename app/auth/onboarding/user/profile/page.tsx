@@ -2,7 +2,7 @@ import { UserProfile } from "@/components/pages/auth/onboarding/userprofile";
 import { authUser, CreateUser, FetchUser } from "@/lib/Actions/Users";
 import { User } from "@/types/Forms";
 import { redirect } from "next/navigation";
-
+export const dynamic = "force-dynamic";
 export default async function page() {
   //authenticate the user if not present redirect to login page
   const userauth = await authUser();
@@ -32,6 +32,7 @@ export default async function page() {
         <p className="text-gray-500 ml-3 text-sm">Edit profile information</p>
       </div>
       <div className="">
+        {" "}
         <UserProfile userData={getUserData} />
       </div>
     </div>

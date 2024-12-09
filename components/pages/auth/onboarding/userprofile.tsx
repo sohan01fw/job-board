@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Inputsync } from "@/components/sharedcomponents/Inputsync";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Imagesync } from "@/components/sharedcomponents/Imagesync";
 export async function UserProfile({
   userData,
 }: {
@@ -21,7 +22,6 @@ export async function UserProfile({
   const img = "img" in userData;
   const email = "email" in userData;
   const name = "name" in userData;
-
   return (
     <div className="">
       <div className="border border-black mt-10">
@@ -30,20 +30,10 @@ export async function UserProfile({
             <CardTitle>Profile</CardTitle>
             <CardDescription>add your profile pic</CardDescription>
             <div>
-              <Avatar className="relative h-20 w-20">
-                <AvatarImage
-                  fetchPriority="high"
-                  src={`${img && userData.img}`}
-                />
-                <div className="absolute mt-10 border border-black bottom-0 h-full w-full">
-                  <Input
-                    className="mt-5 rounded-full h-full w-full"
-                    id="picture"
-                    type="file"
-                  />
-                </div>
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
+              <Imagesync
+                email={`${email && userData.email}`}
+                img={`${img && userData.img}`}
+              />
             </div>
           </CardHeader>
           <CardContent>
@@ -56,7 +46,10 @@ export async function UserProfile({
           </CardContent>
           <CardContent>
             <Label className="font-semibold text-sm m-1">Name</Label>
-            <Inputsync name={`${name && userData.name}`} />
+            <Inputsync
+              email={`${email && userData.email}`}
+              name={`${name && userData.name}`}
+            />
           </CardContent>
           <CardFooter>
             <Link href="/auth/onboarding/user/company">
