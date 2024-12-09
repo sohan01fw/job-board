@@ -82,7 +82,7 @@ export async function uploadImageFile(imageFile: File, bname: string) {
     }
 
     // Update the file if it already exists
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from(bname)
       .update(filePath, imageFile, {
         cacheControl: "3600",

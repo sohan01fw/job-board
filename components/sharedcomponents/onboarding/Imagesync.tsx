@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import { ZodError } from "zod";
 import { inputschema } from "@/lib/zod/global";
 import { UpdateUserProfile } from "@/lib/Actions/Users";
 import { GetAllFile, uploadImageFile } from "@/lib/Actions/FileAction";
 import { toast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const BucketName = "avatars";
 export const Imagesync = ({ email, img }: { email: string; img: string }) => {

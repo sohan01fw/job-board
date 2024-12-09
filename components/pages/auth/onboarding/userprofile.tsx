@@ -7,13 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Inputsync } from "@/components/sharedcomponents/Inputsync";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Imagesync } from "@/components/sharedcomponents/Imagesync";
+import { Imagesync } from "@/components/sharedcomponents/onboarding/Imagesync";
+import { Inputsync } from "@/components/sharedcomponents/onboarding/Inputsync";
+import { UpdateUserName } from "@/lib/Actions/Users";
+import { redirect } from "next/navigation";
 export async function UserProfile({
   userData,
 }: {
@@ -22,6 +23,10 @@ export async function UserProfile({
   const img = "img" in userData;
   const email = "email" in userData;
   const name = "name" in userData;
+  const handleInputProfile = async (value: string) => {
+    "use server";
+    if (email) return UpdateUserName(userData.email, value);
+  };
   return (
     <div className="">
       <div className="border border-black mt-10">
@@ -47,15 +52,11 @@ export async function UserProfile({
           <CardContent>
             <Label className="font-semibold text-sm m-1">Name</Label>
             <Inputsync
-              email={`${email && userData.email}`}
               name={`${name && userData.name}`}
+              updateNameAction={handleInputProfile}
+              placeholder="write your name"
             />
           </CardContent>
-          <CardFooter>
-            <Link href="/auth/onboarding/user/company">
-              <Button>Next</Button>
-            </Link>
-          </CardFooter>
         </Card>
       </div>
     </div>

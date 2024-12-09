@@ -72,11 +72,11 @@ model JobApplication {
 }
 
 model Company {
-  id     String @id @default(uuid())
-  name   String @db.VarChar(255)
-  desc   String
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  id     String  @id @default(uuid())
+  name   String  @unique @db.VarChar(255)
+  desc   String?
+  userId String  @unique
+  user   User    @relation(fields: [userId], references: [id])
 }
 
 model User {

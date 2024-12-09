@@ -61,3 +61,8 @@ export type CheckUserData =
 // Utility function to safely get keys
 export const getKey = <K extends keyof User>(key: K): User[K] | undefined =>
   key in userData ? (userData as User)[key] : undefined;
+
+export interface companyInfo {
+  name?: string;
+  desc?: string;
+}

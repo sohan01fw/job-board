@@ -32,7 +32,6 @@ export default async function page() {
         <p className="text-gray-500 ml-3 text-sm">Edit profile information</p>
       </div>
       <div className="">
-        {" "}
         <UserProfile userData={getUserData} />
       </div>
     </div>
