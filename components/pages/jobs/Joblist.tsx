@@ -6,12 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Applybtn } from "@/lib/ui";
 import { JobData } from "@/types/Forms";
-
-export function Jobcard({ data }: { data: JobData }) {
+export const Joblist = ({ data }: { data: JobData }) => {
   return (
-    <div className="">
-      <Card className="">
+    <div className="m-2">
+      <Card className="relative">
+        <div className="absolute right-0">
+          <Applybtn id={data.id} />
+        </div>
         <CardHeader>
           <CardTitle>{data.title}</CardTitle>
           <CardDescription>{data.desc}</CardDescription>
@@ -38,4 +41,4 @@ export function Jobcard({ data }: { data: JobData }) {
       </Card>
     </div>
   );
-}
+};

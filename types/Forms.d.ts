@@ -1,4 +1,4 @@
-import { jobCreateSchema } from "@/lib/zod/Form";
+import { applyJobSchema, jobCreateSchema } from "@/lib/zod/Form";
 import { Gender, JobCategory, JobLoc, JobType } from "@prisma/client";
 import { z } from "zod";
 
@@ -39,6 +39,15 @@ export type CreateJobResponse =
     }
   | undefined;
 export type JobAppSchemaType = z.infer<typeof jobCreateSchema>;
+export type ApplyJobSchemaType = {
+  about: string;
+  fname: string;
+  lname: string;
+  gender: "MALE" | "FEMALE";
+  sociallinks?: string[] | undefined;
+  age?: number | undefined;
+  resume: File | undefined;
+};
 
 //for job specifically
 export type JobData = {

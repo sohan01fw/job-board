@@ -41,12 +41,11 @@ model JobForm {
   id               String         @id @default(uuid())
   fname            String         @db.VarChar(255)
   lname            String         @db.VarChar(255)
-  age              Int
+  age              Int?
   gender           Gender
   about            String
-  resume           Bytes
-  socialLinks      String[]
-  jobType          JobType
+  resume           String         @default("")
+  socialLinks      String[]       @default([])
   createdAt        DateTime       @default(now())
   jobApplicationId String
   jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id])

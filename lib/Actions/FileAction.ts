@@ -1,24 +1,24 @@
 import { supabase } from "../supabase/supabase_client";
 
-const bucketName = "avatars";
-export async function checkBucket() {
+// const bucketName = "avatars";
+export async function checkBucket(bucketname: string) {
   const bucketData = await supabase.storage.listBuckets();
   const checkBucket = bucketData.data?.some(
-    (value) => value.name == bucketName,
+    (value) => value.name == bucketname,
   );
   return checkBucket;
 }
-export async function SetupBucket() {
+export async function SetupBucket(bucketname: string) {
   try {
     //check the bucket exist or not
-    const checkBuckets = await checkBucket();
+    const checkBuckets = await checkBucket(bucketname);
     if (checkBuckets) {
       return;
     }
     // Create the bucket
-    const { data, error } = await supabase.storage.createBucket(bucketName, {
+    const { data, error } = await supabase.storage.createBucket(bucketname, {
       public: true,
-      allowedMimeTypes: ["image/*"],
+      allowedMimeTypes: ["image/*", "application/pdf"],
       fileSizeLimit: 5 * 1024 * 1024,
     });
     if (error) {
@@ -42,13 +42,13 @@ export async function SetupBucket() {
   }
 }
 
-export async function uploadImageFile(imageFile: File, bname: string) {
+export async function uploadFile(imageFile: File | undefined, bname: string) {
   try {
     // Create bucket in Supabase file storage
-    await SetupBucket();
+    await SetupBucket(bname);
 
     // Check if the specific file exists
-    const filePath = `public/${imageFile.name}`;
+    const filePath = `public/${imageFile?.name}`;
     const existingFile = await supabase.storage.from(bname).list("public", {
       limit: 100,
       offset: 0,
@@ -56,10 +56,10 @@ export async function uploadImageFile(imageFile: File, bname: string) {
     });
 
     const fileExists = existingFile.data?.some(
-      (file) => file.name === imageFile.name,
+      (file) => file.name === imageFile?.name,
     );
 
-    if (!fileExists) {
+    if (!fileExists && imageFile !== undefined) {
       // Upload the file if it doesn't exist
       const { error } = await supabase.storage
         .from(bname)
@@ -111,7 +111,7 @@ export async function uploadImageFile(imageFile: File, bname: string) {
 
 export async function GetAllFile(imageFile: File | undefined, bname: string) {
   try {
-    const checkB = await checkBucket();
+    const checkB = await checkBucket(bname);
     if (!checkB) {
       return { message: "bucket not present" };
     }

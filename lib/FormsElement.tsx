@@ -15,13 +15,12 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { JobAppSchemaType } from "@/types/Forms";
 import { UseFormReturn } from "react-hook-form";
 import { lang } from "./data";
 import { useEffect, useState } from "react";
 
 interface FormProps {
-  form: UseFormReturn<JobAppSchemaType>;
+  form: UseFormReturn<any>;
   name: string;
   label: string;
   placeholder: string;
@@ -174,6 +173,31 @@ export function SelectFormInput({
               })}
             </SelectContent>
           </Select>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
+
+export function ImageInputForm({ form, name, label }) {
+  return (
+    <FormField
+      control={form.control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            <Input
+              type="file"
+              accept="application/pdf"
+              onChange={(event) => {
+                const file = event.target.files?.[0]; // Get the first selected file
+                field.onChange(file); // Update React Hook Form state with the file
+              }}
+            />
+          </FormControl>
           <FormMessage />
         </FormItem>
       )}

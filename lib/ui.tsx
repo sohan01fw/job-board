@@ -6,6 +6,7 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase/supabase_client";
 import { AuthError } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
+import useExportHooks from "./Hooks/useExportHooks";
 export function LoadingBtn() {
   return (
     <Button disabled className="m-2">
@@ -33,4 +34,12 @@ export function SignOut() {
     }
   }
   return <Button onClick={signOut}>logOut</Button>;
+}
+
+export function Applybtn({ id }: { id: string }) {
+  const { router } = useExportHooks();
+  async function apply() {
+    return router.push(`/jobs/applyjob/${id}`);
+  }
+  return <Button onClick={apply}>Apply</Button>;
 }
