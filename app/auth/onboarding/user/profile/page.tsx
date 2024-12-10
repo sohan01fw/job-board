@@ -1,5 +1,10 @@
 import { UserProfile } from "@/components/pages/auth/onboarding/userprofile";
-import { authUser, CreateUser, FetchUser } from "@/lib/Actions/Users";
+import {
+  authUser,
+  CheckUser,
+  CreateUser,
+  FetchUser,
+} from "@/lib/Actions/Users";
 import { User } from "@/types/Forms";
 import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
@@ -10,6 +15,11 @@ export default async function page() {
     return redirect("/auth/login");
   }
   const user = userauth.user;
+  //check user if exists redirect to dashboard
+  const userExist = await CheckUser(user.email || "");
+  if (userExist) {
+    redirect("/dashboard");
+  }
   //save the user to database
   const fullname =
     user?.identities && user?.identities[0].identity_data?.full_name;

@@ -1,6 +1,6 @@
 import { UserCompany } from "@/components/pages/auth/onboarding/usercompany";
 import { CheckCompany } from "@/lib/Actions/Company";
-import { authUser } from "@/lib/Actions/Users";
+import { authUser, CheckUser } from "@/lib/Actions/Users";
 import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 export default async function page() {
@@ -10,6 +10,11 @@ export default async function page() {
     return redirect("/auth/login");
   }
   const user = userauth.user;
+  //check user if exists redirect to dashboard
+  const userExist = await CheckUser(user.email || "");
+  if (userExist) {
+    redirect("/dashboard");
+  }
   const companyData = await CheckCompany(user.id);
   if ("error" in companyData) {
     console.log(companyData.message);

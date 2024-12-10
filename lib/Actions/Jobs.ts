@@ -1,5 +1,5 @@
 "use server";
-import { CreateJobResponse, JobApp } from "@/types/Forms";
+import { CreateJobResponse, GetJobs, JobApp } from "@/types/Forms";
 import { prisma } from "../Prisma";
 import { CheckUser } from "./Users";
 
@@ -39,5 +39,26 @@ export async function CreateJobs(
         message: "Error while posting jobs application",
       };
     }
+  }
+}
+
+export async function GetAllJobs(): Promise<GetJobs> {
+  try {
+    const jobs = await prisma.jobApplication.findMany();
+    if (!jobs) {
+      return {
+        status: 404,
+        message: "job isn't found!",
+      };
+    }
+    return {
+      data: jobs,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: "unexpected error while finding jobs",
+      status: 500,
+    };
   }
 }
