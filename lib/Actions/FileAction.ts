@@ -42,8 +42,25 @@ export async function SetupBucket(bucketname: string) {
   }
 }
 
-export async function uploadFile(imageFile: File | undefined, bname: string) {
+export async function uploadFile(
+  imageFile: File | undefined,
+  bname: string,
+): Promise<
+  | {
+      message: string;
+      updated: boolean;
+    }
+  | { error: boolean; message: string; status: number }
+> {
   try {
+    //check imagefile present or not
+    if (imageFile === undefined) {
+      return {
+        error: true,
+        message: "imagefile is undefined",
+        status: 400,
+      };
+    }
     // Create bucket in Supabase file storage
     await SetupBucket(bname);
 
@@ -59,7 +76,7 @@ export async function uploadFile(imageFile: File | undefined, bname: string) {
       (file) => file.name === imageFile?.name,
     );
 
-    if (!fileExists && imageFile !== undefined) {
+    if (!fileExists) {
       // Upload the file if it doesn't exist
       const { error } = await supabase.storage
         .from(bname)
@@ -70,8 +87,9 @@ export async function uploadFile(imageFile: File | undefined, bname: string) {
 
       if (error) {
         return {
-          error,
+          error: true,
           message: "File failed to upload",
+          status: 400,
         };
       }
 
@@ -80,7 +98,6 @@ export async function uploadFile(imageFile: File | undefined, bname: string) {
         updated: true,
       };
     }
-
     // Update the file if it already exists
     const { error } = await supabase.storage
       .from(bname)
@@ -90,8 +107,9 @@ export async function uploadFile(imageFile: File | undefined, bname: string) {
 
     if (error) {
       return {
-        error,
+        error: true,
         message: "File update failed",
+        status: 400,
       };
     }
 
@@ -103,7 +121,7 @@ export async function uploadFile(imageFile: File | undefined, bname: string) {
     console.error(error);
     return {
       message: "Unexpected error occurred while uploading file",
-      error,
+      error: true,
       status: 500,
     };
   }
