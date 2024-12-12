@@ -1,3 +1,4 @@
+import { funcResponse } from "@/types/global";
 import { supabase } from "../supabase/supabase_client";
 
 // const bucketName = "avatars";
@@ -45,13 +46,7 @@ export async function SetupBucket(bucketname: string) {
 export async function uploadFile(
   imageFile: File | undefined,
   bname: string,
-): Promise<
-  | {
-      message: string;
-      updated: boolean;
-    }
-  | { error: boolean; message: string; status: number }
-> {
+): Promise<funcResponse> {
   try {
     //check imagefile present or not
     if (imageFile === undefined) {
@@ -94,8 +89,9 @@ export async function uploadFile(
       }
 
       return {
+        data: true,
         message: "Successfully uploaded file",
-        updated: true,
+        status: 200,
       };
     }
     // Update the file if it already exists
@@ -114,8 +110,9 @@ export async function uploadFile(
     }
 
     return {
+      data: true,
       message: "Successfully updated file",
-      updated: true,
+      status: 200,
     };
   } catch (error) {
     console.error(error);

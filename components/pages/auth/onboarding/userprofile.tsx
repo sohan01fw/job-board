@@ -13,20 +13,21 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Imagesync } from "@/components/sharedcomponents/onboarding/Imagesync";
 import { Inputsync } from "@/components/sharedcomponents/onboarding/Inputsync";
-import { UpdateUserName } from "@/lib/Actions/Users";
 import { redirect } from "next/navigation";
+import { CheckUser, UpdateUserProfile } from "@/lib/Actions/Users";
+import { funcResponse } from "@/types/global";
 export async function UserProfile({
-  userData,
+  emailValue,
 }: {
-  userData: User | Omit<DataError, "error">;
+  emailValue: string | undefined;
 }) {
-  const img = "img" in userData;
-  const email = "email" in userData;
-  const name = "name" in userData;
-  const handleInputProfile = async (value: string) => {
-    "use server";
-    if (email) return UpdateUserName(userData.email, value);
-  };
+  const userDatas = await CheckUser(emailValue || "");
+  if ("error" in userDatas) {
+    console.log(userDatas.message);
+  }
+  const userData = "data" in userDatas && userDatas.data;
+
+  //console.log(userData);
   return (
     <div className="">
       <div className="border border-black mt-10">
@@ -35,10 +36,7 @@ export async function UserProfile({
             <CardTitle>Profile</CardTitle>
             <CardDescription>add your profile pic</CardDescription>
             <div>
-              <Imagesync
-                email={`${email && userData.email}`}
-                img={`${img && userData.img}`}
-              />
+              <Imagesync email={`${userData.email}`} img={`${userData.img}`} />
             </div>
           </CardHeader>
           <CardContent>
@@ -46,14 +44,14 @@ export async function UserProfile({
             <Input
               className="ml-1 "
               disabled
-              defaultValue={`${email && userData.email}`}
+              defaultValue={`${userData.email}`}
             />
           </CardContent>
           <CardContent>
             <Label className="font-semibold text-sm m-1">Name</Label>
             <Inputsync
-              name={`${name && userData.name}`}
-              updateNameAction={handleInputProfile}
+              email={`${userData.email}`}
+              name={`${userData.name}`}
               placeholder="write your name"
             />
           </CardContent>

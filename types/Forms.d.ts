@@ -1,4 +1,4 @@
-import { applyJobSchema, jobCreateSchema } from "@/lib/zod/Form";
+import { jobCreateSchema } from "@/lib/zod/Form";
 import { Gender, JobCategory, JobLoc, JobType } from "@prisma/client";
 import { z } from "zod";
 

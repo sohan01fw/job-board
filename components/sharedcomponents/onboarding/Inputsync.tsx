@@ -8,14 +8,15 @@ import { Input } from "@/components/ui/input";
 import { CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
+import { UpdateUserProfile } from "@/lib/Actions/Users";
 
 export const Inputsync = ({
   name,
-  updateNameAction,
+  email,
   placeholder,
 }: {
+  email: string;
   name?: string | undefined;
-  updateNameAction: (value: string) => Promise<void>;
   placeholder: string;
 }) => {
   const [inputValue, setInputValue] = useState<string | undefined>("");
@@ -25,10 +26,10 @@ export const Inputsync = ({
     setInputValue(name);
   }, [name]);
 
-  //using debounce to delay the api call
+  //  using debounce to delay the api call
   const debouncedLog = useCallback(
     debounce(async (value: string) => {
-      await updateNameAction(value);
+      await UpdateUserProfile(email, { name: value });
     }, 1000),
     [],
   );
@@ -37,19 +38,16 @@ export const Inputsync = ({
     try {
       inputschema.parse(inputValue);
       setFieldErrorMsg("");
+      debouncedLog(inputValue);
     } catch (error) {
       if (error instanceof ZodError) {
         setFieldErrorMsg(error.errors[0].message);
       }
     }
-
-    debouncedLog(inputValue);
   }
   useEffect(() => {
-    if (inputFocus == true) {
-      handleChange();
-    }
-  }, [inputFocus]);
+    handleChange();
+  }, [inputValue]);
 
   return (
     <div>
@@ -58,13 +56,6 @@ export const Inputsync = ({
         value={inputValue ?? ""}
         onChange={(e) => setInputValue(e.target.value || "")}
         placeholder={placeholder}
-        onFocus={() => {
-          setInputFocus(true);
-        }}
-        onBlur={() => {
-          setFieldErrorMsg("");
-          setInputFocus(false);
-        }}
       />
       {fieldErrorMsg && <p className="text-red-500">{fieldErrorMsg}</p>}
       <CardFooter>

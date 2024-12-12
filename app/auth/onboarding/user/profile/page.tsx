@@ -1,25 +1,18 @@
 import { UserProfile } from "@/components/pages/auth/onboarding/userprofile";
-import {
-  authUser,
-  CheckUser,
-  CreateUser,
-  FetchUser,
-} from "@/lib/Actions/Users";
+import { authUser, CheckUser, CreateUser } from "@/lib/Actions/Users";
 import { User } from "@/types/Forms";
 import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 export default async function page() {
   //authenticate the user if not present redirect to login page
   const userauth = await authUser();
-  if (!userauth || !userauth.user?.email) {
+  const user = userauth.user;
+  if (!userauth || !user) {
     return redirect("/auth/login");
   }
-  const user = userauth.user;
   //check user if exists redirect to dashboard
   const userExist = await CheckUser(user.email || "");
-  if (userExist) {
-    redirect("/dashboard");
-  }
+
   //save the user to database
   const fullname =
     user?.identities && user?.identities[0].identity_data?.full_name;
@@ -31,10 +24,11 @@ export default async function page() {
     name: fullname || "",
     img: profile_pic || "",
   };
-  await CreateUser(userData);
+  const userdata = await CreateUser(userData);
+  if ("error" in userdata) {
+    console.log({ msg: userdata.message, status: userdata.status });
+  }
 
-  //fetch user data from database
-  const getUserData = await FetchUser(userauth.user?.email);
   return (
     <div className="">
       <div>
@@ -42,7 +36,7 @@ export default async function page() {
         <p className="text-gray-500 ml-3 text-sm">Edit profile information</p>
       </div>
       <div className="">
-        <UserProfile userData={getUserData} />
+        <UserProfile emailValue={user.email} />
       </div>
     </div>
   );
