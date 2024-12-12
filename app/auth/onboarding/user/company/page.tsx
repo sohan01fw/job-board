@@ -10,16 +10,10 @@ export default async function page() {
     return redirect("/auth/login");
   }
   const user = userauth.user;
-  //check user if exists redirect to dashboard
-  const userExist = await CheckUser(user.email || "");
-  if (userExist) {
-    redirect("/dashboard");
-  }
   const companyData = await CheckCompany(user.id);
   if ("error" in companyData) {
     console.log(companyData.message);
   }
-  console.log(companyData);
   return (
     <div className="">
       <div>

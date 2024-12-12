@@ -1,5 +1,6 @@
 import { UserProfile } from "@/components/pages/auth/onboarding/userprofile";
 import { authUser, CheckUser, CreateUser } from "@/lib/Actions/Users";
+import { redirectUser } from "@/lib/process";
 import { User } from "@/types/Forms";
 import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";

@@ -1,4 +1,7 @@
 import { supabase } from "./supabase/supabase_client";
+import Login from "@/components/pages/auth/Login";
+import { authUser, CheckUser } from "@/lib/Actions/Users";
+import { redirect } from "next/navigation";
 
 //supabase login through magic link
 export async function SupabaseMagicLinkLogin(emailValue: string | undefined) {
@@ -25,6 +28,18 @@ export async function SupabaseGoogleLogin() {
   return { data, error };
 }
 
+//redirect user to it's desired destination
+export async function redirectUser() {
+  const data = await authUser();
+  if (!data.user?.email) {
+    return redirect("/auth/login");
+  }
+  const checkUser = await CheckUser(data.user?.email);
+  if (checkUser.status === 404) {
+    return redirect("/auth/onboarding/user/profile");
+  }
+  return redirect("/dashboard");
+}
 //get session after user login
 export async function LoginSession() {
   const {
