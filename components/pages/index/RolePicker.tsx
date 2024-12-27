@@ -36,7 +36,7 @@ export function RolePicker() {
               </Button>
             </Link>
 
-            <Link href="/dashboard">
+            <Link href="/dashboard/overview">
               <Button size="sm" className="px-3">
                 <span className="">Recruiter</span>
               </Button>

@@ -30,13 +30,17 @@ const items = [
     id: "IT",
     label: "IT",
   },
+  {
+    id: "ALL",
+    label: "ALL",
+  },
 ] as const;
 
 export function Jobcatagory() {
   const form = useForm<z.infer<typeof jobCatagoryFormSchema>>({
     resolver: zodResolver(jobCatagoryFormSchema),
     defaultValues: {
-      items: ["IT"],
+      items: ["ALL"],
     },
   });
 

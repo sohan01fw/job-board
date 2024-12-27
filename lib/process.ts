@@ -10,7 +10,7 @@ export async function SupabaseMagicLinkLogin(emailValue: string | undefined) {
     options: {
       // set this to false if you do not want the user to be automatically signed up
       shouldCreateUser: true,
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard/overview`,
     },
   });
 
@@ -38,7 +38,7 @@ export async function redirectUser() {
   if (checkUser.status === 404) {
     return redirect("/auth/onboarding/user/profile");
   }
-  return redirect("/dashboard");
+  return redirect("/dashboard/overview");
 }
 //get session after user login
 export async function LoginSession() {

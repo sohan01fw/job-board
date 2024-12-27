@@ -1,3 +1,4 @@
+import Mainpage from "@/components/pages/dashboard/Mainpage";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 
@@ -20,6 +21,7 @@ export default function RootLayout({
         <div className="">
           <h1 className="text-sm font-semibold text-gray-400">Welcome,sohan</h1>
         </div>
+        <Mainpage />
         <main>{children}</main>
         <Toaster />
       </div>
