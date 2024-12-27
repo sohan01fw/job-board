@@ -16,36 +16,34 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { jobCatagoryFormSchema } from "@/lib/zod/Form";
+import { useCatagoryStore } from "@/lib/Stores/CatagoryStore";
 
 const items = [
   {
-    id: "Finance",
+    id: "FINANCE",
     label: "Finance",
   },
   {
-    id: "Marketing",
+    id: "MARKETING",
     label: "Marketing",
   },
   {
     id: "IT",
     label: "IT",
   },
-  {
-    id: "ALL",
-    label: "ALL",
-  },
 ] as const;
 
 export function Jobcatagory() {
+  const { addCatagory } = useCatagoryStore();
   const form = useForm<z.infer<typeof jobCatagoryFormSchema>>({
     resolver: zodResolver(jobCatagoryFormSchema),
     defaultValues: {
-      items: ["ALL"],
+      items: [],
     },
   });
 
   function onSubmit(data: z.infer<typeof jobCatagoryFormSchema>) {
-    console.log(data);
+    addCatagory(data.items);
   }
 
   return (

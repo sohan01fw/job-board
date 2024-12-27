@@ -1,11 +1,9 @@
-import { Jobcard } from "@/components/sharedcomponents/Jobs/Jobcard";
 import { Jobcatagory } from "@/components/sharedcomponents/Jobs/Jobcatagory";
+import { Jobindex } from "@/components/sharedcomponents/Jobs/Jobindex";
 import { Button } from "@/components/ui/button";
-import { GetAllJobs } from "@/lib/Actions/Jobs";
 import Link from "next/link";
 
 export default async function Jobs() {
-  const Jobs = await GetAllJobs();
   return (
     <div className="border border-black w-[50vw]">
       <div className="flex flex-row justify-between">
@@ -19,9 +17,7 @@ export default async function Jobs() {
           <Jobcatagory />
         </div>
         <div className="border border-black p-3">
-          {Jobs.data?.map((data) => {
-            return <Jobcard key={data.id} data={data} />;
-          })}
+          <Jobindex />
         </div>
       </div>
     </div>

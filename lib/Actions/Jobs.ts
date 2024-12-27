@@ -2,6 +2,7 @@
 import { CreateJobResponse, GetJobs, JobApp } from "@/types/Forms";
 import { prisma } from "../Prisma";
 import { CheckUser } from "./Users";
+import { JobCategory } from "@prisma/client";
 
 export async function CreateJobs(
   jobsAppData: JobApp,
@@ -42,13 +43,29 @@ export async function CreateJobs(
   }
 }
 
-export async function GetAllJobs(): Promise<GetJobs> {
+export async function GetAllJobs(filterData: string[]): Promise<GetJobs> {
   try {
-    const jobs = await prisma.jobApplication.findMany();
+    // Make sure to map the strings to JobCategory enum values if necessary
+    const jobCategories = filterData.map(
+      (category) => JobCategory[category as keyof typeof JobCategory],
+    );
+
+    // Now use the array in the Prisma query
+    const jobs = await prisma.jobApplication.findMany({
+      where:
+        jobCategories.length > 0
+          ? {
+              jobCategory: {
+                in: jobCategories, // Pass array of enum values
+              },
+            }
+          : {},
+    });
+
     if (!jobs) {
       return {
         status: 404,
-        message: "job isn't found!",
+        message: "No job add the moment!",
       };
     }
     return {
