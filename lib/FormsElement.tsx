@@ -32,7 +32,7 @@ export function InputFormField({ form, name, label, placeholder }: FormProps) {
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="text-black">{label}</FormLabel>
           <FormControl>
             <Input placeholder={`${placeholder}...`} {...field} />
           </FormControl>
@@ -91,7 +91,7 @@ export function MultiValueInputField({
         name={name}
         render={({}) => (
           <FormItem>
-            <FormLabel>{label}</FormLabel>
+            <FormLabel className="text-black">{label}</FormLabel>
             <FormControl>
               <Input
                 placeholder={`${placeholder}...`}
@@ -106,7 +106,7 @@ export function MultiValueInputField({
           </FormItem>
         )}
       />
-      <div className="m-3 border border-black  flex flex-row flex-wrap gap-2">
+      <div className="md:m-3 shadow-md border border-gray-300 flex flex-row flex-wrap">
         {lang.map((data) => (
           <div
             key={data}
@@ -129,7 +129,7 @@ export function TextAreaForm({ form, name, label, placeholder }: FormProps) {
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="text-black">{label}</FormLabel>
           <FormControl>
             <Textarea placeholder={`${placeholder}`} {...field} />
           </FormControl>
@@ -156,7 +156,7 @@ export function SelectFormInput({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="text-black">{label}</FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger>

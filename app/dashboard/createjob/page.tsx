@@ -35,8 +35,8 @@ export default async function page() {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="border border-black flex justify-center">
-        <div>
+      <div className="flex justify-center">
+        <div className=" p-5 rounded-lg shadow-xl m-5 ">
           <CreateJobForm userEmail={email} userId={id} />
         </div>
       </div>

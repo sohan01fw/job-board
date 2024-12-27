@@ -15,7 +15,7 @@ import {
   MultiValueInputField,
   SelectFormInput,
   TextAreaForm,
-} from "@/lib/Forms";
+} from "@/lib/FormsElement";
 import {
   genderTypeArr,
   jobCatagoryArr,
@@ -26,6 +26,8 @@ import { CreateJobs } from "@/lib/Actions/Jobs";
 import useExportHooks from "@/lib/Hooks/useExportHooks";
 import { ToastAction } from "@/components/ui/toast";
 import { JobApp } from "@/types/Forms";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 export function CreateJobForm({
   userEmail,
   userId,
@@ -34,31 +36,35 @@ export function CreateJobForm({
   userId: string;
 }) {
   const { router, toast } = useExportHooks();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof jobCreateSchema>>({
     resolver: zodResolver(jobCreateSchema),
     defaultValues: {
       title: "",
       desc: "",
-      jobCategory: "IT",
-      jobLoc: "REMOTE",
-      jobType: "FULLTIME",
+      jobCategory: undefined,
+      jobLoc: undefined,
+      jobType: undefined,
       joblimit: 0,
       requirements: [],
       salary: 0,
-      gender: "MALE",
+      gender: undefined,
       Links: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof jobCreateSchema>) {
+    setLoading(true);
     const res = await CreateJobs(values as JobApp, userEmail, userId);
     if (!res?.error) {
+      setLoading(false);
       toast({
         title: "Successfully Create a job Application",
       });
       router.back();
     } else {
+      setLoading(false);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -137,7 +143,14 @@ export function CreateJobForm({
           name="Links"
           placeholder="Add a site link"
         />
-        <Button type="submit">Submit</Button>
+        {loading ? (
+          <Button disabled>
+            <Loader2 className="animate-spin" />
+            Please wait
+          </Button>
+        ) : (
+          <Button type="submit">Submit</Button>
+        )}
       </form>
     </Form>
   );

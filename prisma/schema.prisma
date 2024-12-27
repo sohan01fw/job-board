@@ -57,7 +57,7 @@ model JobApplication {
   desc         String
   requirements String[]
   salary       Int?
-  joblimit     Int?        @default(99)
+  joblimit     Int?
   jobType      JobType
   jobLoc       JobLoc
   links        String?
