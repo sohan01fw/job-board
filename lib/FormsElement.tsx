@@ -95,7 +95,7 @@ export function MultiValueInputField({
             <FormControl>
               <Input
                 placeholder={`${placeholder}...`}
-                value={valueArr.join(", ")} // Display array as a comma-separated string
+                value={valueArr.join(" ")} // Display array as a comma-separated string
                 onChange={(e) => {
                   const changeValue = e.target.value.split(", ");
                   setValueArr(changeValue); // Update local state
@@ -113,7 +113,9 @@ export function MultiValueInputField({
             className="cursor-pointer p-5"
             onClick={() => handlePushData(data)}
           >
-            <div className=" p-1 pl-2 pr-2 rounded-lg bg-black text-white font-semibold text-sm cursor-pointer">
+            <div
+              className={`p-1 pl-2 pr-2 rounded-lg bg-black text-white font-semibold text-sm cursor-pointer`}
+            >
               {data} +
             </div>
           </div>

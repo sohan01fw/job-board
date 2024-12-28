@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/form";
 import { jobCatagoryFormSchema } from "@/lib/zod/Form";
 import { useCatagoryStore } from "@/lib/Stores/CatagoryStore";
+import { useState } from "react";
+import { LoadingBtn } from "@/lib/ui";
 
 const items = [
   {
@@ -34,7 +36,9 @@ const items = [
 ] as const;
 
 export function Jobcatagory() {
-  const { addCatagory } = useCatagoryStore();
+  const { addCatagory, category } = useCatagoryStore();
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof jobCatagoryFormSchema>>({
     resolver: zodResolver(jobCatagoryFormSchema),
     defaultValues: {
@@ -43,7 +47,9 @@ export function Jobcatagory() {
   });
 
   function onSubmit(data: z.infer<typeof jobCatagoryFormSchema>) {
+    setLoading(true);
     addCatagory(data.items);
+    setLoading(false);
   }
 
   return (
@@ -55,10 +61,7 @@ export function Jobcatagory() {
           render={() => (
             <FormItem>
               <div className="mb-4">
-                <FormLabel className="text-base">Sidebar</FormLabel>
-                <FormDescription>
-                  Select the items you want to display in the sidebar.
-                </FormDescription>
+                <FormLabel className="text-base">Select filter</FormLabel>
               </div>
               {items.map((item) => (
                 <FormField
@@ -73,7 +76,10 @@ export function Jobcatagory() {
                       >
                         <FormControl>
                           <Checkbox
-                            checked={field.value?.includes(item.id)}
+                            checked={
+                              field.value?.includes(item.id) ||
+                              category.includes(item.id)
+                            }
                             onCheckedChange={(checked) => {
                               return checked
                                 ? field.onChange([...field.value, item.id])
@@ -97,7 +103,7 @@ export function Jobcatagory() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        {loading ? <LoadingBtn /> : <Button type="submit">Submit</Button>}
       </form>
     </Form>
   );

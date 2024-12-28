@@ -6,34 +6,57 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Applybtn } from "@/lib/ui";
 import { JobData } from "@/types/Forms";
 
-export function Jobcard({ data }: { data: JobData }) {
+export function Jobcard({
+  data,
+  showbtn,
+}: {
+  data: JobData;
+  showbtn: boolean;
+}) {
   return (
     <div className="">
-      <Card className="">
+      <Card className="relative">
+        {showbtn && (
+          <div className="absolute right-0">
+            <Applybtn id={data.id} />
+          </div>
+        )}
         <CardHeader>
           <CardTitle>{data.title}</CardTitle>
           <CardDescription>{data.desc}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p>{data.requirements}</p>
-          <p>Rs.{data.salary}</p>
+          <div className="flex flex-row flex-wrap gap-2 ">
+            {data.requirements.map((data) => (
+              <div
+                key={data}
+                className="rounded-lg shadow-md bg-teal-200/30 font-semibold p-1"
+              >
+                {data}
+              </div>
+            ))}
+          </div>
+          <p className="font-semibold mt-5">Salary:Rs.{data.salary}</p>
         </CardContent>
         <CardFooter>
-          <p>No.of seat: {data.joblimit}</p>
+          <p className="font-medium">No.of seat: {data.joblimit}</p>
         </CardFooter>
-        <CardContent>
-          <p>{data.jobType}</p>
+        <CardContent className="flex flex-row flex-wrap  gap-2 font-bold text-sm">
+          <p className="bg-yellow-300 p-1 rounded-lg shadow-md text-gray-700">
+            {data.jobType}
+          </p>
+          <p className="bg-yellow-300 p-1 rounded-lg shadow-md text-gray-700">
+            {data.jobLoc}
+          </p>
+          <p className="bg-yellow-300 p-1 rounded-lg shadow-md text-gray-700">
+            {data.jobCategory}
+          </p>
         </CardContent>
         <CardContent>
-          <p>{data.jobLoc}</p>
-        </CardContent>
-        <CardContent>
-          <p>{data.jobCategory}</p>
-        </CardContent>
-        <CardContent>
-          <p>No.of applicant applied: {data.applied}</p>
+          <p className="font-medium">No.of applicant applied: {data.applied}</p>
         </CardContent>
       </Card>
     </div>

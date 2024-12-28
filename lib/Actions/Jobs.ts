@@ -60,6 +60,10 @@ export async function GetAllJobs(filterData: string[]): Promise<GetJobs> {
               },
             }
           : {},
+
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     if (!jobs) {

@@ -57,3 +57,10 @@
         @apply font-sans antialiased bg-background text-foreground;
     }
 }
+
+body::-webkit-scrollbar {
+    display: none;
+}
+.jobindex::-webkit-scrollbar {
+    display: none;
+}

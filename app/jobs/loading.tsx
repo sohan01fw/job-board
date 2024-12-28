@@ -1,3 +1,9 @@
+import { LoadingUi } from "@/lib/LoadingUi";
+
 export default function loading() {
-  return <div> loading.... </div>;
+  return (
+    <div>
+      <LoadingUi />
+    </div>
+  );
 }

@@ -11,6 +11,11 @@ export default function RootLayout({
 }>) {
   return (
     <div lang="en">
+      <div>
+        <div className="m-10">
+          <h1 className="text-4xl font-bold ">Welcome,Applicant</h1>
+        </div>
+      </div>
       <div>{children}</div>
     </div>
   );

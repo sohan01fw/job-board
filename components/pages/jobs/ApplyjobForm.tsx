@@ -49,7 +49,6 @@ export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
       values as ApplyJobSchemaType,
       jobAppId as string,
     );
-    console.log(postformres);
     if (!postformres?.error) {
       toast({
         title: "Successfully applied for a job Application",
@@ -68,7 +67,7 @@ export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8  w-96">
         <InputFormField
           form={form}
           label="fname"

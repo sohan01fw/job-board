@@ -7,7 +7,7 @@ export default async function page({
 }) {
   const id = (await params).jobappid;
   return (
-    <div className="w-60 m-10">
+    <div className="w-full m-10 flex justify-center">
       <ApplyJobForm jobAppId={id} />
     </div>
   );
