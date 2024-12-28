@@ -5,7 +5,13 @@ import { useCatagoryStore } from "@/lib/Stores/CatagoryStore";
 import { useEffect, useState } from "react";
 import { Jobcard } from "./Jobcard";
 import { LoadingUi } from "@/lib/LoadingUi";
-export function Jobindex({ showbtn }: { showbtn: boolean }) {
+export function Jobindex({
+  showbtn,
+  delcard,
+}: {
+  showbtn: boolean;
+  delcard: boolean;
+}) {
   const [Jobs, setJobs] = useState<object | undefined>(undefined);
   const { category } = useCatagoryStore();
   const [loading, setLoading] = useState(true);
@@ -25,6 +31,7 @@ export function Jobindex({ showbtn }: { showbtn: boolean }) {
     return <LoadingUi />;
   }
 
+  /* @ts-ignore */
   if (Jobs?.data.length <= 0) {
     return (
       <div className="text-center w-[30vw]">
@@ -37,7 +44,12 @@ export function Jobindex({ showbtn }: { showbtn: boolean }) {
       {/* @ts-ignore */}
       {Jobs?.data.map((data) => {
         return (
-          <Jobcard key={data.id} data={data} showbtn={showbtn} delcard={true} />
+          <Jobcard
+            key={data.id}
+            data={data}
+            showbtn={showbtn}
+            delcard={delcard}
+          />
         );
       })}
     </div>

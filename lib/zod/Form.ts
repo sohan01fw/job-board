@@ -13,9 +13,8 @@ export const jobCreateSchema = z.object({
     .min(20, { message: "Description at least 20 characters long" }),
 
   requirements: z
-    .array(z.string().min(1)) // ensures that the array contains non-empty strings
-    .max(7, { message: "You can select up to 7 requirements only." })
-    .min(2, { message: "required" }),
+    .array(z.string()) // ensures that the array contains non-empty strings
+    .max(7, { message: "You can select up to 7 requirements only." }),
 
   salary: z.number().optional(),
   joblimit: z.number().max(100),

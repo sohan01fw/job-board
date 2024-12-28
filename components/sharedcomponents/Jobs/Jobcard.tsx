@@ -27,10 +27,12 @@ export function Jobcard({
             <Applybtn id={data.id} />
           </div>
         )}
-        <CardHeader className="relative">
-          <div className="absolute right-0 m-1 mr-2 top-0 border  min-w-5 rounded-full">
-            <Deletepop jobId={data.id} />
-          </div>
+        <CardHeader className={`${delcard && "relative"}`}>
+          {delcard && (
+            <div className=" absolute right-0 m-1 mr-2 top-0 border  min-w-5 rounded-full">
+              <Deletepop jobId={data.id} />
+            </div>
+          )}
           <CardTitle>{data.title}</CardTitle>
           <CardDescription>{data.desc}</CardDescription>
         </CardHeader>

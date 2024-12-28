@@ -6,12 +6,15 @@ import { GetAllFile, uploadFile } from "./FileAction";
 export async function UpdateJobApplicationAppplied(jobAppId: string) {
   try {
     let inc = 1;
+    const appliedValue = await prisma.jobApplication.aggregate({
+      _sum: { applied: true },
+    });
     const jobForm = await prisma.jobApplication.update({
       where: {
         id: jobAppId,
       },
       data: {
-        applied: inc++,
+        applied: (appliedValue._sum.applied || 0) + inc,
       },
     });
     return { error: false, ...jobForm };

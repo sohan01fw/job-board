@@ -28,8 +28,11 @@ import useExportHooks from "@/lib/Hooks/useExportHooks";
 import { ToastAction } from "@/components/ui/toast";
 import { PostJobsForm } from "@/lib/Actions/JobForm";
 import { ApplyJobSchemaType } from "@/types/Forms";
+import { useState } from "react";
+import { LoadingBtn } from "@/lib/ui";
 export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
   const { router, toast } = useExportHooks();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof applyJobSchema>>({
     resolver: zodResolver(applyJobSchema),
@@ -45,16 +48,19 @@ export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
   });
 
   async function onSubmit(values: z.infer<typeof applyJobSchema>) {
+    setLoading(true);
     const postformres = await PostJobsForm(
       values as ApplyJobSchemaType,
       jobAppId as string,
     );
     if (!postformres?.error) {
+      setLoading(false);
       toast({
         title: "Successfully applied for a job Application",
       });
       router.back();
     } else {
+      setLoading(false);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -101,7 +107,7 @@ export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
           name="age"
           placeholder="Enter your age"
         />
-        <Button type="submit">Submit</Button>
+        {loading ? <LoadingBtn /> : <Button type="submit">Submit</Button>}
       </form>
     </Form>
   );

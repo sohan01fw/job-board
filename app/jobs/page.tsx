@@ -5,7 +5,6 @@ export const dynamic = "force-dynamic";
 export default async function Jobs() {
   const category = ["IT"];
   const Jobs = await GetAllJobs(category);
-  console.log(Jobs);
   return (
     <div>
       <div className="m-10 mt-[-2rem]">
@@ -21,7 +20,7 @@ export default async function Jobs() {
               <Jobcatagory />
             </div>
             <div>
-              <Jobindex showbtn={true} />
+              <Jobindex showbtn={true} delcard={false} />
             </div>
           </div>
         </div>
