@@ -3,6 +3,8 @@ import { CreateJobResponse, GetJobs, JobApp } from "@/types/Forms";
 import { prisma } from "../Prisma";
 import { CheckUser } from "./Users";
 import { JobCategory } from "@prisma/client";
+import { Pi } from "lucide-react";
+import { revalidateTag } from "next/cache";
 
 export async function CreateJobs(
   jobsAppData: JobApp,
@@ -28,6 +30,7 @@ export async function CreateJobs(
         salary: jobsAppData.salary ?? 0,
         requirements: jobsAppData.requirements || [],
         links: jobsAppData.Links || null,
+        joblimit: jobsAppData.joblimit,
         userId,
       },
     });
@@ -69,7 +72,7 @@ export async function GetAllJobs(filterData: string[]): Promise<GetJobs> {
     if (!jobs) {
       return {
         status: 404,
-        message: "No job add the moment!",
+        message: "No job at the moment!",
       };
     }
     return {
@@ -81,5 +84,32 @@ export async function GetAllJobs(filterData: string[]): Promise<GetJobs> {
       message: "unexpected error while finding jobs",
       status: 500,
     };
+  }
+}
+
+export async function DeleteJobs(jobId: string): Promise<CreateJobResponse> {
+  try {
+    const jobs = await prisma.jobApplication.delete({
+      where: {
+        id: jobId,
+      },
+    });
+    if (!jobs) {
+      return {
+        error: true,
+        message: "problem in deleting job",
+      };
+    }
+
+    revalidateTag("/dashboard/jobs");
+    return { error: false, ...jobs };
+  } catch (error) {
+    if (error) {
+      console.log(error);
+      return {
+        error: true,
+        message: "Unexpected Error occur while deleting job application",
+      };
+    }
   }
 }

@@ -6,13 +6,14 @@ import { useEffect, useState } from "react";
 import { Jobcard } from "./Jobcard";
 import { LoadingUi } from "@/lib/LoadingUi";
 export function Jobindex({ showbtn }: { showbtn: boolean }) {
-  const [Jobs, setJobs] = useState<object>();
+  const [Jobs, setJobs] = useState<object | undefined>(undefined);
   const { category } = useCatagoryStore();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const getAlljobsData = async () => {
     setLoading(true);
     const JobRes = await GetAllJobs(category);
+
     setJobs(JobRes);
     setLoading(false);
   };
@@ -23,11 +24,21 @@ export function Jobindex({ showbtn }: { showbtn: boolean }) {
   if (loading) {
     return <LoadingUi />;
   }
+
+  if (Jobs?.data.length <= 0) {
+    return (
+      <div className="text-center w-[30vw]">
+        <h1 className="font-bold text-xl">No Job at the moment... </h1>
+      </div>
+    );
+  }
   return (
-    <div className="p-3 h-[30rem] overflow-y-scroll jobindex">
+    <div className="p-3  h-[30rem] overflow-y-scroll jobindex overflow-x-auto">
       {/* @ts-ignore */}
       {Jobs?.data.map((data) => {
-        return <Jobcard key={data.id} data={data} showbtn />;
+        return (
+          <Jobcard key={data.id} data={data} showbtn={showbtn} delcard={true} />
+        );
       })}
     </div>
   );

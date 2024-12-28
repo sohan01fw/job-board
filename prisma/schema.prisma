@@ -48,7 +48,7 @@ model JobForm {
   socialLinks      String[]       @default([])
   createdAt        DateTime       @default(now())
   jobApplicationId String
-  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id])
+  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
 }
 
 model JobApplication {

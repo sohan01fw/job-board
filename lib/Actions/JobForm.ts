@@ -3,6 +3,29 @@ import { ApplyJobSchemaType } from "@/types/Forms";
 import { prisma } from "../Prisma";
 import { GetAllFile, uploadFile } from "./FileAction";
 
+export async function UpdateJobApplicationAppplied(jobAppId: string) {
+  try {
+    let inc = 1;
+    const jobForm = await prisma.jobApplication.update({
+      where: {
+        id: jobAppId,
+      },
+      data: {
+        applied: inc++,
+      },
+    });
+    return { error: false, ...jobForm };
+  } catch (error) {
+    if (error) {
+      console.log(error);
+      return {
+        error: true,
+        message: "Error while posting jobs application",
+      };
+    }
+  }
+}
+
 export async function PostJobsForm(
   jobsFormData: ApplyJobSchemaType,
   jobFormId: string,
@@ -32,14 +55,14 @@ export async function PostJobsForm(
         jobApplicationId: jobFormId,
       },
     });
-    console.log(jobForm);
+    await UpdateJobApplicationAppplied(jobFormId);
     return { error: false, ...jobForm };
   } catch (error) {
     if (error) {
       console.log(error);
       return {
         error: true,
-        message: "Error while posting jobs application",
+        message: "Error while creating job form",
       };
     }
   }

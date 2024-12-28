@@ -1,3 +1,4 @@
+import { Deletepop } from "@/components/pages/dashboard/Deletepop";
 import {
   Card,
   CardContent,
@@ -12,19 +13,24 @@ import { JobData } from "@/types/Forms";
 export function Jobcard({
   data,
   showbtn,
+  delcard,
 }: {
   data: JobData;
   showbtn: boolean;
+  delcard: boolean;
 }) {
   return (
-    <div className="">
+    <div className="min-w-40">
       <Card className="relative">
         {showbtn && (
           <div className="absolute right-0">
             <Applybtn id={data.id} />
           </div>
         )}
-        <CardHeader>
+        <CardHeader className="relative">
+          <div className="absolute right-0 m-1 mr-2 top-0 border  min-w-5 rounded-full">
+            <Deletepop jobId={data.id} />
+          </div>
           <CardTitle>{data.title}</CardTitle>
           <CardDescription>{data.desc}</CardDescription>
         </CardHeader>
