@@ -5,7 +5,7 @@ import { GetAllFile, uploadFile } from "./FileAction";
 
 export async function UpdateJobApplicationAppplied(jobAppId: string) {
   try {
-    let inc = 1;
+    const inc = 1;
     const appliedValue = await prisma.jobApplication.aggregate({
       _sum: { applied: true },
     });

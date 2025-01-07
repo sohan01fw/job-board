@@ -26,7 +26,7 @@ import { CreateJobs } from "@/lib/Actions/Jobs";
 import useExportHooks from "@/lib/Hooks/useExportHooks";
 import { ToastAction } from "@/components/ui/toast";
 import { JobApp } from "@/types/Forms";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 export function CreateJobForm({
   userEmail,

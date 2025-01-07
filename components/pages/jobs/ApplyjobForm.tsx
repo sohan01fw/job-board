@@ -13,17 +13,10 @@ import {
   ImageInputForm,
   InputFormField,
   InputNumberField,
-  MultiValueInputField,
   SelectFormInput,
   TextAreaForm,
 } from "@/lib/FormsElement";
-import {
-  genderTypeArr,
-  jobCatagoryArr,
-  jobLocArr,
-  jobTypeArr,
-} from "@/lib/data";
-import { CreateJobs } from "@/lib/Actions/Jobs";
+import { genderTypeArr } from "@/lib/data";
 import useExportHooks from "@/lib/Hooks/useExportHooks";
 import { ToastAction } from "@/components/ui/toast";
 import { PostJobsForm } from "@/lib/Actions/JobForm";

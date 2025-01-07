@@ -1,3 +1,4 @@
+"use server";
 import { funcResponse } from "@/types/global";
 import { supabase } from "../supabase/supabase_client";
 
@@ -14,7 +15,7 @@ export async function SetupBucket(bucketname: string) {
     //check the bucket exist or not
     const checkBuckets = await checkBucket(bucketname);
     if (checkBuckets) {
-      return;
+      return null;
     }
     // Create the bucket
     const { data, error } = await supabase.storage.createBucket(bucketname, {
@@ -51,6 +52,7 @@ export async function uploadFile(
     //check imagefile present or not
     if (imageFile === undefined) {
       return {
+        data: false,
         error: true,
         message: "imagefile is undefined",
         status: 400,
@@ -82,6 +84,7 @@ export async function uploadFile(
 
       if (error) {
         return {
+          data: false,
           error: true,
           message: "File failed to upload",
           status: 400,
@@ -103,6 +106,7 @@ export async function uploadFile(
 
     if (error) {
       return {
+        data: false,
         error: true,
         message: "File update failed",
         status: 400,
@@ -117,6 +121,7 @@ export async function uploadFile(
   } catch (error) {
     console.error(error);
     return {
+      data: false,
       message: "Unexpected error occurred while uploading file",
       error: true,
       status: 500,

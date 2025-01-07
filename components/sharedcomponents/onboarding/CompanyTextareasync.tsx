@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { ZodError } from "zod";
 import { inputschema } from "@/lib/zod/global";
 import { debounce } from "@/lib/debounce";
-import { companyInfo } from "@/types/Forms";
 import { Textarea } from "@/components/ui/textarea";
 
 export const CompanyTextareasync = ({

@@ -8,6 +8,8 @@ import {
   TotalJobCount,
 } from "@/lib/Actions/AggregateData";
 
+export const dynamic = "force-dynamic";
+
 export default async function Overview() {
   //for jobs
   const allJob = await TotalJobCount();
@@ -15,14 +17,17 @@ export default async function Overview() {
     alert(allJob.message);
   }
 
-  const totaljobs = allJob.data.reduce((a, c) => a + (c?._count?.id || 0), 0);
+  const totaljobs = allJob.data.reduce(
+    (a: any, c: any) => a + (c?._count?.id || 0),
+    0,
+  );
   //for applicant
   const allApplicant = await TotalApplicantCount();
   if ("error" in allApplicant) {
     alert(allApplicant.message);
   }
   const totalApplicant = allApplicant.data.reduce(
-    (a, c) => a + (c?._sum.applied || 0),
+    (a: any, c: any) => a + (c?._sum.applied || 0),
     0,
   );
   return (
@@ -39,7 +44,7 @@ export default async function Overview() {
         </div>
       </div>
       <div className="m-5 mt-3">
-        <DataChart applicant={totalApplicant} jobs={totaljobs} />
+        <DataChart />
       </div>
     </div>
   );

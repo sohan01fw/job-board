@@ -1,25 +1,16 @@
 "use client";
-import JobApplication from "@/app/dashboard/job-applications/page";
-import Jobs from "@/app/dashboard/jobs/page";
-import Overview from "@/app/dashboard/overview/page";
-import Settings from "@/app/dashboard/setting/page";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SignOut } from "@/lib/ui";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 export default function Mainpage() {
   const pathname = usePathname();
   const pathArr = pathname.split("/");
-  const pathValue = pathArr[pathArr.length - 1];
-  console.log(pathValue);
+  const pathValue: string = pathArr[pathArr.length - 1];
+  const pathValueArr = ["overview", "jobs", "job-applications", "setting"];
   return (
     <div className="m-2">
       <Tabs
-        defaultValue={
-          pathValue === "overview" || "jobs" || "job-applications" || "setting"
-            ? pathValue
-            : ""
-        }
+        defaultValue={pathValueArr.includes(pathValue) ? pathValue : ""}
         className=""
       >
         <TabsList className="">

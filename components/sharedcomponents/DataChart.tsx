@@ -29,11 +29,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-interface datachart {
-  jobs: number;
-  applicant: number;
-}
-export function DataChart({ applicant, jobs }: datachart) {
+export function DataChart() {
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-[40rem]">
       <BarChart accessibilityLayer data={chartData}>

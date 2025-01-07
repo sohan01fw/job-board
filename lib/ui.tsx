@@ -9,8 +9,8 @@ import { redirect } from "next/navigation";
 import useExportHooks from "./Hooks/useExportHooks";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { DeleteJobs } from "./Actions/Jobs";
-import { revalidateTag } from "next/cache";
-export function LoadingBtn() {
+import { JSX } from "react/jsx-runtime";
+export function LoadingBtn(): JSX.Element {
   return (
     <Button disabled className="m-2">
       <Loader2 className="animate-spin" />
@@ -18,7 +18,7 @@ export function LoadingBtn() {
     </Button>
   );
 }
-export function GoogleButtonIcon() {
+export function GoogleButtonIcon(): JSX.Element {
   return (
     <Button className="w-full">
       <Image src={GoogleIcon} alt="google_logo" height={10} width={20} />
@@ -26,7 +26,7 @@ export function GoogleButtonIcon() {
     </Button>
   );
 }
-export function SignOut() {
+export function SignOut(): JSX.Element {
   async function signOut() {
     const { error }: { error: AuthError | null } =
       await supabase.auth.signOut();
@@ -39,7 +39,7 @@ export function SignOut() {
   return <Button onClick={signOut}>logOut</Button>;
 }
 
-export function Applybtn({ id }: { id: string }) {
+export function Applybtn({ id }: { id: string }): JSX.Element {
   const { router } = useExportHooks();
   async function apply() {
     return router.push(`/jobs/applyjob/${id}`);
@@ -47,7 +47,7 @@ export function Applybtn({ id }: { id: string }) {
   return <Button onClick={apply}>Apply</Button>;
 }
 
-export function DeleteJobbtn({ id }: { id: string }) {
+export function DeleteJobbtn({ id }: { id: string }): JSX.Element {
   async function handleDeleteJob() {
     const delJob = await DeleteJobs(id);
     if (delJob?.error === true) {

@@ -1,5 +1,4 @@
 import { supabase } from "./supabase/supabase_client";
-import Login from "@/components/pages/auth/Login";
 import { authUser, CheckUser } from "@/lib/Actions/Users";
 import { redirect } from "next/navigation";
 

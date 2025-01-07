@@ -1,10 +1,7 @@
 import { Jobcatagory } from "@/components/sharedcomponents/Jobs/Jobcatagory";
 import { Jobindex } from "@/components/sharedcomponents/Jobs/Jobindex";
-import { GetAllJobs } from "@/lib/Actions/Jobs";
 export const dynamic = "force-dynamic";
 export default async function Jobs() {
-  const category = ["IT"];
-  const Jobs = await GetAllJobs(category);
   return (
     <div>
       <div className="m-10 mt-[-2rem]">

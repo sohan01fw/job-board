@@ -1,7 +1,6 @@
 "use server";
 import { funcResponse } from "@/types/global";
 import { prisma } from "../Prisma";
-import { JobCategory } from "@prisma/client";
 
 export async function TotalJobCount(): Promise<funcResponse> {
   try {

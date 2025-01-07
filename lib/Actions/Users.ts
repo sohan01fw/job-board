@@ -1,6 +1,6 @@
 "use server";
 
-import { CheckUserData, DataError, User } from "@/types/Forms";
+import { User } from "@/types/Forms";
 import { prisma } from "../Prisma";
 import { createClient } from "../supabase/supabase_server";
 import { funcResponse } from "@/types/global";
@@ -23,6 +23,7 @@ export async function CheckUser(userEmail: string): Promise<funcResponse> {
 
     if (!checkUser) {
       return {
+        data: false,
         error: true,
         message: "user not found",
         status: 404,
@@ -42,6 +43,7 @@ export async function CheckUser(userEmail: string): Promise<funcResponse> {
   } catch (error) {
     console.log(error);
     return {
+      data: false,
       error: true,
       message: "Error while check the user",
       status: 500,
@@ -78,6 +80,7 @@ export async function CreateUser(user: User): Promise<funcResponse> {
   } catch (error) {
     console.log("error while creating new user", error);
     return {
+      data: false,
       error: true,
       message: "Unexpected error occur creating user",
       status: 500,
@@ -95,6 +98,7 @@ export async function UpdateUserProfile(
     const checkUser = await CheckUser(email);
     if ("error" in checkUser) {
       return {
+        data: false,
         error: checkUser.error,
         message: checkUser.message,
         status: checkUser.status,
@@ -109,6 +113,7 @@ export async function UpdateUserProfile(
     // If no valid data is provided to update, return an error
     if (Object.keys(updateData).length === 0) {
       return {
+        data: false,
         error: true,
         message: "No valid data provided for update",
         status: 400,
@@ -131,6 +136,7 @@ export async function UpdateUserProfile(
   } catch (error) {
     console.log("Unexpected error:", error);
     return {
+      data: false,
       error: true,
       message: "Unexpected error occurred",
       status: 500,

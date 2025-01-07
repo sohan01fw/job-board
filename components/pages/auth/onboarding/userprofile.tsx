@@ -1,21 +1,15 @@
-import { DataError, User } from "@/types/Forms";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Imagesync } from "@/components/sharedcomponents/onboarding/Imagesync";
 import { Inputsync } from "@/components/sharedcomponents/onboarding/Inputsync";
-import { redirect } from "next/navigation";
-import { CheckUser, UpdateUserProfile } from "@/lib/Actions/Users";
-import { funcResponse } from "@/types/global";
+import { CheckUser } from "@/lib/Actions/Users";
 export async function UserProfile({
   emailValue,
 }: {

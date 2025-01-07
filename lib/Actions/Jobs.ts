@@ -3,7 +3,6 @@ import { CreateJobResponse, GetJobs, JobApp } from "@/types/Forms";
 import { prisma } from "../Prisma";
 import { CheckUser } from "./Users";
 import { JobCategory } from "@prisma/client";
-import { Pi } from "lucide-react";
 import { revalidateTag } from "next/cache";
 
 export async function CreateJobs(
@@ -109,6 +108,36 @@ export async function DeleteJobs(jobId: string): Promise<CreateJobResponse> {
       return {
         error: true,
         message: "Unexpected Error occur while deleting job application",
+      };
+    }
+  }
+}
+
+//get jobs for specific id
+export async function getJobsFromId(jobId: string): Promise<CreateJobResponse> {
+  try {
+    const jobs = await prisma.jobApplication.findUnique({
+      where: {
+        id: jobId,
+      },
+      include: {
+        jobForm: true,
+      },
+    });
+    if (!jobs) {
+      return {
+        error: true,
+        message: "problem in finding job",
+      };
+    }
+
+    return { error: false, ...jobs };
+  } catch (error) {
+    if (error) {
+      console.log(error);
+      return {
+        error: true,
+        message: "Unexpected Error occur while job job application",
       };
     }
   }

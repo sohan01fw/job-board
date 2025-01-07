@@ -89,7 +89,7 @@ export function MultiValueInputField({
       <FormField
         control={form.control}
         name={name}
-        render={({}) => (
+        render={() => (
           <FormItem>
             <FormLabel className="text-black">{label}</FormLabel>
             <FormControl>
@@ -182,7 +182,15 @@ export function SelectFormInput({
   );
 }
 
-export function ImageInputForm({ form, name, label }) {
+export function ImageInputForm({
+  form,
+  name,
+  label,
+}: {
+  form: any;
+  name: string;
+  label: string;
+}) {
   return (
     <FormField
       control={form.control}

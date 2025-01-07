@@ -31,7 +31,7 @@ export function Jobindex({
     return <LoadingUi />;
   }
 
-  /* @ts-ignore */
+  /* @ts-expect-error:there might not be the value in jobs.data */
   if (Jobs?.data.length <= 0) {
     return (
       <div className="text-center w-[30vw]">
@@ -41,7 +41,7 @@ export function Jobindex({
   }
   return (
     <div className="p-3  h-[30rem] overflow-y-scroll jobindex overflow-x-auto">
-      {/* @ts-ignore */}
+      {/* @ts-expect-error:there might not be the value in jobs.data */}
       {Jobs?.data.map((data) => {
         return (
           <Jobcard

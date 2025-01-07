@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DeleteJobbtn } from "@/lib/ui";
+import Link from "next/link";
 export function Deletepop({ jobId }: { jobId: string }) {
   return (
     <DropdownMenu>
@@ -14,11 +15,11 @@ export function Deletepop({ jobId }: { jobId: string }) {
         :
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>Job Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuItem>Billing</DropdownMenuItem>
-        <DropdownMenuItem>Team</DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link href={`/dashboard/jobs/${jobId}`}>Applicants</Link>
+        </DropdownMenuItem>
         <DeleteJobbtn id={jobId} />
       </DropdownMenuContent>
     </DropdownMenu>

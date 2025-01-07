@@ -2,16 +2,18 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TotalJobCount } from "@/lib/Actions/AggregateData";
-import { Label } from "../ui/label";
 
 interface TotalJobCard {
   allJob: object;
   totalJob: number;
+}
+interface Data {
+  jobCategory: string;
+  _count: { id: string };
+  _sum: { applied: string };
 }
 
 export async function DataCard({ allJob, totalJob }: TotalJobCard) {
@@ -24,8 +26,8 @@ export async function DataCard({ allJob, totalJob }: TotalJobCard) {
             Jobs detail count
           </CardDescription>
         </CardHeader>
-        {/* @ts-ignore */}
-        {allJob?.data.map((data: any) => {
+        {/* @ts-expect-error: there might not be the value in alljob.data so becarefull */}
+        {allJob?.data.map((data: Data) => {
           return (
             <CardContent key={data.jobCategory} className="flex flex-row gap-2">
               <p>{data.jobCategory}:</p>
@@ -56,8 +58,8 @@ export async function ApplicantCard({
             Applicants detail count
           </CardDescription>
         </CardHeader>
-        {/* @ts-ignore */}
-        {allApplicant?.data.map((data: any) => {
+        {/* @ts-expect-error: there might not be the value in alljob.data so becarefull */}
+        {allApplicant?.data.map((data: Data) => {
           return (
             <CardContent key={data.jobCategory} className="flex flex-row gap-2">
               <p>{data.jobCategory}:</p>

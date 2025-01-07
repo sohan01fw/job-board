@@ -1,6 +1,6 @@
 import { UserCompany } from "@/components/pages/auth/onboarding/usercompany";
 import { CheckCompany } from "@/lib/Actions/Company";
-import { authUser, CheckUser } from "@/lib/Actions/Users";
+import { authUser } from "@/lib/Actions/Users";
 import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 export default async function page() {

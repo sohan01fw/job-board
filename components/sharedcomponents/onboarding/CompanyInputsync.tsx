@@ -5,7 +5,6 @@ import { ZodError } from "zod";
 import { inputschema } from "@/lib/zod/global";
 import { debounce } from "@/lib/debounce";
 import { Input } from "@/components/ui/input";
-import { companyInfo } from "@/types/Forms";
 
 export const CompanyInputsync = ({
   name,

@@ -17,7 +17,7 @@ export default async function Jobs() {
             <Jobcatagory />
           </div>
           <div className="p-3 h-[30rem] overflow-y-scroll jobindex">
-            <Jobindex showbtn={false} />
+            <Jobindex showbtn={false} delcard={true} />
           </div>
         </div>
       </div>

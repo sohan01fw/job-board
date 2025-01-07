@@ -21,7 +21,6 @@ export const Inputsync = ({
 }) => {
   const [inputValue, setInputValue] = useState<string | undefined>("");
   const [fieldErrorMsg, setFieldErrorMsg] = useState<string>("");
-  const [inputFocus, setInputFocus] = useState<boolean>(false);
   useEffect(() => {
     setInputValue(name);
   }, [name]);
