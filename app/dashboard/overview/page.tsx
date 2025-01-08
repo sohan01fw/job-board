@@ -7,6 +7,17 @@ import {
   TotalApplicantCount,
   TotalJobCount,
 } from "@/lib/Actions/AggregateData";
+import { Suspense } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -31,21 +42,64 @@ export default async function Overview() {
     0,
   );
   return (
-    <div>
-      <div className="flex flex-col md:flex-row gap-4 ">
-        <div>
+    <div className="container mx-auto p-6 space-y-6">
+      {/* <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1> */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Suspense fallback={<CardSkeleton />}>
           <DataCard totalJob={totaljobs} allJob={allJob} />
-        </div>
-        <div>
+        </Suspense>
+        <Suspense fallback={<CardSkeleton />}>
           <ApplicantCard
             totalApplicant={totalApplicant}
             allApplicant={allApplicant}
           />
+        </Suspense>
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Manage your job board efficiently</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-2">
+            <Link href="/dashboard/createjob">
+              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-2 rounded-md">
+                Post a New Job
+              </Button>
+            </Link>
+            <Link href="/dashboard/jobs">
+              <button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 py-2 rounded-md">
+                View Jobs Applications
+              </button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+      <Suspense fallback={<CardSkeleton className="h-[400px]" />}>
+        <div className="">
+          <h1 className="text-3xl font-bold tracking-tight">
+            Job Market Overview
+          </h1>
+          <span className="text-md  font-semibold text-gray-400">
+            Jan-June 2024
+          </span>
         </div>
-      </div>
-      <div className="m-5 mt-3">
         <DataChart />
-      </div>
+      </Suspense>
     </div>
+  );
+}
+
+function CardSkeleton({ className }: { className?: string }) {
+  return (
+    <Card className={className}>
+      <CardHeader>
+        <Skeleton className="h-8 w-[200px]" />
+        <Skeleton className="h-4 w-[300px]" />
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <Skeleton className="h-4 w-[250px]" />
+        <Skeleton className="h-4 w-[200px]" />
+        <Skeleton className="h-4 w-[150px]" />
+      </CardContent>
+    </Card>
   );
 }

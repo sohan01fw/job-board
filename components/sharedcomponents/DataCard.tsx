@@ -7,67 +7,98 @@ import {
 } from "@/components/ui/card";
 
 interface TotalJobCard {
-  allJob: object;
+  allJob: { data: JobData[] } | { error: string };
   totalJob: number;
 }
-interface Data {
+
+interface JobData {
   jobCategory: string;
-  _count: { id: string };
-  _sum: { applied: string };
+  _count: { id: number };
 }
 
-export async function DataCard({ allJob, totalJob }: TotalJobCard) {
-  return (
-    <div className="w-64">
+export function DataCard({ allJob, totalJob }: TotalJobCard) {
+  if ("error" in allJob) {
+    return (
       <Card>
         <CardHeader>
-          <CardTitle>Total Jobs: {totalJob}</CardTitle>
-          <CardDescription className="text-sm font-semibold">
-            Jobs detail count
-          </CardDescription>
+          <CardTitle>Error Loading Jobs</CardTitle>
+          <CardDescription>Please try again later</CardDescription>
         </CardHeader>
-        {/* @ts-expect-error: there might not be the value in alljob.data so becarefull */}
-        {allJob?.data.map((data: Data) => {
-          return (
-            <CardContent key={data.jobCategory} className="flex flex-row gap-2">
-              <p>{data.jobCategory}:</p>
-              <p>{data._count.id}</p>
-            </CardContent>
-          );
-        })}
       </Card>
-    </div>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">
+          Total Jobs: {totalJob}
+        </CardTitle>
+        <CardDescription>Jobs detail count</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2">
+          {allJob.data.map((data: JobData) => (
+            <li
+              key={data.jobCategory}
+              className="flex justify-between items-center"
+            >
+              <span className="text-sm font-medium">{data.jobCategory}:</span>
+              <span className="text-sm font-bold">{data._count.id}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
   );
 }
 
 interface TotalApplicantCard {
   totalApplicant: number;
-  allApplicant: object;
+  allApplicant: { data: ApplicantData[] } | { error: string };
 }
 
-export async function ApplicantCard({
+interface ApplicantData {
+  jobCategory: string;
+  _sum: { applied: number };
+}
+
+export function ApplicantCard({
   totalApplicant,
   allApplicant,
 }: TotalApplicantCard) {
-  return (
-    <div className="w-64">
+  if ("error" in allApplicant) {
+    return (
       <Card>
         <CardHeader>
-          <CardTitle>Total Applicants: {totalApplicant}</CardTitle>
-          <CardDescription className="text-sm font-semibold">
-            Applicants detail count
-          </CardDescription>
+          <CardTitle>Error Loading Applicants</CardTitle>
+          <CardDescription>Please try again later</CardDescription>
         </CardHeader>
-        {/* @ts-expect-error: there might not be the value in alljob.data so becarefull */}
-        {allApplicant?.data.map((data: Data) => {
-          return (
-            <CardContent key={data.jobCategory} className="flex flex-row gap-2">
-              <p>{data.jobCategory}:</p>
-              <p>{data._sum.applied}</p>
-            </CardContent>
-          );
-        })}
       </Card>
-    </div>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">
+          Total Applicants: {totalApplicant}
+        </CardTitle>
+        <CardDescription>Applicants detail count</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2">
+          {allApplicant.data.map((data: ApplicantData) => (
+            <li
+              key={data.jobCategory}
+              className="flex justify-between items-center"
+            >
+              <span className="text-sm font-medium">{data.jobCategory}:</span>
+              <span className="text-sm font-bold">{data._sum.applied}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
   );
 }

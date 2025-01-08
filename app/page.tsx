@@ -1,9 +1,9 @@
-import { RolePicker } from "@/components/pages/index/RolePicker";
+import { Navbar } from "@/components/pages/index/Navbar";
 
 export default async function Home() {
   return (
-    <div className="flex justify-center mt-40">
-      <RolePicker />
+    <div className="">
+      <Navbar />
     </div>
   );
 }

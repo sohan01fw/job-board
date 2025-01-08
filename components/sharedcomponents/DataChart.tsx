@@ -8,6 +8,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Card } from "../ui/card";
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -21,17 +22,20 @@ const chartData = [
 const chartConfig = {
   desktop: {
     label: "Jobs",
-    color: "#2563eb",
+    color: "#1F2937", // Charcoal black for elegance
   },
   mobile: {
     label: "Applicants",
-    color: "#60a5fa",
+    color: "#93C5FD", // Soft sky blue for a modern touch
   },
 } satisfies ChartConfig;
 
 export function DataChart() {
   return (
-    <ChartContainer config={chartConfig} className="min-h-[200px] w-[40rem]">
+    <ChartContainer
+      config={chartConfig}
+      className="min-h-[200px] w-[40rem] md:w-full md:h-[35rem]"
+    >
       <BarChart accessibilityLayer data={chartData}>
         <CartesianGrid vertical={false} />
         <XAxis

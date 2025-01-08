@@ -1,3 +1,4 @@
+import { DashNavbar } from "@/components/pages/dashboard/DashNavbar";
 import Mainpage from "@/components/pages/dashboard/Mainpage";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
@@ -14,9 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <div>
+      <DashNavbar />
       <div className="m-10">
         <div className="">
-          <h1 className="text-4xl font-bold">Dashboard</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
         </div>
         <div className="">
           <h1 className="text-sm font-semibold text-gray-400">Welcome,sohan</h1>

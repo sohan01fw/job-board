@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 export function AppliedJobForm({ jobform }: { jobform: any }) {
-  console.log(jobform);
   return (
     <div>
       {jobform.jobForm.map((data: any) => (

@@ -15,11 +15,13 @@ export default function Mainpage() {
       >
         <TabsList className="">
           <Link href="/dashboard/overview">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="overview" className="text-2xl m-10">
+              Overview
+            </TabsTrigger>
           </Link>
-          <Link href="/dashboard/jobs">
+          {/* <Link href="/dashboard/jobs">
             <TabsTrigger value="jobs">Jobs</TabsTrigger>
-          </Link>
+          </Link> */}
         </TabsList>
       </Tabs>
     </div>
