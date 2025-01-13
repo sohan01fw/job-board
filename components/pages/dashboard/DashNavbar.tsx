@@ -16,8 +16,7 @@ import {
 
 const navigation = [
   { name: "Find Jobs", href: "/jobs" },
-  { name: "Companies", href: "/companies" },
-  { name: "Resources", href: "/resources" },
+  { name: "Blogs", href: "/blogs" },
 ];
 
 export function DashNavbar() {

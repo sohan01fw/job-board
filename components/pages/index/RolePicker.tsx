@@ -20,7 +20,7 @@ export function RolePicker() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-white">
         <DialogHeader>
-          <DialogTitle>Who you are?</DialogTitle>
+          <DialogTitle>Are u a Recruiter?</DialogTitle>
           <DialogDescription>select the role for you</DialogDescription>
         </DialogHeader>
         <div className="flex items-center space-x-2">
@@ -30,15 +30,9 @@ export function RolePicker() {
             </Label>
           </div>
           <div className="flex gap-2">
-            <Link href="/jobs">
-              <Button size="sm" className="px-3">
-                <span className="">Applicant</span>
-              </Button>
-            </Link>
-
             <Link href="/dashboard/overview">
-              <Button size="sm" className="px-3">
-                <span className="">Recruiter</span>
+              <Button size="lg" className="px-10">
+                <span className="">yes</span>
               </Button>
             </Link>
           </div>

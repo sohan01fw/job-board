@@ -16,9 +16,7 @@ import { RolePicker } from "./RolePicker";
 
 const navigation = [
   { name: "Find Jobs", href: "/jobs" },
-  { name: "Companies", href: "/companies" },
-  { name: "Resources", href: "/resources" },
-  { name: "Blog", href: "/blog" },
+  { name: "Blog", href: "/blogs" },
 ];
 
 export function Navbar() {
