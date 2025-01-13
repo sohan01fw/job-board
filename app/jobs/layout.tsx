@@ -1,3 +1,4 @@
+import { Navbar } from "@/components/pages/index/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 
@@ -12,6 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <div lang="en">
+      <Navbar />
       <div>
         <div className="m-10">
           <h1 className="text-4xl font-bold ">Welcome,Applicant</h1>
