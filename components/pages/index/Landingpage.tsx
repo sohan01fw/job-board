@@ -157,7 +157,9 @@ export function LandingPage() {
             ].map((testimonial, index) => (
               <Card key={index}>
                 <CardContent className="p-6">
-                  <p className="mb-4 italic">"{testimonial.quote}"</p>
+                  <p className="mb-4 italic">
+                    &ldquo;{testimonial.quote}&rdquo;
+                  </p>
                   <div className="flex items-center">
                     <div className="w-12 h-12 bg-primary rounded-full mr-4"></div>
                     <div>

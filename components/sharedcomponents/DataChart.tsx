@@ -8,7 +8,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Card } from "../ui/card";
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
