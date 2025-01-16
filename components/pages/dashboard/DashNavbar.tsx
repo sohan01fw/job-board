@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { supabase } from "@/lib/supabase/supabase_client";
 
 const navigation = [
   { name: "Find Jobs", href: "/jobs" },
@@ -21,6 +22,11 @@ const navigation = [
 
 export function DashNavbar() {
   const pathname = usePathname();
+
+  async function handleSignOut() {
+    const { error } = await supabase.auth.signOut();
+    console.log(error);
+  }
 
   return (
     <nav className="bg-background shadow-sm">
@@ -92,11 +98,10 @@ export function DashNavbar() {
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Dashboard</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Sign out</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignOut}>
+                  Sign out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
