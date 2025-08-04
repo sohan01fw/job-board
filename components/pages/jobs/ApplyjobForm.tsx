@@ -23,9 +23,12 @@ import { PostJobsForm } from "@/lib/Actions/JobForm";
 import { ApplyJobSchemaType } from "@/types/Forms";
 import { useState } from "react";
 import { LoadingBtn } from "@/lib/ui";
+import { useJobStore } from "@/lib/Stores/JobStore";
+import JobDetailsPage from "@/components/sharedcomponents/Jobs/JobDetails";
 export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
   const { router, toast } = useExportHooks();
   const [loading, setLoading] = useState(false);
+  const { job } = useJobStore();
 
   const form = useForm<z.infer<typeof applyJobSchema>>({
     resolver: zodResolver(applyJobSchema),
@@ -63,45 +66,53 @@ export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
       });
     }
   }
-
+  if (!job) {
+    return;
+  }
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8  w-96">
-        <InputFormField
-          form={form}
-          label="fname"
-          name="fname"
-          placeholder="write your fname..."
-        />
-        <InputFormField
-          form={form}
-          label="lname"
-          name="lname"
-          placeholder="write your lname..."
-        />
-        <TextAreaForm
-          form={form}
-          label="About"
-          name="about"
-          placeholder="write about you..."
-        />
-        <ImageInputForm form={form} label="Upload Resume" name="resume" />
-        <SelectFormInput
-          options={genderTypeArr}
-          placeholder="Select your gender"
-          form={form}
-          label="gender"
-          name="gender"
-        />
+    <div className="flex flex-row gap-5 w-full">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8  w-96"
+        >
+          <InputFormField
+            form={form}
+            label="fname"
+            name="fname"
+            placeholder="write your fname..."
+          />
+          <InputFormField
+            form={form}
+            label="lname"
+            name="lname"
+            placeholder="write your lname..."
+          />
+          <TextAreaForm
+            form={form}
+            label="About"
+            name="about"
+            placeholder="write about you..."
+          />
+          <ImageInputForm form={form} label="Upload Resume" name="resume" />
+          <SelectFormInput
+            options={genderTypeArr}
+            placeholder="Select your gender"
+            form={form}
+            label="gender"
+            name="gender"
+          />
 
-        <InputNumberField
-          form={form}
-          label="Age"
-          name="age"
-          placeholder="Enter your age"
-        />
-        {loading ? <LoadingBtn /> : <Button type="submit">Submit</Button>}
-      </form>
-    </Form>
+          <InputNumberField
+            form={form}
+            label="Age"
+            name="age"
+            placeholder="Enter your age"
+          />
+          {loading ? <LoadingBtn /> : <Button type="submit">Submit</Button>}
+        </form>
+      </Form>
+      <JobDetailsPage data={job} showbtn={false} delcard={false} />
+    </div>
   );
 }

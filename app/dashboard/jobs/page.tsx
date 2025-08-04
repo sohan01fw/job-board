@@ -1,4 +1,3 @@
-import { Jobcatagory } from "@/components/sharedcomponents/Jobs/Jobcatagory";
 import { Jobindex } from "@/components/sharedcomponents/Jobs/Jobindex";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -13,9 +12,7 @@ export default async function Jobs() {
           </Link>
         </div>
         <div className="m-3 flex flex-col md:flex-row gap-10">
-          <div>
-            <Jobcatagory />
-          </div>
+          <div></div>
           <div className="p-3 h-[30rem] overflow-y-scroll jobindex">
             <Jobindex showbtn={false} delcard={true} />
           </div>

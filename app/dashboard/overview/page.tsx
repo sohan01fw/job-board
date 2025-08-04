@@ -18,10 +18,16 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase/supabase_client";
 
 export const dynamic = "force-dynamic";
 
 export default async function Overview() {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  console.log(session?.user); // should not be null
+
   //for jobs
   const allJob = await TotalJobCount();
   if ("error" in allJob) {

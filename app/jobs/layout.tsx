@@ -15,8 +15,11 @@ export default function RootLayout({
     <div lang="en">
       <Navbar />
       <div>
-        <div className="m-10">
+        <div className="m-2 ml-5 mt-10">
           <h1 className="text-4xl font-bold ">Welcome,Applicant</h1>
+          <p className="text-sm text-gray-500 font-semibold ">
+            view latest jobs
+          </p>
         </div>
       </div>
       <Toaster />

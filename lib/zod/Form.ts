@@ -2,10 +2,11 @@ import { Gender, JobCategory, JobLoc, JobType } from "@prisma/client";
 import { z } from "zod";
 
 export const jobCatagoryFormSchema = z.object({
-  items: z.array(z.string()).refine((value) => value.some((item) => item), {
+  items: z.string().min(1, {
     message: "You have to select at least one item.",
   }),
 });
+
 export const jobCreateSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
   desc: z

@@ -5,15 +5,21 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 import { jobCatagoryFormSchema } from "@/lib/zod/Form";
 import { useCatagoryStore } from "@/lib/Stores/CatagoryStore";
 import { useState } from "react";
@@ -34,78 +40,54 @@ const items = [
   },
 ] as const;
 
-export function Jobcatagory() {
-  const { addCatagory, category } = useCatagoryStore();
+export function JobCategory() {
+  const { addCatagory } = useCatagoryStore();
   const [loading, setLoading] = useState(false);
-
   const form = useForm<z.infer<typeof jobCatagoryFormSchema>>({
     resolver: zodResolver(jobCatagoryFormSchema),
-    defaultValues: {
-      items: [],
-    },
   });
 
   function onSubmit(data: z.infer<typeof jobCatagoryFormSchema>) {
     setLoading(true);
     addCatagory(data.items);
     setLoading(false);
+    console.log(data);
+    toast("You submitted the following values", {
+      description: (
+        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+    });
   }
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 md:space-y-8 flex flex-row gap-3 flex-wrap md:flex-col"
+        className="mt-10 space-x-6 flex "
       >
         <FormField
           control={form.control}
           name="items"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
-              <div className="mb-4">
-                <FormLabel className="text-base">Select filter</FormLabel>
-              </div>
-              <div className="flex flex-row md:flex-col gap-3">
-                {items.map((item) => (
-                  <FormField
-                    key={item.id}
-                    control={form.control}
-                    name="items"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={item.id}
-                          className="flex flex-row items-start space-x-3 space-y-0"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={
-                                field.value?.includes(item.id) ||
-                                category.includes(item.id)
-                              }
-                              onCheckedChange={(checked) => {
-                                if (category.length !== 0) {
-                                  addCatagory([""]);
-                                }
-                                return checked
-                                  ? field.onChange([...field.value, item.id])
-                                  : field.onChange(
-                                      field.value?.filter(
-                                        (value) => value !== item.id,
-                                      ),
-                                    );
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            {item.label}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
-                  />
-                ))}
-              </div>
+              <Select onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger className="w-56">
+                    <SelectValue placeholder="select a job" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {items.map((item) => {
+                    return (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.label}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

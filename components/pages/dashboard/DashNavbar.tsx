@@ -18,7 +18,6 @@ import { supabase } from "@/lib/supabase/supabase_client";
 const navigation = [
   { name: "Find Jobs", href: "/jobs" },
   { name: "Blogs", href: "/blogs" },
-  { name: "Blogs", href: "/blogs" },
 ];
 
 export function DashNavbar() {

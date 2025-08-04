@@ -45,24 +45,14 @@ export async function CreateJobs(
   }
 }
 
-export async function GetAllJobs(filterData: string[]): Promise<GetJobs> {
+export async function GetAllJobs(filterData: string): Promise<GetJobs> {
   try {
-    // Make sure to map the strings to JobCategory enum values if necessary
-    const jobCategories = filterData.map(
-      (category) => JobCategory[category as keyof typeof JobCategory],
-    );
-
-    // Now use the array in the Prisma query
     const jobs = await prisma.jobApplication.findMany({
-      where:
-        jobCategories.length > 0
-          ? {
-              jobCategory: {
-                in: jobCategories, // Pass array of enum values
-              },
-            }
-          : {},
-
+      where: filterData
+        ? {
+            jobCategory: filterData as JobCategory,
+          }
+        : {},
       orderBy: {
         createdAt: "desc",
       },
