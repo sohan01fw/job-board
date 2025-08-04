@@ -15,7 +15,7 @@ export function RolePicker() {
     <Dialog>
       <DialogTrigger asChild>
         <Button size="lg" variant="default" className="rounded-[5px]">
-          Job
+          Post a Job
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-white">
