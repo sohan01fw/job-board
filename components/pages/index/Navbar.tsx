@@ -13,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RolePicker } from "./RolePicker";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase/supabase_client";
 
 const navigation = [
   { name: "Find Jobs", href: "/jobs" },
@@ -21,6 +23,14 @@ const navigation = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const [user, setUser] = useState<any>(null);
+  useEffect(() => {
+    const user = async () => {
+      const user = await supabase.auth.getUser();
+      setUser(user.data.user);
+    };
+    user();
+  }, []);
 
   return (
     <nav className="bg-white shadow">
@@ -52,7 +62,16 @@ export function Navbar() {
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <RolePicker />
+            {user === null ? (
+              <RolePicker />
+            ) : (
+              <Link
+                href="/dashboard/overview"
+                className="bg-blue-50 p-2 rounded-md font-semibold"
+              >
+                Dashboard
+              </Link>
+            )}
           </div>
           <div className="flex items-center sm:hidden">
             <DropdownMenu>

@@ -20,7 +20,7 @@ export default async function RootLayout({
       <div>
         <div className="m-10 flex justify-between">
           <h1 className="text-4xl font-bold ">Welcome to Blogs</h1>
-          {user !== null && <Button>create a blog post</Button>}
+          {user.user !== null && <Button>create a blog post</Button>}
         </div>
       </div>
       <Toaster />
