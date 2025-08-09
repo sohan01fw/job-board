@@ -1,12 +1,26 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import Image from "next/image";
 import googlelogo from "@/app/assets/google.png";
 import notionlogo from "@/app/assets/notion.png";
+import { useEffect, useRef } from "react";
+import { useScrollStore } from "@/lib/Stores/scrollStore";
 
 export default function HeroSection() {
+  const ref = useRef<HTMLElement | null>(null);
+  const register = useScrollStore((s) => s.register);
+
+  useEffect(() => {
+    register("home", ref.current);
+    return () => register("home", null);
+  }, [register]);
   return (
-    <section className="bg-gradient-to-br from-green-50 to-green-100 py-32 relative overflow-hidden">
+    <section
+      ref={ref}
+      id="home"
+      className="bg-gradient-to-br from-green-50 to-green-100 py-32 relative overflow-hidden"
+    >
       <div className="container mx-auto px-4 text-center relative z-10">
         <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
           Discover Your

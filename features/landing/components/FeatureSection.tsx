@@ -1,5 +1,8 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
+import { useScrollStore } from "@/lib/Stores/scrollStore";
 import { Search, Users, Target, Shield } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 const features = [
   {
@@ -29,8 +32,15 @@ const features = [
 ];
 
 export default function FeaturesSection() {
+  const ref = useRef<HTMLElement | null>(null);
+  const register = useScrollStore((s) => s.register);
+
+  useEffect(() => {
+    register("features", ref.current);
+    return () => register("features", null);
+  }, [register]);
   return (
-    <section className="py-20 bg-gray-50">
+    <section ref={ref} id="features" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
