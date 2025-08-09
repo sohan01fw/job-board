@@ -1,10 +1,10 @@
-import { CreateJobForm } from "@/components/pages/dashboard/CreateJobForm";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
+import { CreateJobForm } from "@/features/dashboard/components/CreateJobForm";
 import { authUser } from "@/lib/Actions/Users";
 import { redirect } from "next/navigation";
 

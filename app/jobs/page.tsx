@@ -1,5 +1,6 @@
-import { JobCategory } from "@/components/sharedcomponents/Jobs/Jobcatagory";
-import { Jobindex } from "@/components/sharedcomponents/Jobs/Jobindex";
+import { JobCategory } from "@/features/jobs/components/Jobcatagory";
+import { Jobindex } from "@/features/jobs/components/Jobindex";
+
 export const dynamic = "force-dynamic";
 export default async function Jobs() {
   return (

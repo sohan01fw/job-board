@@ -1,6 +1,5 @@
 "use client";
 
-import { Deletepop } from "@/components/pages/dashboard/Deletepop";
 import {
   Card,
   CardContent,
@@ -9,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Deletepop } from "@/features/dashboard/components/Deletepop";
 import { Applybtn } from "@/lib/ui";
 import { JobData } from "@/types/Forms";
 

@@ -1,4 +1,4 @@
-import { UserCompany } from "@/components/pages/auth/onboarding/usercompany";
+import { UserCompany } from "@/features/auth/components/onboarding/usercompany";
 import { CheckCompany } from "@/lib/Actions/Company";
 import { authUser } from "@/lib/Actions/Users";
 import { redirect } from "next/navigation";

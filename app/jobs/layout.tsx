@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/pages/index/Navbar";
+import { Navbar } from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 

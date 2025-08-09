@@ -1,6 +1,6 @@
-import { DashNavbar } from "@/components/pages/dashboard/DashNavbar";
-import Mainpage from "@/components/pages/dashboard/Mainpage";
 import { Toaster } from "@/components/ui/toaster";
+import { DashNavbar } from "@/features/dashboard/components/DashNavbar";
+import Mainpage from "@/features/dashboard/components/Mainpage";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

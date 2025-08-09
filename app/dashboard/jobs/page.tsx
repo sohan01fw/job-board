@@ -1,5 +1,5 @@
-import { Jobindex } from "@/components/sharedcomponents/Jobs/Jobindex";
 import { Button } from "@/components/ui/button";
+import { Jobindex } from "@/features/jobs/components/Jobindex";
 import Link from "next/link";
 export default async function Jobs() {
   return (

@@ -1,8 +1,4 @@
-import {
-  ApplicantCard,
-  DataCard,
-} from "@/components/sharedcomponents/DataCard";
-import { DataChart } from "@/components/sharedcomponents/DataChart";
+import { DataChart } from "@/features/dashboard/components/DataChart";
 import {
   TotalApplicantCount,
   TotalJobCount,
@@ -19,6 +15,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase/supabase_client";
+import {
+  ApplicantCard,
+  DataCard,
+} from "@/features/dashboard/components/DataCard";
 
 export const dynamic = "force-dynamic";
 

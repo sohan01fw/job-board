@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/pages/index/Navbar";
+import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { authUser } from "@/lib/Actions/Users";

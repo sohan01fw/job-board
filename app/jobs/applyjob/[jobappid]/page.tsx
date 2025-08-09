@@ -1,4 +1,4 @@
-import { ApplyJobForm } from "@/components/pages/jobs/ApplyjobForm";
+import { ApplyJobForm } from "@/features/jobs/apply/ApplyjobForm";
 
 export default async function page({
   params,

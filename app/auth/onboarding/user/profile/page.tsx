@@ -1,4 +1,4 @@
-import { UserProfile } from "@/components/pages/auth/onboarding/userprofile";
+import { UserProfile } from "@/features/auth/components/onboarding/userprofile";
 import { authUser, CreateUser } from "@/lib/Actions/Users";
 import { User } from "@/types/Forms";
 import { redirect } from "next/navigation";

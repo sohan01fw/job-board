@@ -1,4 +1,4 @@
-import { AppliedJobForm } from "@/components/pages/dashboard/AppliedJobForm";
+import { AppliedJobForm } from "@/features/dashboard/components/AppliedJobForm";
 import { getJobsFromId } from "@/lib/Actions/Jobs";
 
 export default async function page({

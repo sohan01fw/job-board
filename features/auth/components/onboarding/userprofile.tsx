@@ -7,9 +7,10 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Imagesync } from "@/components/sharedcomponents/onboarding/Imagesync";
-import { Inputsync } from "@/components/sharedcomponents/onboarding/Inputsync";
+
 import { CheckUser } from "@/lib/Actions/Users";
+import { Imagesync } from "./Imagesync";
+import { Inputsync } from "./Inputsync";
 export async function UserProfile({
   emailValue,
 }: {

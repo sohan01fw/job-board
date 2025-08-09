@@ -24,7 +24,8 @@ import { ApplyJobSchemaType } from "@/types/Forms";
 import { useState } from "react";
 import { LoadingBtn } from "@/lib/ui";
 import { useJobStore } from "@/lib/Stores/JobStore";
-import JobDetailsPage from "@/components/sharedcomponents/Jobs/JobDetails";
+import JobDetailsPage from "../components/JobDetails";
+
 export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
   const { router, toast } = useExportHooks();
   const [loading, setLoading] = useState(false);

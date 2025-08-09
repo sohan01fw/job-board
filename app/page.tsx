@@ -1,11 +1,25 @@
-import { LandingPage } from "@/components/pages/index/Landingpage";
-import { Navbar } from "@/components/pages/index/Navbar";
+import { Navbar } from "@/components/Navbar";
+import CompaniesSection from "@/features/landing/components/CompaniesSection";
+import FeaturesSection from "@/features/landing/components/FeatureSection";
+import Footer from "@/features/landing/components/Footer";
+import HeroSection from "@/features/landing/components/HeroSection";
+import JobSearchSection from "@/features/landing/components/JobSearchSection";
+import ResumeBuilderSection from "@/features/landing/components/ResumeSection";
+import StatsSection from "@/features/landing/components/StatsSection";
+import TestimonialsSection from "@/features/landing/components/TestimonialsSection";
 
-export default async function Home() {
+export default function LandingPage() {
   return (
-    <div className="">
+    <div className="min-h-screen bg-white">
       <Navbar />
-      <LandingPage />
+      <HeroSection />
+      <JobSearchSection />
+      <ResumeBuilderSection />
+      <FeaturesSection />
+      <StatsSection />
+      <CompaniesSection />
+      <TestimonialsSection />
+      <Footer />
     </div>
   );
 }
