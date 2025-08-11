@@ -1,12 +1,11 @@
 "use client";
 
-import { GetAllJobs } from "@/lib/Actions/Jobs";
-import { useCatagoryStore } from "@/lib/Stores/CatagoryStore";
-import { useEffect, useState } from "react";
+import { useCatagoryStore } from "@/features/jobs/stores/CatagoryStore";
 import { Jobcard } from "./Jobcard";
 import { LoadingUi } from "@/lib/LoadingUi";
-import { useJobStore } from "@/lib/Stores/JobStore";
 import JobDetailsPage from "./JobDetails";
+import { useJobs } from "../hooks/useJobs";
+
 export function Jobindex({
   showbtn,
   delcard,
@@ -14,44 +13,33 @@ export function Jobindex({
   showbtn: boolean;
   delcard: boolean;
 }) {
-  const [Jobs, setJobs] = useState<object | undefined>(undefined);
   const { category } = useCatagoryStore();
-  const [loading, setLoading] = useState(true);
-  const { job } = useJobStore();
+  const { data: Jobs, error, isLoading } = useJobs(category);
 
-  const getAlljobsData = async () => {
-    setLoading(true);
-    const JobRes = await GetAllJobs(category);
+  if (isLoading) return <LoadingUi />;
+  if (error) return <div>Error loading jobs</div>;
 
-    setJobs(JobRes);
-    setLoading(false);
-  };
-  useEffect(() => {
-    getAlljobsData();
-  }, [category]);
-
-  if (loading) {
-    return <LoadingUi />;
-  }
-
-  /* @ts-expect-error:there might not be the value in jobs.data */
-  if (Jobs?.data == "") {
+  if (!Jobs?.data || Jobs.data.length === 0) {
     return (
       <div className="text-center w-[30vw]">
         <h1 className="font-bold text-xl">No Job at the moment... </h1>
       </div>
     );
   }
+
   return (
     <div className="flex ">
       <div className="p-3 w-[28rem]  h-[30rem] overflow-y-scroll jobindex overflow-x-auto ">
-        {/* @ts-expect-error:there might not be the value in jobs.data */}
-        {Jobs?.data.map((data) => {
+        {Jobs?.data.map((data: any) => {
           return <Jobcard key={data.id} data={data} />;
         })}
       </div>
-      {job ? (
-        <JobDetailsPage data={job} showbtn={showbtn} delcard={delcard} />
+      {Jobs && Jobs.data.length > 0 ? (
+        <JobDetailsPage
+          data={Jobs.data[0]}
+          showbtn={showbtn}
+          delcard={delcard}
+        />
       ) : (
         <div>Please select a job to see details</div>
       )}

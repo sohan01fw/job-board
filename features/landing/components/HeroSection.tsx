@@ -5,7 +5,7 @@ import Image from "next/image";
 import googlelogo from "@/app/assets/google.png";
 import notionlogo from "@/app/assets/notion.png";
 import { useEffect, useRef } from "react";
-import { useScrollStore } from "@/lib/Stores/scrollStore";
+import { useScrollStore } from "../stores/scrollStore";
 
 export default function HeroSection() {
   const ref = useRef<HTMLElement | null>(null);

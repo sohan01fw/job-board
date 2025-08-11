@@ -1,5 +1,5 @@
-import { JobData } from "@/types/Forms";
 import { create } from "zustand";
+import { JobData } from "../types";
 
 type JobState = {
   job: JobData | null;

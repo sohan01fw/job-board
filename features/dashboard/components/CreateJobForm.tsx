@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { jobCreateSchema } from "@/lib/zod/Form";
 import {
   Form, // This should be from your shadcn components
 } from "@/components/ui/form";
@@ -22,12 +21,10 @@ import {
   jobLocArr,
   jobTypeArr,
 } from "@/lib/data";
-import { CreateJobs } from "@/lib/Actions/Jobs";
 import useExportHooks from "@/lib/Hooks/useExportHooks";
 import { ToastAction } from "@/components/ui/toast";
-import { JobApp } from "@/types/Forms";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { jobCreateSchema } from "../lib/zod/schema";
+import { useCreateJob } from "../hooks/useCreateJob";
 export function CreateJobForm({
   userEmail,
   userId,
@@ -36,7 +33,7 @@ export function CreateJobForm({
   userId: string;
 }) {
   const { router, toast } = useExportHooks();
-  const [loading, setLoading] = useState(false);
+  const { trigger, isMutating } = useCreateJob();
 
   const form = useForm<z.infer<typeof jobCreateSchema>>({
     resolver: zodResolver(jobCreateSchema),
@@ -55,21 +52,15 @@ export function CreateJobForm({
   });
 
   async function onSubmit(values: z.infer<typeof jobCreateSchema>) {
-    setLoading(true);
-    const res = await CreateJobs(values as JobApp, userEmail, userId);
+    const res = await trigger({ values, userEmail, userId });
     if (!res?.error) {
-      setLoading(false);
-      toast({
-        title: "Successfully Create a job Application",
-      });
+      toast({ title: "Successfully created a job Application" });
       router.back();
     } else {
-      setLoading(false);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description:
-          "There was a problem with your request.Please Refresh the page",
+        description: "There was a problem with your request. Please refresh.",
         action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
     }
@@ -143,14 +134,9 @@ export function CreateJobForm({
           name="Links"
           placeholder="Add a site link"
         />
-        {loading ? (
-          <Button disabled>
-            <Loader2 className="animate-spin" />
-            Please wait
-          </Button>
-        ) : (
-          <Button type="submit">Submit</Button>
-        )}
+        <Button disabled={isMutating}>
+          {isMutating ? "Creating..." : "Create Job"}
+        </Button>
       </form>
     </Form>
   );

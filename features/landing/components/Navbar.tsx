@@ -3,10 +3,14 @@ import Link from "next/link";
 import { CheckCircle, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useScrollStore } from "@/lib/Stores/scrollStore";
+import { useScrollStore } from "../stores/scrollStore";
+import { redirectUser } from "@/lib/process";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const handleLogin = () => {
+    redirectUser();
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full">
@@ -31,7 +35,10 @@ export function Navbar() {
 
             {/* right: actions */}
             <div className="flex items-center gap-3">
-              <Button className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium">
+              <Button
+                onClick={handleLogin}
+                className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium"
+              >
                 Log In
               </Button>
               {/* mobile toggle */}

@@ -3,12 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { applyJobSchema } from "@/lib/zod/Form";
 import {
   Form, // This should be from your shadcn components
 } from "@/components/ui/form";
-
 import {
   ImageInputForm,
   InputFormField,
@@ -19,17 +16,16 @@ import {
 import { genderTypeArr } from "@/lib/data";
 import useExportHooks from "@/lib/Hooks/useExportHooks";
 import { ToastAction } from "@/components/ui/toast";
-import { PostJobsForm } from "@/lib/Actions/JobForm";
-import { ApplyJobSchemaType } from "@/types/Forms";
-import { useState } from "react";
-import { LoadingBtn } from "@/lib/ui";
-import { useJobStore } from "@/lib/Stores/JobStore";
 import JobDetailsPage from "../components/JobDetails";
+import { applyJobSchema } from "../lib/zod/schema";
+import { useJobStore } from "../stores/JobStore";
+import { useState } from "react";
+import { PostJobsForm } from "../actions"; // adjust path if needed
 
 export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
   const { router, toast } = useExportHooks();
-  const [loading, setLoading] = useState(false);
   const { job } = useJobStore();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof applyJobSchema>>({
     resolver: zodResolver(applyJobSchema),
@@ -46,30 +42,33 @@ export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
 
   async function onSubmit(values: z.infer<typeof applyJobSchema>) {
     setLoading(true);
-    const postformres = await PostJobsForm(
-      values as ApplyJobSchemaType,
-      jobAppId as string,
-    );
-    if (!postformres?.error) {
-      setLoading(false);
-      toast({
-        title: "Successfully applied for a job Application",
-      });
-      router.back();
-    } else {
-      setLoading(false);
+    try {
+      const res = await PostJobsForm(values as any, jobAppId);
+      if (!res?.error) {
+        toast({ title: "Successfully applied for a job Application" });
+        router.back();
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description:
+            res.message ||
+            "There was a problem with your request. Please refresh.",
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
+      }
+    } catch {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description:
-          "There was a problem with your request.Please Refresh the page",
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
+        title: "Submission failed",
+        description: "Unexpected error. Please try again.",
       });
+    } finally {
+      setLoading(false);
     }
   }
-  if (!job) {
-    return;
-  }
+
+  if (!job) return null;
   return (
     <div className="flex flex-row gap-5 w-full">
       <Form {...form}>
@@ -110,7 +109,9 @@ export function ApplyJobForm({ jobAppId }: { jobAppId: string }) {
             name="age"
             placeholder="Enter your age"
           />
-          {loading ? <LoadingBtn /> : <Button type="submit">Submit</Button>}
+          <button type="submit" disabled={loading}>
+            {loading ? "Applying..." : "Apply"}
+          </button>
         </form>
       </Form>
       <JobDetailsPage data={job} showbtn={false} delcard={false} />

@@ -60,10 +60,10 @@ export const Inputsync = ({
       <CardFooter>
         <Button
           onClick={() => {
-            return redirect("/auth/onboarding/user/company");
+            return redirect("/dashboard/overview");
           }}
         >
-          Next
+          finish
         </Button>
       </CardFooter>
     </div>

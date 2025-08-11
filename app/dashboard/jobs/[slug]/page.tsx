@@ -1,5 +1,5 @@
 import { AppliedJobForm } from "@/features/dashboard/components/AppliedJobForm";
-import { getJobsFromId } from "@/lib/Actions/Jobs";
+import { getJobsFromId } from "@/features/jobs/actions";
 
 export default async function page({
   params,

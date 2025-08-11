@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { SupabaseGoogleLogin, SupabaseMagicLinkLogin } from "@/lib/process";
 import { GoogleButtonIcon, LoadingBtn } from "@/lib/ui";
 import { emailschema } from "@/lib/zod/global";
 import Link from "next/link";
 import { useState } from "react";
 import { ZodError } from "zod";
+import { SupabaseGoogleLogin, SupabaseMagicLinkLogin } from "../actions";
 export default function Login() {
   const [emailValue, setEmailValue] = useState<string>("");
   const [isLoadingBtn, setLoadingBtn] = useState<boolean>();
@@ -85,7 +85,7 @@ export default function Login() {
               <LoadingBtn />
             ) : (
               <Button type="submit" className="m-2">
-                submit
+                login
               </Button>
             )}
           </div>

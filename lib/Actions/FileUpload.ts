@@ -1,8 +1,6 @@
-"use server";
-import { funcResponse } from "@/types/global";
 import { supabase } from "../supabase/supabase_client";
 
-// const bucketName = "avatars";
+//this is for files
 export async function checkBucket(bucketname: string) {
   const bucketData = await supabase.storage.listBuckets();
   const checkBucket = bucketData.data?.some(
@@ -47,7 +45,7 @@ export async function SetupBucket(bucketname: string) {
 export async function uploadFile(
   imageFile: File | undefined,
   bname: string,
-): Promise<funcResponse> {
+): Promise<any> {
   try {
     //check imagefile present or not
     if (imageFile === undefined) {

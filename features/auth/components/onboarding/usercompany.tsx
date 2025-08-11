@@ -10,6 +10,7 @@ import { ZodError } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { PostCompanyInfo } from "@/lib/Actions/Company";
 import { redirect } from "next/navigation";
+
 export function UserCompany({
   name,
   desc,

@@ -5,8 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useJobStore } from "@/lib/Stores/JobStore";
-import { JobData } from "@/types/Forms";
+import { useJobStore } from "@/features/jobs/stores/JobStore";
+import { JobData } from "../types";
 
 export function Jobcard({ data }: { data: JobData }) {
   const { setJob } = useJobStore();

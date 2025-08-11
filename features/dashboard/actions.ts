@@ -1,15 +1,13 @@
-"use server";
-import { CreateJobResponse, GetJobs, JobApp } from "@/types/Forms";
-import { prisma } from "../Prisma";
-import { CheckUser } from "./Users";
-import { JobCategory } from "@prisma/client";
 import { revalidateTag } from "next/cache";
+import { JobApp } from "./types";
+import { CheckUser } from "@/lib/Actions/Users";
+import { prisma } from "@/lib/Prisma";
 
 export async function CreateJobs(
   jobsAppData: JobApp,
   userEmail: string,
   userId: string,
-): Promise<CreateJobResponse> {
+): Promise<any> {
   try {
     const checkUser = await CheckUser(userEmail);
 
@@ -45,38 +43,7 @@ export async function CreateJobs(
   }
 }
 
-export async function GetAllJobs(filterData: string): Promise<GetJobs> {
-  try {
-    const jobs = await prisma.jobApplication.findMany({
-      where: filterData
-        ? {
-            jobCategory: filterData as JobCategory,
-          }
-        : {},
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    if (!jobs) {
-      return {
-        status: 404,
-        message: "No job at the moment!",
-      };
-    }
-    return {
-      data: jobs,
-    };
-  } catch (error) {
-    console.log(error);
-    return {
-      message: "unexpected error while finding jobs",
-      status: 500,
-    };
-  }
-}
-
-export async function DeleteJobs(jobId: string): Promise<CreateJobResponse> {
+export async function DeleteJobs(jobId: string): Promise<any> {
   try {
     const jobs = await prisma.jobApplication.delete({
       where: {
@@ -103,32 +70,66 @@ export async function DeleteJobs(jobId: string): Promise<CreateJobResponse> {
   }
 }
 
-//get jobs for specific id
-export async function getJobsFromId(jobId: string): Promise<CreateJobResponse> {
+export async function TotalJobCount(): Promise<any> {
   try {
-    const jobs = await prisma.jobApplication.findUnique({
-      where: {
-        id: jobId,
-      },
-      include: {
-        jobForm: true,
-      },
+    const totalJob = await prisma.jobApplication.groupBy({
+      by: ["jobCategory"],
+      _count: { id: true },
+      where: { status: true },
     });
-    if (!jobs) {
+    if (!totalJob) {
       return {
-        error: true,
-        message: "problem in finding job",
+        data: null,
+        message: "no job found",
+        status: 404,
       };
     }
 
-    return { error: false, ...jobs };
+    return {
+      data: totalJob,
+      status: 200,
+      message: "success!",
+    };
   } catch (error) {
-    if (error) {
-      console.log(error);
+    console.log(error);
+    return {
+      data: null,
+      error: true,
+      message: "Unexpected error while counting total job",
+      status: 500,
+    };
+  }
+}
+
+export async function TotalApplicantCount(): Promise<any> {
+  try {
+    const totalApplicant = await prisma.jobApplication.groupBy({
+      by: ["jobCategory"],
+      _sum: {
+        applied: true,
+      },
+    });
+
+    if (!totalApplicant) {
       return {
-        error: true,
-        message: "Unexpected Error occur while job job application",
+        data: null,
+        message: "no job found",
+        status: 404,
       };
     }
+
+    return {
+      data: totalApplicant,
+      status: 200,
+      message: "success!",
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      data: null,
+      error: true,
+      message: "Unexpected error while counting total job",
+      status: 500,
+    };
   }
 }

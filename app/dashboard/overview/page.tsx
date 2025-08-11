@@ -1,8 +1,4 @@
 import { DataChart } from "@/features/dashboard/components/DataChart";
-import {
-  TotalApplicantCount,
-  TotalJobCount,
-} from "@/lib/Actions/AggregateData";
 import { Suspense } from "react";
 import {
   Card,
@@ -14,19 +10,20 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabase/supabase_client";
 import {
   ApplicantCard,
   DataCard,
 } from "@/features/dashboard/components/DataCard";
+import {
+  TotalApplicantCount,
+  TotalJobCount,
+} from "@/features/dashboard/actions";
+// import { LoginSession } from "@/lib/process";
 
 export const dynamic = "force-dynamic";
 
 export default async function Overview() {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  console.log(session?.user); // should not be null
+  // const session = await LoginSession();
 
   //for jobs
   const allJob = await TotalJobCount();

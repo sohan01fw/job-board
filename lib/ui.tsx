@@ -8,8 +8,8 @@ import { AuthError } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import useExportHooks from "./Hooks/useExportHooks";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { DeleteJobs } from "./Actions/Jobs";
 import { JSX } from "react/jsx-runtime";
+import { DeleteJobs } from "@/features/dashboard/actions";
 export function LoadingBtn(): JSX.Element {
   return (
     <Button disabled className="m-2">

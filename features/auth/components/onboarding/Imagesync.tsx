@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ZodError } from "zod";
 import { UpdateUserProfile } from "@/lib/Actions/Users";
-import { GetAllFile, uploadFile } from "@/lib/Actions/FileAction";
 import { toast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ImageFileSchema } from "@/lib/zod/Form";
+import { GetAllFile, uploadFile } from "@/lib/Actions/FileUpload";
 
 const BucketName = "avatars";
 export const Imagesync = ({ email, img }: { email: string; img: string }) => {

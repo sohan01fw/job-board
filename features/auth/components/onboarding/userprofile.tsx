@@ -8,21 +8,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-import { CheckUser } from "@/lib/Actions/Users";
 import { Imagesync } from "./Imagesync";
 import { Inputsync } from "./Inputsync";
-export async function UserProfile({
-  emailValue,
-}: {
-  emailValue: string | undefined;
-}) {
-  const userDatas = await CheckUser(emailValue || "");
-  if ("error" in userDatas) {
-    console.log(userDatas.message);
-  }
-  const userData = "data" in userDatas && userDatas.data;
-
-  //console.log(userData);
+export async function UserProfile({ userData }: { userData: any }) {
   return (
     <div className="">
       <div className="border border-black mt-10">
@@ -31,7 +19,10 @@ export async function UserProfile({
             <CardTitle>Profile</CardTitle>
             <CardDescription>add your profile pic</CardDescription>
             <div>
-              <Imagesync email={`${userData.email}`} img={`${userData.img}`} />
+              <Imagesync
+                email={`${userData.email}`}
+                img={`${userData.user_metadata.avatar_url}`}
+              />
             </div>
           </CardHeader>
           <CardContent>
@@ -43,11 +34,11 @@ export async function UserProfile({
             />
           </CardContent>
           <CardContent>
-            <Label className="font-semibold text-sm m-1">Name</Label>
+            <Label className="font-semibold text-sm m-1">Full Name</Label>
             <Inputsync
               email={`${userData.email}`}
-              name={`${userData.name}`}
-              placeholder="write your name"
+              name={`${userData.user_metadata.full_name}`}
+              placeholder="write your full name"
             />
           </CardContent>
         </Card>

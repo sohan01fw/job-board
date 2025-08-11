@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Deletepop } from "@/features/dashboard/components/Deletepop";
 import { Applybtn } from "@/lib/ui";
-import { JobData } from "@/types/Forms";
+import { JobData } from "../types";
 
 export default function JobDetailsPage({
   data,

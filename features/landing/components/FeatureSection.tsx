@@ -1,8 +1,8 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { useScrollStore } from "@/lib/Stores/scrollStore";
 import { Search, Users, Target, Shield } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { useScrollStore } from "../stores/scrollStore";
 
 const features = [
   {

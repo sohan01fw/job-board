@@ -1,6 +1,6 @@
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
+import { Navbar } from "@/features/landing/components/Navbar";
 import { authUser } from "@/lib/Actions/Users";
 import type { Metadata } from "next";
 

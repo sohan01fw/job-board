@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/Navbar";
+import { Navbar } from "@/features/landing/components/Navbar";
 import CompaniesSection from "@/features/landing/components/CompaniesSection";
 import FeaturesSection from "@/features/landing/components/FeatureSection";
 import Footer from "@/features/landing/components/Footer";

@@ -52,18 +52,9 @@ export async function CheckUser(userEmail: string): Promise<funcResponse> {
 }
 
 //create a new user if not already exist in db
-export async function CreateUser(user: User): Promise<funcResponse> {
+export async function CreateUser(user: User): Promise<funcResponse | any> {
   try {
-    // check user exists or not
-    const checkUser = await CheckUser(user.email);
-    //save user to db
-    if ("data" in checkUser) {
-      return {
-        data: checkUser.data,
-        message: checkUser.message,
-        status: checkUser.status,
-      };
-    }
+    console.log("creating new user");
     const createUserData = await prisma.user.create({
       data: {
         id: user.id,
