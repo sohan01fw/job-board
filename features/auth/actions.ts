@@ -1,5 +1,3 @@
-"use server";
-
 import { supabase } from "@/lib/supabase/supabase_client";
 
 //supabase login through magic link

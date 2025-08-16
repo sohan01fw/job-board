@@ -1,6 +1,6 @@
 import { UserProfile } from "@/features/auth/components/onboarding/userprofile";
 import { authUser, CheckUser, CreateUser } from "@/lib/Actions/Users";
-import { User } from "@/types/Forms";
+import { UserData } from "@/types/Forms";
 import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 
@@ -8,25 +8,23 @@ export default async function page() {
   //authenticate the user if not present redirect to login page
   const userauth = await authUser();
 
-  const user = userauth.user;
+  const user = userauth;
   if (!userauth || !user) {
     return redirect("/auth/login");
   }
 
   const checkUser = await CheckUser(user?.email || "");
   //save the user to database
-  const fullname =
-    user?.identities && user?.identities[0].identity_data?.full_name;
-  const profile_pic =
-    user?.identities && user?.identities[0].identity_data?.avatar_url;
-  const userData: User = {
+  const fullname = user?.name;
+  const profile_pic = user?.img;
+  const userD: UserData = {
     id: user.id,
     email: user.email || "",
     name: fullname || "",
     img: profile_pic || "",
   };
   if (checkUser.data === false) {
-    await CreateUser(userData);
+    await CreateUser(userD);
   }
 
   return (

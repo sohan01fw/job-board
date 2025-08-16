@@ -4,12 +4,21 @@ import { CheckCircle, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useScrollStore } from "../stores/scrollStore";
-import { redirectUser } from "@/lib/process";
+import { useRouter } from "next/navigation";
+import { UserData } from "@/types/Forms";
 
-export function Navbar() {
+export function Navbar({ isUser, user }: { isUser: boolean; user: UserData }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const handleLogin = () => {
-    redirectUser();
+  const router = useRouter();
+
+  const handleLogin = async () => {
+    if (!user.email) {
+      router.push("/auth/login");
+    } else if (!isUser) {
+      router.push("/user/onboarding");
+    } else {
+      router.push("/dashboard/overview");
+    }
   };
 
   return (
@@ -35,12 +44,21 @@ export function Navbar() {
 
             {/* right: actions */}
             <div className="flex items-center gap-3">
-              <Button
-                onClick={handleLogin}
-                className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium"
-              >
-                Log In
-              </Button>
+              {user.email ? (
+                <Button
+                  onClick={handleLogin}
+                  className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium"
+                >
+                  Dashboard
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleLogin}
+                  className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium"
+                >
+                  Log In
+                </Button>
+              )}
               {/* mobile toggle */}
               <button
                 className="md:hidden p-2"

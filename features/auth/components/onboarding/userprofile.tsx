@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 
 import { Imagesync } from "./Imagesync";
 import { Inputsync } from "./Inputsync";
-export async function UserProfile({ userData }: { userData: any }) {
+import { UserData } from "@/types/Forms";
+export async function UserProfile({ userData }: { userData: UserData }) {
   return (
     <div className="">
       <div className="border border-black mt-10">
@@ -19,10 +20,7 @@ export async function UserProfile({ userData }: { userData: any }) {
             <CardTitle>Profile</CardTitle>
             <CardDescription>add your profile pic</CardDescription>
             <div>
-              <Imagesync
-                email={`${userData.email}`}
-                img={`${userData.user_metadata.avatar_url}`}
-              />
+              <Imagesync email={`${userData.email}`} img={`${userData.img}`} />
             </div>
           </CardHeader>
           <CardContent>
@@ -37,7 +35,7 @@ export async function UserProfile({ userData }: { userData: any }) {
             <Label className="font-semibold text-sm m-1">Full Name</Label>
             <Inputsync
               email={`${userData.email}`}
-              name={`${userData.user_metadata.full_name}`}
+              name={`${userData.name}`}
               placeholder="write your full name"
             />
           </CardContent>

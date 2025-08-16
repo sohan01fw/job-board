@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 export function JobSeekerCard() {
   const navigate = useRouter();
   const handleJobSeeker = () => {
-    navigate.push("/auth/onboarding/profile");
+    navigate.push("/user/onboarding/profile");
   };
   return (
     <Card
@@ -33,7 +33,7 @@ export function JobSeekerCard() {
 export function RecruiterCard() {
   const navigate = useRouter();
   const handleRecruiter = () => {
-    navigate.push("/auth/onboarding/company");
+    navigate.push("/user/onboarding/company");
   };
   return (
     <Card

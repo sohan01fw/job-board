@@ -11,12 +11,12 @@ import { redirect } from "next/navigation";
 export default async function page() {
   const authResponse = await authUser();
 
-  if (!authResponse || !authResponse.user) {
+  if (!authResponse || !authResponse) {
     return redirect("/auth/login");
   }
 
-  const email = authResponse.user.email ?? "";
-  const id = authResponse.user.id ?? "";
+  const email = authResponse.email ?? "";
+  const id = authResponse.id ?? "";
 
   return (
     <div className="m-2">

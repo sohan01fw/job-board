@@ -6,10 +6,10 @@ export const dynamic = "force-dynamic";
 export default async function page() {
   //authenticate the user if not present redirect to login page
   const userauth = await authUser();
-  if (!userauth || !userauth.user?.email) {
+  if (!userauth || !userauth?.email) {
     return redirect("/auth/login");
   }
-  const user = userauth.user;
+  const user = userauth;
   const companyData = await CheckCompany(user.id);
   if ("error" in companyData) {
     console.log(companyData.message);

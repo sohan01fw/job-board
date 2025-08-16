@@ -1,15 +1,24 @@
 "use server";
 
-import { User } from "@/types/Forms";
 import { prisma } from "../Prisma";
-import { createClient } from "../supabase/supabase_server";
 import { funcResponse } from "@/types/global";
+import { createServerSupabaseClient } from "../supabase/supabase_server";
+import { UserData } from "@/types/Forms";
 
-//check the user in supabase authentication
+//check the user in supabase authentication clientside(not db)
 export async function authUser() {
-  const supabase = await createClient();
+  const supabase = await createServerSupabaseClient();
+
   const { data } = await supabase.auth.getUser();
-  return data;
+
+  const user: UserData = {
+    email: data.user?.email || "",
+    id: data.user?.id || "",
+    name: data.user?.user_metadata.name || "",
+    img: data.user?.user_metadata.avatar_url || "",
+  };
+
+  return user;
 }
 //checking user exist in db or not
 export async function CheckUser(userEmail: string): Promise<funcResponse> {
@@ -29,14 +38,9 @@ export async function CheckUser(userEmail: string): Promise<funcResponse> {
         status: 404,
       };
     }
-    const userdata: User = {
-      email: checkUser.email,
-      id: checkUser.id,
-      name: checkUser.name || "",
-      img: checkUser.img || "",
-    };
+
     return {
-      data: userdata,
+      data: checkUser,
       message: "successfully check the user data",
       status: 200,
     };
@@ -52,7 +56,7 @@ export async function CheckUser(userEmail: string): Promise<funcResponse> {
 }
 
 //create a new user if not already exist in db
-export async function CreateUser(user: User): Promise<funcResponse | any> {
+export async function CreateUser(user: UserData): Promise<funcResponse | any> {
   try {
     console.log("creating new user");
     const createUserData = await prisma.user.create({

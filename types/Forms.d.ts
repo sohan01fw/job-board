@@ -1,5 +1,5 @@
 import { jobCreateSchema } from "@/lib/zod/Form";
-import { JobCategory, JobLoc, JobType } from "@prisma/client";
+import { JobCategory, JobLoc, JobType, User } from "@prisma/client";
 import { z } from "zod";
 
 export type CreateJobResponse =
@@ -28,12 +28,13 @@ export type CreateJobResponse =
 export type JobAppSchemaType = z.infer<typeof jobCreateSchema>;
 
 //For User
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  img?: string;
-}
+// export interface User {
+//   id: string;
+//   email: string;
+//   name?: string;
+//   img?: string;
+// }
+export type UserData = Omit<User, "createdAt">;
 export interface DataError {
   error: boolean;
   message: string;
