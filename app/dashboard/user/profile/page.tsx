@@ -1,6 +1,8 @@
 import { ProfileForm } from "@/features/dashboard/user/profile/components/ProfileForm";
+import { getUser } from "@/lib/Actions/Users";
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const user = await getUser();
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -11,7 +13,7 @@ export default function ProfilePage() {
           Manage your personal information and job preferences
         </p>
       </div>
-      <ProfileForm />
+      <ProfileForm user={user} />
     </div>
   );
 }

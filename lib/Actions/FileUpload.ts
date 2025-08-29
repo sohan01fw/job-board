@@ -1,158 +1,108 @@
 import { supabase } from "../supabase/supabase_client";
+import { withTryCatch } from "../tryCatch";
 
-//this is for files
+// Check if bucket exists
 export async function checkBucket(bucketname: string) {
-  const bucketData = await supabase.storage.listBuckets();
-  const checkBucket = bucketData.data?.some(
-    (value) => value.name == bucketname,
-  );
-  return checkBucket;
+  return withTryCatch(async () => {
+    const bucketData = await supabase.storage.listBuckets();
+    return bucketData.data?.some((b) => b.name === bucketname) ?? false;
+  }, "Error checking bucket");
 }
+
+// Create bucket if not exist
 export async function SetupBucket(bucketname: string) {
-  try {
-    //check the bucket exist or not
-    const checkBuckets = await checkBucket(bucketname);
-    if (checkBuckets) {
-      return null;
-    }
-    // Create the bucket
+  return withTryCatch(async () => {
+    const exists = await checkBucket(bucketname);
+    if (exists.data) return null;
+
     const { data, error } = await supabase.storage.createBucket(bucketname, {
       public: true,
       allowedMimeTypes: ["image/*", "application/pdf"],
       fileSizeLimit: 5 * 1024 * 1024,
     });
-    if (error) {
-      console.log(error);
-      return {
-        error: true,
-        message: "Unexpected error while creating bucket",
-        data: error,
-        status: 500,
-      };
-    }
+
+    if (error) throw error;
     return data;
-  } catch (error) {
-    console.log(error);
-    return {
-      error: error,
-      message: "Unexpected error while creating bucket",
-      status: 500,
-      data: error,
-    };
-  }
+  }, "Error creating bucket");
 }
 
-export async function uploadFile(
-  imageFile: File | undefined,
-  bname: string,
-): Promise<any> {
-  try {
-    //check imagefile present or not
-    if (imageFile === undefined) {
-      return {
-        data: false,
-        error: true,
-        message: "imagefile is undefined",
-        status: 400,
-      };
+// Upload or update file
+
+export async function uploadFile({
+  imageFile,
+  imageUrl,
+  bucketName,
+  fileName,
+}: {
+  imageFile?: File;
+  imageUrl?: string;
+  bucketName: string;
+  fileName?: string; // fallback if URL → we can use `${Date.now()}.png`
+}) {
+  return withTryCatch(async () => {
+    let fileToUpload: File | undefined;
+
+    if (imageFile) {
+      fileToUpload = imageFile;
+    } else if (imageUrl) {
+      const response = await fetch(imageUrl);
+      if (!response.ok) throw new Error("Failed to fetch image from URL");
+
+      const blob = await response.blob();
+      const ext = blob.type.split("/")[1] || "png";
+      fileToUpload = new File([blob], fileName ?? `${Date.now()}.${ext}`, {
+        type: blob.type,
+      });
     }
-    // Create bucket in Supabase file storage
-    await SetupBucket(bname);
 
-    // Check if the specific file exists
-    const filePath = `public/${imageFile?.name}`;
-    const existingFile = await supabase.storage.from(bname).list("public", {
-      limit: 100,
-      offset: 0,
-      sortBy: { column: "name", order: "asc" },
-    });
+    if (!fileToUpload) throw new Error("No file or URL provided");
 
-    const fileExists = existingFile.data?.some(
-      (file) => file.name === imageFile?.name,
-    );
+    await SetupBucket(bucketName);
 
-    if (!fileExists) {
-      // Upload the file if it doesn't exist
-      const { error } = await supabase.storage
-        .from(bname)
-        .upload(filePath, imageFile, {
+    const filePath = `public/${fileToUpload.name}`;
+    const list = await supabase.storage.from(bucketName).list("public");
+    const exists = list.data?.some((f) => f.name === fileToUpload.name);
+
+    const { error } = exists
+      ? await supabase.storage
+          .from(bucketName)
+          .update(filePath, fileToUpload, { cacheControl: "3600" })
+      : await supabase.storage.from(bucketName).upload(filePath, fileToUpload, {
           cacheControl: "3600",
-          upsert: true, // Allow replacing existing files (optional)
+          upsert: true,
         });
 
-      if (error) {
-        return {
-          data: false,
-          error: true,
-          message: "File failed to upload",
-          status: 400,
-        };
-      }
+    if (error) throw error;
 
-      return {
-        data: true,
-        message: "Successfully uploaded file",
-        status: 200,
-      };
-    }
-    // Update the file if it already exists
-    const { error } = await supabase.storage
-      .from(bname)
-      .update(filePath, imageFile, {
-        cacheControl: "3600",
-      });
+    // return public URL immediately
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
 
-    if (error) {
-      return {
-        data: false,
-        error: true,
-        message: "File update failed",
-        status: 400,
-      };
-    }
-
-    return {
-      data: true,
-      message: "Successfully updated file",
-      status: 200,
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      data: false,
-      message: "Unexpected error occurred while uploading file",
-      error: true,
-      status: 500,
-    };
-  }
+    return { uploaded: true, publicUrl: data.publicUrl };
+  }, "Error uploading file");
 }
 
-export async function GetAllFile(imageFile: File | undefined, bname: string) {
-  try {
-    const checkB = await checkBucket(bname);
-    if (!checkB) {
-      return { message: "bucket not present" };
-    }
+// Get public URL of file
+export async function getFileUrl({
+  imageFile,
+  fileName,
+  bucketName,
+}: {
+  imageFile?: File;
+  fileName?: string;
+  bucketName: string;
+}) {
+  return withTryCatch(async () => {
+    if (!imageFile && !fileName) throw new Error("No file or name provided");
 
-    const { data } = supabase.storage
-      .from(bname)
-      .getPublicUrl(`public/${imageFile?.name}`);
+    const exists = await checkBucket(bucketName);
+    if (!exists.data) throw new Error("Bucket not present");
 
-    if (!data) {
-      return { error: true, message: "file not found", status: 404 };
-    }
+    const targetName = imageFile?.name ?? fileName!;
+    const filePath = `public/${targetName}`;
 
-    return {
-      data: data,
-      message: "successfully retrive all files",
-      status: 200,
-    };
-  } catch (error) {
-    console.log(error);
-    return {
-      message: "Unexpected occur while getting all file",
-      error: error,
-      status: 500,
-    };
-  }
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+    if (!data?.publicUrl) throw new Error("File not found");
+
+    return data;
+  }, "Error getting file URL");
 }

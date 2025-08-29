@@ -51,3 +51,19 @@ export async function UpdateUserProfile(
     });
   }, "Error while updating user profile");
 }
+
+export async function updateUserImage({
+  userId,
+  imageUrl,
+}: {
+  userId: string;
+  imageUrl: string;
+}) {
+  return withTryCatch(async () => {
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { img: imageUrl },
+    });
+    return updated;
+  }, "Error updating user image");
+}

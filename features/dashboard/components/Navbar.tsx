@@ -13,7 +13,7 @@ import {
 import { handleLogOutBtn } from "../lib/logout";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export function Header() {
+export function Header({ img }: { img: string }) {
   return (
     <header className="h-16 border-b border-border bg-background px-6 flex items-center justify-between">
       {/* Date */}
@@ -42,7 +42,7 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger className=" outline-none border-none focus:outline-none focus:border-none">
             <Avatar className="w-8 h-8 ">
-              <AvatarImage src="/professional-headshot.png" />
+              <AvatarImage src={img} />
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>

@@ -1,5 +1,6 @@
 "use server";
 
+import { U, UserData } from "@/types/Forms";
 import { prisma } from "../Prisma";
 import { createServerSupabaseClient } from "../supabase/supabase_server";
 import { withTryCatch } from "../tryCatch";
@@ -24,4 +25,10 @@ export async function CheckUser(userEmail: string): Promise<any> {
     if (!user) throw new Error("user not found");
     return user;
   }, "Error while checking user");
+}
+
+export async function getUser() {
+  const user = await authUser();
+  const { data: dbUser } = await CheckUser(user.email);
+  return dbUser as UserData;
 }

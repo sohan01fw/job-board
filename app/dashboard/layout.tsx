@@ -2,6 +2,7 @@ import ThemeProviderWrapper from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/features/dashboard/components/Navbar";
 import { Sidebar } from "@/features/dashboard/components/Sidebar";
+import { getUser } from "@/lib/Actions/Users";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getUser();
   return (
     <ThemeProviderWrapper>
       <div className="min-h-screen grid grid-rows-[auto_1fr] lg:grid-cols-[250px_1fr]">
@@ -24,7 +26,7 @@ export default async function RootLayout({
 
         {/* Header sticky top */}
         <header className="col-span-1 sticky top-0 z-40 bg-white ml-1">
-          <Header />
+          <Header img={user.img || ""} />
         </header>
 
         {/* Main content centered */}

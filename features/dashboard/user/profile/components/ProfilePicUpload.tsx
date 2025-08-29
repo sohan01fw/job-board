@@ -67,15 +67,12 @@ export function ProfileImageUpload({
     <div className="flex flex-col items-center space-y-4">
       <div className="relative">
         <Avatar className="w-32 h-32 border-4 border-green-200">
-          <AvatarImage
-            src={value || "/placeholder.svg"}
-            alt="Profile picture"
-          />
+          <AvatarImage src={value} alt="Profile picture" />
           <AvatarFallback className="bg-green-50 text-green-600">
             <User className="w-12 h-12" />
           </AvatarFallback>
         </Avatar>
-        {value && (
+        {/*{value && (
           <Button
             type="button"
             variant="destructive"
@@ -85,7 +82,7 @@ export function ProfileImageUpload({
           >
             <X className="w-4 h-4" />
           </Button>
-        )}
+        )}*/}
       </div>
 
       <div

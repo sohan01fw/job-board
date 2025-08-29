@@ -28,12 +28,12 @@ export type CreateJobResponse =
 export type JobAppSchemaType = z.infer<typeof jobCreateSchema>;
 
 //For User
-// export interface User {
-//   id: string;
-//   email: string;
-//   name?: string;
-//   img?: string;
-// }
+export interface U {
+  id: string;
+  email: string;
+  name?: string;
+  img?: string;
+}
 export type UserData = Omit<User, "createdAt">;
 export interface DataError {
   error: boolean;

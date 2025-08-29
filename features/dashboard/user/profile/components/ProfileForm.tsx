@@ -37,8 +37,9 @@ import { ResumeUpload } from "./ResumeUpload";
 import { ProfileFormData, profileSchema } from "../lib/zod";
 import { skillSuggestions } from "../constants";
 import { Progress } from "@/components/ui/progress";
+import { UserData } from "@/types/Forms";
 
-export function ProfileForm() {
+export function ProfileForm({ user }: { user: UserData }) {
   const [newSkill, setNewSkill] = useState("");
   const [profileCompletion, setProfileCompletion] = useState(0);
 
@@ -53,8 +54,8 @@ export function ProfileForm() {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
+      fullName: user.name || "",
+      email: user.email,
       phone: "",
       location: "",
       title: "",
@@ -69,7 +70,7 @@ export function ProfileForm() {
       salaryRange: "",
       remote: false,
       relocate: false,
-      profileImage: "",
+      profileImage: user.img || "",
       resume: "",
     },
     mode: "onChange",
@@ -213,6 +214,7 @@ export function ProfileForm() {
                 placeholder="your.email@example.com"
                 className="h-12 text-lg"
                 aria-required="true"
+                disabled
               />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">
