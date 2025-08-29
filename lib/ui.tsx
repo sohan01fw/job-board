@@ -7,9 +7,7 @@ import { supabase } from "@/lib/supabase/supabase_client";
 import { AuthError } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import useExportHooks from "./Hooks/useExportHooks";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { JSX } from "react/jsx-runtime";
-import { DeleteJobs } from "@/features/dashboard/actions";
 export function LoadingBtn(): JSX.Element {
   return (
     <Button disabled className="m-2">
@@ -45,15 +43,4 @@ export function Applybtn({ id }: { id: string }): JSX.Element {
     return router.push(`/jobs/applyjob/${id}`);
   }
   return <Button onClick={apply}>Apply</Button>;
-}
-
-export function DeleteJobbtn({ id }: { id: string }): JSX.Element {
-  async function handleDeleteJob() {
-    const delJob = await DeleteJobs(id);
-    if (delJob?.error === true) {
-      alert("error while deleting job");
-      console.log("error while deleting job");
-    }
-  }
-  return <DropdownMenuItem onClick={handleDeleteJob}>Delete</DropdownMenuItem>;
 }

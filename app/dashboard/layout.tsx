@@ -1,9 +1,8 @@
+import ThemeProviderWrapper from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
-import { DashNavbar } from "@/features/dashboard/components/DashNavbar";
-import Mainpage from "@/features/dashboard/components/Mainpage";
-import { authUser, CheckUser } from "@/lib/Actions/Users";
+import { Header } from "@/features/dashboard/components/Navbar";
+import { Sidebar } from "@/features/dashboard/components/Sidebar";
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,25 +14,24 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await authUser();
-  const checkUser = await CheckUser(user.email || "");
-  if (!checkUser.data) {
-    redirect("/user/onboarding");
-  }
   return (
-    <div>
-      <DashNavbar />
-      <div className="m-10">
-        <div className="">
-          <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
-        </div>
-        <div className="">
-          <h1 className="text-sm font-semibold text-gray-400">Welcome,sohan</h1>
-        </div>
-        <Mainpage />
-        <main>{children}</main>
+    <ThemeProviderWrapper>
+      <div className="min-h-screen grid grid-rows-[auto_1fr] lg:grid-cols-[250px_1fr]">
+        {/* Sidebar sticky left */}
+        <aside className="row-span-full hidden lg:block sticky top-0 left-0 h-screen z-50">
+          <Sidebar />
+        </aside>
+
+        {/* Header sticky top */}
+        <header className="col-span-1 sticky top-0 z-40 bg-white ml-1">
+          <Header />
+        </header>
+
+        {/* Main content centered */}
+        <main className="">{children}</main>
+
         <Toaster />
       </div>
-    </div>
+    </ThemeProviderWrapper>
   );
 }

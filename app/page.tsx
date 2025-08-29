@@ -7,15 +7,14 @@ import JobSearchSection from "@/features/landing/components/JobSearchSection";
 import ResumeBuilderSection from "@/features/landing/components/ResumeSection";
 import StatsSection from "@/features/landing/components/StatsSection";
 import TestimonialsSection from "@/features/landing/components/TestimonialsSection";
-import { authUser, CheckUser } from "@/lib/Actions/Users";
+import { authUser } from "@/lib/Actions/Users";
 
 export default async function LandingPage() {
   const user = await authUser();
-  const checkuser = await CheckUser(user.email || "");
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar user={user} isUser={checkuser.data ? true : false} />
+      <Navbar user={user} />
       <HeroSection />
       <JobSearchSection />
       <ResumeBuilderSection />

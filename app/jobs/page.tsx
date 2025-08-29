@@ -1,5 +1,5 @@
-import { JobCategory } from "@/features/jobs/components/Jobcatagory";
-import { Jobindex } from "@/features/jobs/components/Jobindex";
+import { JobCategory } from "@/features/dashboard/jobs/components/Jobcatagory";
+import { Jobindex } from "@/features/dashboard/jobs/components/Jobindex";
 
 export const dynamic = "force-dynamic";
 

@@ -7,18 +7,12 @@ import { useScrollStore } from "../stores/scrollStore";
 import { useRouter } from "next/navigation";
 import { UserData } from "@/types/Forms";
 
-export function Navbar({ isUser, user }: { isUser: boolean; user: UserData }) {
+export function Navbar({ user }: { user: UserData }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (!user.email) {
-      router.push("/auth/login");
-    } else if (!isUser) {
-      router.push("/user/onboarding");
-    } else {
-      router.push("/dashboard/overview");
-    }
+    router.push("/dashboard");
   };
 
   return (

@@ -6,8 +6,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DeleteJobbtn } from "@/lib/ui";
 import Link from "next/link";
+import { DeleteJobbtn } from "../lib/ui";
 export function Deletepop({ jobId }: { jobId: string }) {
   return (
     <DropdownMenu>

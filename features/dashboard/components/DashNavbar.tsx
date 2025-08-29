@@ -35,7 +35,7 @@ export function DashNavbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="flex items-center">
+              <Link href="/dashboard/overview" className="flex items-center">
                 <Briefcase className="h-8 w-8 text-primary" />
                 <span className="ml-1 text-xl font-bold">JobBoard</span>
               </Link>

@@ -79,11 +79,27 @@ model Company {
 }
 
 model User {
-  id             String           @id
-  name           String?          @db.VarChar(255)
-  email          String           @unique
-  img            String?
-  createdAt      DateTime         @default(now())
+  id          String   @id @default(uuid())
+  name        String?  @db.VarChar(255) // maps to fullName
+  email       String   @unique
+  phone       String?  @unique
+  location    String?
+  title       String?
+  experience  String?
+  education   String?
+  bio         String?
+  skills      String[] // array of skills
+  website     String?
+  linkedin    String?
+  github      String?
+  jobType     String[] // array (e.g. ["full-time","part-time"])
+  salaryRange String?
+  remote      Boolean  @default(false)
+  relocate    Boolean  @default(false)
+  img         String? // profileImage
+  resume      String?
+  createdAt   DateTime @default(now())
+
   jobapplication JobApplication[]
   company        Company?
 }

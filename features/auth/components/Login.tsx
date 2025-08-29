@@ -84,7 +84,7 @@ export default function Login() {
             {isLoadingBtn ? (
               <LoadingBtn />
             ) : (
-              <Button type="submit" className="m-2">
+              <Button disabled={!!msg} type="submit" className="m-2 ">
                 login
               </Button>
             )}
