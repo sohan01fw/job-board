@@ -3,21 +3,55 @@ import z from "zod";
 const profileSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
-  location: z.string().min(2, "Location is required"),
-  title: z.string().min(2, "Job title is required"),
-  experience: z.string().min(1, "Please select your experience level"),
+
+  phone: z.string().refine((val) => val === "" || val.length >= 10, {
+    message: "Please enter a valid phone number",
+  }),
+
+  location: z.string().refine((val) => val === "" || val.length >= 2, {
+    message: "Location is required",
+  }),
+
+  title: z.string().refine((val) => val === "" || val.length >= 2, {
+    message: "Job title is required min 2 characters",
+  }),
+
+  experience: z.string().refine((val) => val === "" || val.length >= 1, {
+    message: "Please select your experience level",
+  }),
+
   education: z.string().optional(),
-  bio: z.string().min(50, "Bio must be at least 50 characters"),
-  skills: z.array(z.string()).min(1, "Please add at least one skill"),
+
+  bio: z.string().refine((val) => val === "" || val.length >= 50, {
+    message: "Bio must be at least 50 characters",
+  }),
+
+  skills: z
+    .array(z.string())
+    .refine((val) => val.length === 0 || val.length >= 1, {
+      message: "Please add at least one skill",
+    }),
+
   website: z
     .string()
-    .url("Please enter a valid URL")
-    .optional()
-    .or(z.literal("")),
-  linkedin: z.string().optional(),
-  github: z.string().optional(),
-  jobType: z.array(z.string()).min(1, "Please select at least one job type"),
+    .refine((val) => val === "" || /^https?:\/\/[^\s$.?#].[^\s]*$/.test(val), {
+      message: "Please enter a valid URL",
+    }),
+
+  linkedin: z.string().refine((val) => val === "" || val.startsWith("http"), {
+    message: "Please enter a valid LinkedIn URL",
+  }),
+
+  github: z.string().refine((val) => val === "" || val.startsWith("http"), {
+    message: "Please enter a valid GitHub URL",
+  }),
+
+  jobType: z
+    .array(z.string())
+    .refine((val) => val.length === 0 || val.length >= 1, {
+      message: "Please select at least one job type",
+    }),
+
   salaryRange: z.string().optional(),
   remote: z.boolean(),
   relocate: z.boolean(),

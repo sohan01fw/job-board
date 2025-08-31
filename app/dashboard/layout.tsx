@@ -1,9 +1,9 @@
 import ThemeProviderWrapper from "@/components/ThemeProvider";
-import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/features/dashboard/components/Navbar";
 import { Sidebar } from "@/features/dashboard/components/Sidebar";
 import { getUser } from "@/lib/Actions/Users";
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -32,7 +32,7 @@ export default async function RootLayout({
         {/* Main content centered */}
         <main className="">{children}</main>
 
-        <Toaster />
+        <Toaster richColors />
       </div>
     </ThemeProviderWrapper>
   );

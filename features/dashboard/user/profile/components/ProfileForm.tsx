@@ -38,40 +38,43 @@ import { ProfileFormData, profileSchema } from "../lib/zod";
 import { skillSuggestions } from "../constants";
 import { Progress } from "@/components/ui/progress";
 import { UserData } from "@/types/Forms";
+import { toast } from "sonner";
+import { UpdateUserProfile } from "../actions";
+import { useUpdateUser } from "../hooks/useUpdateUser";
 
 export function ProfileForm({ user }: { user: UserData }) {
   const [newSkill, setNewSkill] = useState("");
   const [profileCompletion, setProfileCompletion] = useState(0);
+  const { updateUser, loading } = useUpdateUser();
 
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty, dirtyFields },
     trigger,
-    reset,
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: user.name || "",
-      email: user.email,
-      phone: "",
-      location: "",
-      title: "",
-      experience: "",
-      education: "",
-      bio: "",
-      skills: [],
-      website: "",
-      linkedin: "",
-      github: "",
-      jobType: [],
-      salaryRange: "",
-      remote: false,
-      relocate: false,
+      email: user.email || "",
+      phone: user.phone || "",
+      location: user.location || "",
+      title: user.title || "",
+      experience: user.experience || "",
+      education: user.education || "",
+      bio: user.bio || "",
+      skills: user.skills || [],
+      website: user.website || "",
+      linkedin: user.linkedin || "",
+      github: user.github || "",
+      jobType: user.jobType || [],
+      salaryRange: user.salaryRange || "",
+      remote: user.remote ?? false,
+      relocate: user.relocate ?? false,
       profileImage: user.img || "",
-      resume: "",
+      resume: user.resume || "",
     },
     mode: "onChange",
   });
@@ -107,7 +110,9 @@ export function ProfileForm({ user }: { user: UserData }) {
   const addSkill = (skill: string) => {
     if (skill.trim() && !watchedFields.skills?.includes(skill.trim())) {
       const updatedSkills = [...(watchedFields.skills || []), skill.trim()];
-      setValue("skills", updatedSkills);
+      setValue("skills", updatedSkills, {
+        shouldDirty: false,
+      });
       setNewSkill("");
       trigger("skills");
     }
@@ -125,14 +130,14 @@ export function ProfileForm({ user }: { user: UserData }) {
     const updated = current.includes(type)
       ? current.filter((t) => t !== type)
       : [...current, type];
-    setValue("jobType", updated);
+    setValue("jobType", updated, {
+      shouldDirty: true,
+    });
     trigger("jobType");
   };
 
-  const onSubmit = (data: ProfileFormData) => {
-    console.log("Form submitted:", data);
-    // Handle form submission here
-    reset();
+  const onSubmit = async (formData: any) => {
+    await updateUser(user.email, formData, dirtyFields);
   };
 
   return (
@@ -225,7 +230,7 @@ export function ProfileForm({ user }: { user: UserData }) {
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-green-700 font-medium">
-                Phone Number <span className="text-red-500">*</span>
+                Phone Number
               </Label>
               <Input
                 id="phone"
@@ -233,7 +238,6 @@ export function ProfileForm({ user }: { user: UserData }) {
                 {...register("phone")}
                 placeholder="+1 (555) 123-4567"
                 className="h-12 text-lg"
-                aria-required="true"
               />
               {errors.phone && (
                 <p className="text-red-500 text-sm mt-1">
@@ -244,14 +248,13 @@ export function ProfileForm({ user }: { user: UserData }) {
 
             <div className="space-y-2">
               <Label htmlFor="location" className="text-green-700 font-medium">
-                Location <span className="text-red-500">*</span>
+                Location
               </Label>
               <Input
                 id="location"
                 {...register("location")}
                 placeholder="City, State, Country"
                 className="h-12 text-lg"
-                aria-required="true"
               />
               {errors.location && (
                 <p className="text-red-500 text-sm mt-1">
@@ -277,14 +280,13 @@ export function ProfileForm({ user }: { user: UserData }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="title" className="text-green-700 font-medium">
-                  Job Title <span className="text-red-500">*</span>
+                  Job Title
                 </Label>
                 <Input
                   id="title"
                   {...register("title")}
                   placeholder="e.g., Senior Software Engineer"
                   className="h-12 text-lg"
-                  aria-required="true"
                 />
                 {errors.title && (
                   <p className="text-red-500 text-sm mt-1">
@@ -298,13 +300,17 @@ export function ProfileForm({ user }: { user: UserData }) {
                   htmlFor="experience"
                   className="text-green-700 font-medium"
                 >
-                  Years of Experience <span className="text-red-500">*</span>
+                  Years of Experience
                 </Label>
                 <Select
                   value={watchedFields.experience}
-                  onValueChange={(value) => setValue("experience", value)}
+                  onValueChange={(value) =>
+                    setValue("experience", value, {
+                      shouldDirty: true,
+                    })
+                  }
                 >
-                  <SelectTrigger className="h-12 text-lg" aria-required="true">
+                  <SelectTrigger className="h-12 text-lg">
                     <SelectValue placeholder="Select experience level" />
                   </SelectTrigger>
                   <SelectContent>
@@ -337,14 +343,13 @@ export function ProfileForm({ user }: { user: UserData }) {
 
             <div className="space-y-2">
               <Label htmlFor="bio" className="text-green-700 font-medium">
-                Professional Bio <span className="text-red-500">*</span>
+                Professional Bio
               </Label>
               <Textarea
                 id="bio"
                 {...register("bio")}
                 placeholder="Tell us about your professional background, achievements, and career goals..."
                 className="min-h-32 text-lg resize-none"
-                aria-required="true"
               />
               {errors.bio && (
                 <p className="text-red-500 text-sm mt-1">
@@ -368,7 +373,11 @@ export function ProfileForm({ user }: { user: UserData }) {
           <CardContent>
             <ResumeUpload
               value={watchedFields.resume || ""}
-              onChange={(value) => setValue("resume", value)}
+              onChange={(value) =>
+                setValue("resume", value, {
+                  shouldDirty: true,
+                })
+              }
             />
           </CardContent>
         </Card>
@@ -561,9 +570,7 @@ export function ProfileForm({ user }: { user: UserData }) {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
-              <Label className="text-green-700 font-medium">
-                Job Types <span className="text-red-500">*</span>
-              </Label>
+              <Label className="text-green-700 font-medium">Job Types </Label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {["Full-time", "Part-time", "Contract", "Freelance"].map(
                   (type) => (
@@ -600,7 +607,11 @@ export function ProfileForm({ user }: { user: UserData }) {
                 </Label>
                 <Select
                   value={watchedFields.salaryRange}
-                  onValueChange={(value) => setValue("salaryRange", value)}
+                  onValueChange={(value) =>
+                    setValue("salaryRange", value, {
+                      shouldDirty: true,
+                    })
+                  }
                 >
                   <SelectTrigger className="h-12 text-lg">
                     <SelectValue placeholder="Select salary range" />
@@ -623,7 +634,9 @@ export function ProfileForm({ user }: { user: UserData }) {
                     id="remote"
                     checked={watchedFields.remote}
                     onCheckedChange={(checked) =>
-                      setValue("remote", checked as boolean)
+                      setValue("remote", checked as boolean, {
+                        shouldDirty: true,
+                      })
                     }
                   />
                   <Label
@@ -639,7 +652,9 @@ export function ProfileForm({ user }: { user: UserData }) {
                     id="relocate"
                     checked={watchedFields.relocate}
                     onCheckedChange={(checked) =>
-                      setValue("relocate", checked as boolean)
+                      setValue("relocate", checked as boolean, {
+                        shouldDirty: true,
+                      })
                     }
                   />
                   <Label
@@ -655,17 +670,17 @@ export function ProfileForm({ user }: { user: UserData }) {
         </Card>
 
         {/* Submit Button */}
-        <div className="flex justify-center pt-6">
+        <div className="flex justify-end  pt-3 sticky bottom-3 right-3">
           <Button
             type="submit"
-            disabled={!isValid}
+            disabled={!isDirty || !isValid}
             className={`h-14 px-12 text-lg font-semibold ${
-              isValid
-                ? "bg-green-600 hover:bg-green-700 text-white"
+              isDirty && isValid
+                ? "bg-gray-800 hover:bg-gray-900 text-white"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
-            {isValid ? "Save Profile" : "Please complete all required fields"}
+            Update Profile 🚀
           </Button>
         </div>
       </form>

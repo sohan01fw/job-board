@@ -1,6 +1,8 @@
+"use server";
 import { prisma } from "@/lib/Prisma";
 import { withTryCatch } from "@/lib/tryCatch";
 import { UserData } from "@/types/Forms";
+import { User } from "@prisma/client";
 
 // create user
 export async function CreateUser(user: UserData): Promise<any> {
@@ -32,22 +34,15 @@ export async function CreateUser(user: UserData): Promise<any> {
 }
 
 // update user profile
+
 export async function UpdateUserProfile(
   email: string,
-  data: { name?: string; img?: string },
+  data: Partial<Omit<User, "id" | "email">>, // any user fields except id/email
 ): Promise<any> {
   return withTryCatch(async () => {
-    const updateData: { name?: string; img?: string } = {};
-    if (data.name) updateData.name = data.name;
-    if (data.img) updateData.img = data.img;
-
-    if (Object.keys(updateData).length === 0) {
-      throw new Error("No valid data provided for update");
-    }
-
     return await prisma.user.update({
       where: { email },
-      data: updateData,
+      data, // only provided fields are updated
     });
   }, "Error while updating user profile");
 }
