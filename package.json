@@ -11,6 +11,8 @@
     "fixlint": "eslint --fix ."
   },
   "dependencies": {
+    "@ai-sdk/google": "^2.0.11",
+    "@ai-sdk/rsc": "^1.0.29",
     "@hookform/resolvers": "^3.10.0",
     "@prisma/client": "^6.15.0",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -28,6 +30,7 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.56.1",
     "@types/lodash": "^4.17.20",
+    "ai": "^5.0.28",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lodash": "^4.17.21",

@@ -26,11 +26,13 @@ import {
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 type Status = "IDLE" | "OPENTOWORK" | "HIRING";
 
 export function Header({ img, email }: { img: string; email: string }) {
   const { loading, updateStatus } = useUpdateStatus();
+  const router = useRouter();
   const [selectedValue, setSelectedValue] = useState<Status>("IDLE");
   const {
     data,
@@ -50,6 +52,9 @@ export function Header({ img, email }: { img: string; email: string }) {
     setSelectedValue(status);
   };
 
+  const handlePostJobBtn = async () => {
+    router.push("/dashboard/recruiter");
+  };
   return (
     <header className="h-16 border-b border-border bg-background px-6 flex items-center justify-between">
       {/* Date */}
@@ -102,7 +107,9 @@ export function Header({ img, email }: { img: string; email: string }) {
         {loadingFields ? (
           <Skeleton className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-md" />
         ) : (
-          data.status === "HIRING" && <Button>Post a Job</Button>
+          data.status === "HIRING" && (
+            <Button onClick={handlePostJobBtn}>Post a Job</Button>
+          )
         )}
         <ThemeToggle />
         <div className="relative">
