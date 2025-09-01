@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, ChevronDown } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -12,28 +12,98 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { handleLogOutBtn } from "../lib/logout";
 import ThemeToggle from "@/components/ThemeToggle";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  useFetchUserFields,
+  useUpdateStatus,
+} from "../user/profile/hooks/useUpdateUser";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export function Header({ img }: { img: string }) {
+type Status = "IDLE" | "OPENTOWORK" | "HIRING";
+
+export function Header({ img, email }: { img: string; email: string }) {
+  const { loading, updateStatus } = useUpdateStatus();
+  const [selectedValue, setSelectedValue] = useState<Status>("IDLE");
+  const {
+    data,
+    fetchFields,
+    loading: loadingFields,
+  } = useFetchUserFields({ email });
+
+  useEffect(() => {
+    const fetchUserFields = async () => {
+      await fetchFields({ fields: "status" }); // pass fields you need
+    };
+    fetchUserFields();
+  }, [selectedValue]);
+
+  const handleUpdateStatus = async (status: Status) => {
+    await updateStatus({ email, status });
+    setSelectedValue(status);
+  };
+
   return (
     <header className="h-16 border-b border-border bg-background px-6 flex items-center justify-between">
       {/* Date */}
-
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-10  sm:p-2 ">
         <div className="text-sm sm:text-lg text-muted-foreground">
+          <span className="w-2 h-2 bg-green-500  rounded-full"></span>
           Friday, 23 August
         </div>
 
-        <div className="relative bg-gray-100 flex items-center gap-3 p-1 px-4 rounded-xl text-sm sm:text-base hover:cursor-pointer">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 w-2 h-2 bg-green-500 rounded-full"></span>
-          <h3 className="ml-5 truncate font-medium text-sm  ">open to work</h3>
-          <span>
-            <ChevronDown size={14} className="text-gray-600" />
-          </span>
-        </div>
+        {loadingFields ? (
+          <Skeleton className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded-2xl" />
+        ) : (
+          <Select
+            defaultValue={data.status}
+            onValueChange={(val: Status) => handleUpdateStatus(val)}
+          >
+            <SelectTrigger className="w-40 rounded-2xl" loading={loading}>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem
+                value="IDLE"
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <span className="inline-block w-2 h-2 bg-yellow-500 rounded-full mr-2" />
+                Idle
+              </SelectItem>
+
+              <SelectItem
+                value="OPENTOWORK"
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2" />
+                Open to Work
+              </SelectItem>
+              <SelectItem
+                value="HIRING"
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mr-2" />
+                Hiring
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       {/* Right Section */}
       <div className="flex items-center gap-4">
+        {loadingFields ? (
+          <Skeleton className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-md" />
+        ) : (
+          data.status === "HIRING" && <Button>Post a Job</Button>
+        )}
         <ThemeToggle />
         <div className="relative">
           <Bell className="w-5 h-5 hover:cursor-pointer" />

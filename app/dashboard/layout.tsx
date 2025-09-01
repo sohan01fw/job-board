@@ -26,7 +26,7 @@ export default async function RootLayout({
 
         {/* Header sticky top */}
         <header className="col-span-1 sticky top-0 z-40 bg-white ml-1">
-          <Header img={user.img || ""} />
+          <Header email={user.email} img={user.img || ""} />
         </header>
 
         {/* Main content centered */}

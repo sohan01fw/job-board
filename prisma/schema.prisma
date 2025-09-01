@@ -37,6 +37,12 @@ enum Gender {
   FEMALE
 }
 
+enum Status {
+  IDLE
+  OPENTOWORK
+  HIRING
+}
+
 model JobForm {
   id               String         @id @default(uuid())
   fname            String         @db.VarChar(255)
@@ -98,6 +104,7 @@ model User {
   relocate    Boolean  @default(false)
   img         String? // profileImage
   resume      String?
+  status      Status   @default(IDLE)
   createdAt   DateTime @default(now())
 
   jobapplication JobApplication[]

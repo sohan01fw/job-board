@@ -1,6 +1,6 @@
 "use server";
 
-import { U, UserData } from "@/types/Forms";
+import { UserData } from "@/types/Forms";
 import { prisma } from "../Prisma";
 import { createServerSupabaseClient } from "../supabase/supabase_server";
 import { withTryCatch } from "../tryCatch";

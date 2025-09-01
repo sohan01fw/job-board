@@ -34,7 +34,6 @@ export async function CreateUser(user: UserData): Promise<any> {
 }
 
 // update user profile
-
 export async function UpdateUserProfile(
   email: string,
   data: Partial<Omit<User, "id" | "email">>, // any user fields except id/email
@@ -62,3 +61,19 @@ export async function updateUserImage({
     return updated;
   }, "Error updating user image");
 }
+
+export const getUserFields = async (
+  email: string,
+  fields:
+    | keyof Omit<User, "id" | "email">
+    | (keyof Omit<User, "id" | "email">)[],
+) => {
+  const select = Array.isArray(fields)
+    ? Object.fromEntries(fields.map((f) => [f, true]))
+    : { [fields]: true };
+
+  return await prisma.user.findUnique({
+    where: { email },
+    select,
+  });
+};

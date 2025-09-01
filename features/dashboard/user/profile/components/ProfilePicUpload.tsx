@@ -3,9 +3,8 @@
 import type React from "react";
 
 import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, User, X } from "lucide-react";
+import { Upload, User } from "lucide-react";
 
 interface ProfileImageUploadProps {
   value: string;
@@ -56,13 +55,6 @@ export function ProfileImageUpload({
     }
   };
 
-  const removeImage = () => {
-    onChange("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
   return (
     <div className="flex flex-col items-center space-y-4">
       <div className="relative">
@@ -72,17 +64,6 @@ export function ProfileImageUpload({
             <User className="w-12 h-12" />
           </AvatarFallback>
         </Avatar>
-        {/*{value && (
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            className="absolute -top-2 -right-2 rounded-full w-8 h-8 p-0"
-            onClick={removeImage}
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        )}*/}
       </div>
 
       <div

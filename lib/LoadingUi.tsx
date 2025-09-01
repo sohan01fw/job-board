@@ -46,3 +46,15 @@ export const LoadingUi = () => {
     </div>
   );
 };
+
+export function SelectSkeleton() {
+  return (
+    <Skeleton className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded-2xl" />
+  );
+}
+
+export function ButtonSkeleton() {
+  return (
+    <Skeleton className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-md" />
+  );
+}

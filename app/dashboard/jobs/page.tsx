@@ -1,7 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { JobBoard } from "@/features/dashboard/components/JobBoard";
-import { Jobindex } from "@/features/dashboard/jobs/components/Jobindex";
-import Link from "next/link";
+
 export default async function Jobs() {
   return (
     <div className="   md:m-5 h-[36.2rem] overflow-hidden">
