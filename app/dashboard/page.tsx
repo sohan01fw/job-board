@@ -10,7 +10,8 @@ import { authUser, CheckUser } from "@/lib/Actions/Users";
 export default async function page() {
   const user = await authUser();
   const isUser = await CheckUser(user.email);
-  if (isUser.error) {
+  if (!isUser) {
+    console.log("creating user");
     await CreateUser(user);
     await uploadFile({
       imageUrl: user.img,
@@ -24,7 +25,7 @@ export default async function page() {
 
     await updateUserImage({
       userId: user.id,
-      imageUrl: url.data?.publicUrl || "",
+      imageUrl: url.publicUrl || "",
     });
   }
   return (

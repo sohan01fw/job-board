@@ -1,29 +1,12 @@
 import { create } from "zustand";
-
-export interface JobPostData {
-  title: string;
-  company: string;
-  location: string;
-  workType: "remote" | "hybrid" | "onsite";
-  jobType: "full-time" | "part-time" | "contract" | "internship";
-  experience: "entry" | "mid" | "senior" | "executive";
-  salary: {
-    salaryMin: string;
-    salaryMax: string;
-    salaryCurrency: string;
-  };
-  description: string;
-  requirements: string[];
-  benefits: string[];
-  skills: string[];
-  applicationDeadline: string;
-  contactEmail: string;
-}
+import { JobData } from "../../types";
 
 interface JobPostStore {
-  jobData: JobPostData;
-  updateField: (field: keyof JobPostData, value: any) => void;
-  updateSalary: (field: keyof JobPostData["salary"], value: string) => void;
+  jobData: JobData;
+  updateField: (field: keyof JobData, value: any) => void;
+  updateMinSalary: (value: number) => void;
+  updateMaxSalary: (value: number) => void;
+  updateCurrency: (currency: string) => void;
   addRequirement: (requirement: string) => void;
   removeRequirement: (index: number) => void;
   addBenefit: (benefit: string) => void;
@@ -33,18 +16,16 @@ interface JobPostStore {
   resetForm: () => void;
 }
 
-const initialJobData: JobPostData = {
+const initialJobData: JobData = {
   title: "",
   company: "",
   location: "",
   workType: "remote",
-  jobType: "full-time",
+  jobType: "fulltime",
   experience: "mid",
-  salary: {
-    salaryMin: "",
-    salaryMax: "",
-    salaryCurrency: "USD", // TODO: make this dynamic
-  },
+  minSalary: 0,
+  maxSalary: 0,
+  currency: "USD", // TODO: make this dynamic
   description: "",
   requirements: [],
   benefits: [],
@@ -61,11 +42,26 @@ export const useJobPostStore = create<JobPostStore>((set) => ({
       jobData: { ...state.jobData, [field]: value },
     })),
 
-  updateSalary: (field, value) =>
+  updateMinSalary: (value) =>
     set((state) => ({
       jobData: {
         ...state.jobData,
-        salary: { ...state.jobData.salary, [field]: value },
+        salaryMin: value,
+      },
+    })),
+
+  updateMaxSalary: (value) =>
+    set((state) => ({
+      jobData: {
+        ...state.jobData,
+        salaryMax: value,
+      },
+    })),
+  updateCurrency: () =>
+    set((state) => ({
+      jobData: {
+        ...state.jobData,
+        currency: "USD",
       },
     })),
 

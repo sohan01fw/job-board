@@ -15,23 +15,23 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, Building, DollarSign, Calendar } from "lucide-react";
+import { Plus, X, Building, DollarSign, Calendar, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useJobPostStore } from "../stores/postJobStore";
 import { AiInputModel } from "./ui/AiInputModel";
+import { useCreateJobPost } from "../hooks/useJobPost";
+import { UserData } from "@/types/Forms";
 
 const jobPostSchema = z.object({
   title: z.string().min(1, "Job title is required"),
   company: z.string().min(1, "Company name is required"),
   location: z.string().min(1, "Location is required"),
   workType: z.enum(["remote", "hybrid", "onsite"]),
-  jobType: z.enum(["full-time", "part-time", "contract", "internship"]),
+  jobType: z.enum(["fulltime", "parttime", "contract", "internship"]),
   experience: z.enum(["entry", "mid", "senior", "executive"]),
-  salary: z.object({
-    salaryMin: z.string().min(1, "Minimum salary is required"),
-    salaryMax: z.string().min(1, "Maximum salary is required"),
-    currency: z.string().default("USD"),
-  }),
+  minSalary: z.number().min(1, "Minimum salary is required"),
+  maxSalary: z.number().min(1, "Maximum salary is required"),
+  currency: z.string().default("USD"),
   description: z.string().min(50, "Description must be at least 50 characters"),
   applicationDeadline: z.string().min(1, "Application deadline is required"),
   contactEmail: z.string().email("Valid email is required"),
@@ -42,11 +42,13 @@ const jobPostSchema = z.object({
 
 type JobPostFormData = z.infer<typeof jobPostSchema>;
 
-export function PostJobForm() {
+export function PostJobForm({ user }: { user: UserData }) {
   const {
     jobData,
     updateField,
-    updateSalary,
+    updateMaxSalary,
+    updateMinSalary,
+    updateCurrency,
     addRequirement,
     removeRequirement,
     addBenefit,
@@ -57,12 +59,14 @@ export function PostJobForm() {
   const [newRequirement, setNewRequirement] = useState("");
   const [newBenefit, setNewBenefit] = useState("");
   const [newSkill, setNewSkill] = useState("");
+  const { mutateAsync, isPending } = useCreateJobPost();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
     // watch,
   } = useForm<JobPostFormData>({
     resolver: zodResolver(jobPostSchema),
@@ -73,11 +77,9 @@ export function PostJobForm() {
       workType: jobData.workType,
       jobType: jobData.jobType,
       experience: jobData.experience,
-      salary: {
-        salaryMax: jobData.salary.salaryMax,
-        salaryMin: jobData.salary.salaryMin,
-        currency: jobData.salary.salaryCurrency,
-      },
+      maxSalary: jobData.maxSalary,
+      minSalary: jobData.minSalary,
+      currency: jobData.currency,
       description: jobData.description,
       applicationDeadline: jobData.applicationDeadline,
       contactEmail: jobData.contactEmail,
@@ -101,14 +103,17 @@ export function PostJobForm() {
     }
   };
 
-  const handleSalaryChange = (
-    field: "salaryMin" | "salaryMax" | "salaryCurrency",
-    value: string,
-  ) => {
-    updateSalary(field, value);
-    if (field === "salaryMin") setValue("salary.salaryMin", value);
-    if (field === "salaryMax") setValue("salary.salaryMax", value);
-    if (field === "salaryCurrency") setValue("salary.currency", value);
+  const handleMinSalaryChange = (value: number) => {
+    updateMinSalary(value);
+    setValue("minSalary", value);
+  };
+  const handleMaxSalaryChange = (value: number) => {
+    updateMaxSalary(value);
+    setValue("maxSalary", value);
+  };
+  const handleCurrencyChange = (value: string) => {
+    updateCurrency(value);
+    setValue("currency", value);
   };
 
   const handleAddRequirement = () => {
@@ -132,8 +137,10 @@ export function PostJobForm() {
     }
   };
 
-  const onSubmit = (data: JobPostFormData) => {
-    console.log("Job post submitted:", data);
+  const onSubmit = async (data: JobPostFormData) => {
+    await mutateAsync({ job: data, email: user.email });
+    reset();
+    useJobPostStore.getState().resetForm();
   };
 
   return (
@@ -233,10 +240,10 @@ export function PostJobForm() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="full-time">Full-time</SelectItem>
-                    <SelectItem value="part-time">Part-time</SelectItem>
-                    <SelectItem value="contract">Contract</SelectItem>
-                    <SelectItem value="internship">Internship</SelectItem>
+                    <SelectItem value="fulltime">fulltime</SelectItem>
+                    <SelectItem value="parttime">parttime</SelectItem>
+                    <SelectItem value="contract">contract</SelectItem>
+                    <SelectItem value="internship">cnternship</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -281,15 +288,16 @@ export function PostJobForm() {
                   Min Salary <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  {...register("salary.salaryMin")}
+                  {...register("minSalary")}
                   placeholder="50000"
+                  type="number"
                   onChange={(e) =>
-                    handleSalaryChange("salaryMin", e.target.value)
+                    handleMinSalaryChange(Number(e.target.value))
                   }
                 />
-                {errors.salary?.salaryMin && (
+                {errors.minSalary && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.salary.salaryMin.message}
+                    {errors.minSalary.message}
                   </p>
                 )}
               </div>
@@ -299,15 +307,16 @@ export function PostJobForm() {
                   Max Salary <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  {...register("salary.salaryMax")}
+                  {...register("maxSalary")}
                   placeholder="80000"
+                  type="number"
                   onChange={(e) =>
-                    handleSalaryChange("salaryMax", e.target.value)
+                    handleMaxSalaryChange(Number(e.target.value))
                   }
                 />
-                {errors.salary?.salaryMax && (
+                {errors.maxSalary && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.salary?.salaryMax.message}
+                    {errors.maxSalary.message}
                   </p>
                 )}
               </div>
@@ -317,10 +326,8 @@ export function PostJobForm() {
                   Currency
                 </label>
                 <Select
-                  value={jobData.salary.salaryCurrency || ""}
-                  onValueChange={(value) =>
-                    handleSalaryChange("salaryCurrency", value)
-                  }
+                  value={jobData.currency || ""}
+                  onValueChange={(value) => handleCurrencyChange(value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -524,16 +531,27 @@ export function PostJobForm() {
         </Card>
 
         <div className="flex gap-4">
-          <Button
-            type="submit"
-            className="flex-1 bg-green-600 hover:bg-green-700"
-          >
-            Post Job
-          </Button>
+          {isPending ? (
+            <Button disabled className="flex-1 bg-green-600 hover:bg-green-700">
+              <Loader2 className="animate-spin" />
+              posting...
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              className="flex-1 bg-green-600 hover:bg-green-700"
+            >
+              Post Job
+            </Button>
+          )}
+
           <Button
             type="button"
             variant="outline"
-            onClick={() => useJobPostStore.getState().resetForm()}
+            onClick={() => {
+              reset();
+              useJobPostStore.getState().resetForm();
+            }}
           >
             Reset Form
           </Button>

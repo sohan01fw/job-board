@@ -19,16 +19,16 @@ export async function authUser(): Promise<any> {
 }
 
 // check user in db
-export async function CheckUser(userEmail: string): Promise<any> {
+export async function CheckUser(userEmail: string) {
   return withTryCatch(async () => {
     const user = await prisma.user.findUnique({ where: { email: userEmail } });
-    if (!user) throw new Error("user not found");
+    if (!user) throw new Error("User not found");
     return user;
   }, "Error while checking user");
 }
 
 export async function getUser() {
   const user = await authUser();
-  const { data: dbUser } = await CheckUser(user.email);
+  const dbUser = await CheckUser(user.email); // throws if not found
   return dbUser as UserData;
 }

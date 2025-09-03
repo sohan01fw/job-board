@@ -13,7 +13,7 @@ export async function checkBucket(bucketname: string) {
 export async function SetupBucket(bucketname: string) {
   return withTryCatch(async () => {
     const exists = await checkBucket(bucketname);
-    if (exists.data) return null;
+    if (exists) return null;
 
     const { data, error } = await supabase.storage.createBucket(bucketname, {
       public: true,
@@ -95,7 +95,7 @@ export async function getFileUrl({
     if (!imageFile && !fileName) throw new Error("No file or name provided");
 
     const exists = await checkBucket(bucketName);
-    if (!exists.data) throw new Error("Bucket not present");
+    if (!exists) throw new Error("Bucket not present");
 
     const targetName = imageFile?.name ?? fileName!;
     const filePath = `public/${targetName}`;

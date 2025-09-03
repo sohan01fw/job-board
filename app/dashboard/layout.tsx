@@ -1,7 +1,9 @@
 import ThemeProviderWrapper from "@/components/ThemeProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Header } from "@/features/dashboard/components/Navbar";
 import { Sidebar } from "@/features/dashboard/components/Sidebar";
 import { getUser } from "@/lib/Actions/Users";
+import { ReactQueryProvider } from "@/lib/ReactQueryProvider";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 
@@ -18,22 +20,26 @@ export default async function RootLayout({
   const user = await getUser();
   return (
     <ThemeProviderWrapper>
-      <div className="min-h-screen grid grid-rows-[auto_1fr] lg:grid-cols-[250px_1fr]">
-        {/* Sidebar sticky left */}
-        <aside className="row-span-full hidden lg:block sticky top-0 left-0 h-screen z-50">
-          <Sidebar />
-        </aside>
+      <ReactQueryProvider>
+        <TooltipProvider>
+          <div className="min-h-screen grid grid-rows-[auto_1fr] lg:grid-cols-[250px_1fr]">
+            {/* Sidebar sticky left */}
+            <aside className="row-span-full hidden lg:block sticky top-0 left-0 h-screen z-50">
+              <Sidebar />
+            </aside>
 
-        {/* Header sticky top */}
-        <header className="col-span-1 sticky top-0 z-40 bg-white ml-1">
-          <Header email={user.email} img={user.img || ""} />
-        </header>
+            {/* Header sticky top */}
+            <header className="col-span-1 sticky top-0 z-40 bg-white ml-1">
+              <Header email={user?.email} img={user?.img || ""} />
+            </header>
 
-        {/* Main content centered */}
-        <main className="">{children}</main>
+            {/* Main content centered */}
+            <main className="">{children}</main>
 
-        <Toaster richColors />
-      </div>
+            <Toaster richColors />
+          </div>
+        </TooltipProvider>
+      </ReactQueryProvider>
     </ThemeProviderWrapper>
   );
 }

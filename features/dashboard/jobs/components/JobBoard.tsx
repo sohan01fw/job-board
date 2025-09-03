@@ -1,0 +1,22 @@
+import { JobFilters } from "./Job-filters";
+import { JobList } from "./Job-list";
+
+export function JobBoard() {
+  return (
+    <div className="flex  w-full bg-background">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 overflow-hidden">
+          <div className="p-6 flex flex-col ">
+            {/* Static filters */}
+            <JobFilters />
+            {/* Scrollable JobList */}
+            <div className="mt-6 flex-1 ">
+              <JobList />
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

@@ -1,8 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PostJobForm } from "@/features/dashboard/recruiter/components/Postajob";
 import { JobPreview } from "@/features/dashboard/recruiter/components/PreviewJob";
+import { authUser } from "@/lib/Actions/Users";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const user = await authUser();
   return (
     <Tabs defaultValue="postajob" className="m-5 ">
       <TabsList>
@@ -24,7 +26,7 @@ export default function Dashboard() {
                 Fill out the details below
               </div>
             </div>
-            <PostJobForm />
+            <PostJobForm user={user} />
           </div>
 
           {/* Preview Section */}

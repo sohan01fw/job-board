@@ -17,13 +17,12 @@ export function JobPreview() {
   const { jobData } = useJobPostStore();
 
   const formatSalary = () => {
-    if (!jobData.salary.salaryMin && !jobData.salary.salaryMax)
-      return "Salary not specified";
-    if (jobData.salary.salaryMin && jobData.salary.salaryMax) {
-      return `${jobData.salary.salaryCurrency} ${Number.parseInt(jobData.salary.salaryMin).toLocaleString()} - ${Number.parseInt(jobData.salary.salaryMax).toLocaleString()}`;
+    if (!jobData.minSalary && !jobData.maxSalary) return "Salary not specified";
+    if (jobData.minSalary && jobData.maxSalary) {
+      return `${jobData.currency} ${jobData.minSalary} - ${jobData.maxSalary}`;
     }
-    return jobData.salary.salaryMin
-      ? `${jobData.salary.salaryCurrency} ${Number.parseInt(jobData.salary.salaryMin).toLocaleString()}+`
+    return jobData.minSalary
+      ? `${jobData.currency} ${jobData.minSalary}+`
       : "Competitive salary";
   };
 
@@ -31,12 +30,12 @@ export function JobPreview() {
     return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
-  const formatJobType = (type: string) => {
-    return type
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
+  // const formatJobType = (type: string) => {
+  //   return type
+  //     .split("-")
+  //     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  //     .join(" ");
+  // };
 
   const formatExperience = (exp: string) => {
     const levels = {
@@ -74,9 +73,7 @@ export function JobPreview() {
                 >
                   {formatWorkType(jobData.workType)}
                 </Badge>
-                <Badge variant="secondary">
-                  {formatJobType(jobData.jobType)}
-                </Badge>
+                <Badge variant="secondary">{jobData.jobType}</Badge>
                 <Badge variant="secondary">
                   {formatExperience(jobData.experience)}
                 </Badge>

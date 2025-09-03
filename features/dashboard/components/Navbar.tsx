@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { handleLogOutBtn } from "../lib/logout";
+import { handleLogOutBtn } from "./ui/logout";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
   Select,

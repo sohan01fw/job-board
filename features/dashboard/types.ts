@@ -1,14 +1,19 @@
-import { Gender, JobCategory, JobLoc, JobType } from "@prisma/client";
+import { JobType } from "@prisma/client";
 
-export interface JobApp {
+export interface JobData {
   title: string;
-  desc: string;
-  jobCategory: JobCategory;
-  jobLoc: JobLoc;
+  company: string;
+  location: string;
+  workType: "remote" | "hybrid" | "onsite";
   jobType: JobType;
-  joblimit?: number;
+  experience: "entry" | "mid" | "senior" | "executive";
+  minSalary: number;
+  maxSalary: number;
+  currency: string;
+  description: string;
   requirements: string[];
-  salary?: number;
-  gender: Gender;
-  Links?: string;
+  benefits: string[];
+  skills: string[];
+  applicationDeadline: string;
+  contactEmail: string;
 }

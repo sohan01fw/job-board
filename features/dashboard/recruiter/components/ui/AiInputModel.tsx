@@ -10,8 +10,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { genAi } from "@/lib/ai/genAi";
-import { JobPostData, useJobPostStore } from "../../stores/postJobStore";
+import { useJobPostStore } from "../../stores/postJobStore";
 import { readStreamableValue } from "@ai-sdk/rsc";
+import Spinner from "@/components/loadingSpinner";
+import { JobData } from "@/features/dashboard/types";
 
 const placeholders = [
   "Create a job for Next.js dev...",
@@ -24,37 +26,45 @@ export function AiInputModel({ setValue }: { setValue: any }) {
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [jobInput, setJobInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const { updateField } = useJobPostStore();
 
   const handleGenerateJob = async () => {
-    const prompt = jobInput;
-    if (prompt.length < 10) {
+    if (jobInput.length < 10) {
       alert("Please enter more than 10 characters");
       setJobInput("");
       return;
     }
-    const { object: res, error } = await genAi(prompt); // await server action
-    if (!res) {
-      console.error("no response");
-      return;
-    }
 
-    if (error) {
-      // show rejection message
-      alert("I can't help with that.Please write to create job only");
-      setJobInput("");
-      return;
-    }
+    setLoading(true);
+    try {
+      const { object: res, error } = await genAi(jobInput);
 
-    for await (const partial of readStreamableValue(res)) {
-      if (!partial) continue;
+      // console.log(res);
+      if (!res) {
+        console.error("no response", res);
+        return;
+      }
 
-      (Object.keys(partial) as (keyof JobPostData)[]).forEach((key) => {
-        setValue(key, partial[key]);
-        updateField(key, partial[key]);
-      });
+      if (error) {
+        alert("I can't help with that. Please write to create job only");
+        setJobInput("");
+        return;
+      }
+
+      for await (const partial of readStreamableValue(res)) {
+        if (!partial) continue;
+
+        (Object.keys(partial) as (keyof JobData)[]).forEach((key) => {
+          setValue(key, partial[key]);
+          updateField(key, partial[key]);
+        });
+      }
+    } finally {
+      setLoading(false);
     }
   };
+
   // cycling placeholder effect
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,8 +76,13 @@ export function AiInputModel({ setValue }: { setValue: any }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition">
-        Create with AI 🚀
+      <DialogTrigger className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition flex gap-2 ">
+        {loading ? <span>Generating...</span> : <span>Create with AI</span>}
+        {loading ? (
+          <Spinner className="w-4 h-4 mt-0.5 animate-spin text-white" />
+        ) : (
+          <span className="ml-3">🚀</span>
+        )}
       </DialogTrigger>
       <DialogContent className="space-y-4">
         <DialogHeader>

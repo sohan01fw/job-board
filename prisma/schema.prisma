@@ -14,27 +14,24 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum WorkType {
+  remote
+  hybrid
+  onsite
+}
+
 enum JobType {
-  PARTTIME
-  FULLTIME
-  CONTRACT
+  fulltime
+  parttime
+  contract
+  internship
 }
 
-enum JobLoc {
-  REMOTE
-  ONSITE
-  HYBRID
-}
-
-enum JobCategory {
-  FINANCE
-  MARKETING
-  IT
-}
-
-enum Gender {
-  MALE
-  FEMALE
+enum Experience {
+  entry
+  mid
+  senior
+  executive
 }
 
 enum Status {
@@ -43,45 +40,28 @@ enum Status {
   HIRING
 }
 
-model JobForm {
-  id               String         @id @default(uuid())
-  fname            String         @db.VarChar(255)
-  lname            String         @db.VarChar(255)
-  age              Int?
-  gender           Gender
-  about            String
-  resume           String         @default("")
-  socialLinks      String[]       @default([])
-  createdAt        DateTime       @default(now())
-  jobApplicationId String
-  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
-}
+model JobPost {
+  id                  String     @id @default(uuid())
+  title               String
+  company             String
+  location            String
+  workType            WorkType
+  jobType             JobType
+  experience          Experience
+  minSalary           Int
+  maxSalary           Int
+  currency            String
+  description         String
+  requirements        String[]
+  benefits            String[]
+  skills              String[]
+  applicationDeadline String
+  contactEmail        String
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 
-model JobApplication {
-  id           String      @id @default(uuid())
-  title        String      @db.VarChar(255)
-  desc         String
-  requirements String[]
-  salary       Int?
-  joblimit     Int?
-  jobType      JobType
-  jobLoc       JobLoc
-  links        String?
-  jobCategory  JobCategory
-  applied      Int?        @default(0)
-  status       Boolean     @default(true)
-  createdAt    DateTime    @default(now())
-  userId       String
-  user         User        @relation(fields: [userId], references: [id])
-  jobForm      JobForm[]
-}
-
-model Company {
-  id     String  @id @default(uuid())
-  name   String  @unique @db.VarChar(255)
-  desc   String?
-  userId String  @unique
-  user   User    @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 }
 
 model User {
@@ -107,6 +87,5 @@ model User {
   status      Status   @default(IDLE)
   createdAt   DateTime @default(now())
 
-  jobapplication JobApplication[]
-  company        Company?
+  jobs JobPost[]
 }

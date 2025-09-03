@@ -8,7 +8,8 @@
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint",
-    "fixlint": "eslint --fix ."
+    "fixlint": "eslint --fix .",
+    "check": "bun tsc --noEmit && bun eslint . --ext ts,tsx"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.11",
@@ -27,8 +28,10 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.15",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.56.1",
+    "@tanstack/react-query": "^5.85.9",
     "@types/lodash": "^4.17.20",
     "ai": "^5.0.28",
     "class-variance-authority": "^0.7.1",
@@ -42,7 +45,6 @@
     "react-hook-form": "^7.62.0",
     "recharts": "^2.15.4",
     "sonner": "^2.0.7",
-    "swr": "^2.3.6",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.25.76",

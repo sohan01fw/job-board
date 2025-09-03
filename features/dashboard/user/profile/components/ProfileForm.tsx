@@ -38,14 +38,12 @@ import { ProfileFormData, profileSchema } from "../lib/zod";
 import { skillSuggestions } from "../constants";
 import { Progress } from "@/components/ui/progress";
 import { UserData } from "@/types/Forms";
-import { toast } from "sonner";
-import { UpdateUserProfile } from "../actions";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 
 export function ProfileForm({ user }: { user: UserData }) {
   const [newSkill, setNewSkill] = useState("");
   const [profileCompletion, setProfileCompletion] = useState(0);
-  const { updateUser, loading } = useUpdateUser();
+  const { updateUser } = useUpdateUser();
 
   const {
     register,

@@ -10,33 +10,47 @@ const jobPostSchema = z.object({
   company: z
     .string()
     .min(1)
-    .describe("Name of the hiring company.Take random name ok."),
+    .describe(
+      "Name of the hiring company.Take random name and unique everytime.",
+    ),
   location: z
     .string()
     .min(1)
-    .describe("Job location (city, state, or remote)."),
+    .describe(
+      "Job location (city, state, country)only.Don't include these (remote, hybrid, onsite )",
+    ),
   workType: z
     .enum(["remote", "hybrid", "onsite"])
     .describe("Type of working arrangement."),
   jobType: z
-    .enum(["full-time", "part-time", "contract", "internship"])
+    .enum(["fulltime", "parttime", "contract", "internship"])
     .describe("Employment type."),
   experience: z
     .enum(["entry", "mid", "senior", "executive"])
     .describe("Experience level required."),
-  salary: z.object({
-    salaryMin: z.string().min(1).describe("Minimum salary offered."),
-    salaryMax: z.string().min(1).describe("Maximum salary offered."),
-    currency: z.string().default("USD").describe("Salary currency, e.g., USD."),
-  }),
+  minSalary: z
+    .number()
+    .min(20000, "Minimum salary must be at least 20000")
+    .describe(
+      "Minimum salary offered.just create number not any symbol.just create number don't separate it with comma.",
+    ),
+  maxSalary: z
+    .number()
+    .min(30000, "Maximum salary must be at least 30000")
+    .describe(
+      "Maximum salary offered.just create number not any symbol.just create number don't separate it with comma.",
+    ),
+  currency: z.string().default("USD").describe("Salary currency, e.g., USD."),
   description: z
     .string()
     .min(50)
     .describe("Detailed job description, minimum 100 characters."),
+
   applicationDeadline: z
     .string()
-    .min(1)
-    .describe("Application deadline in YYYY-MM-DD format."),
+    .describe(
+      "Application deadline as a date string in YYYY-MM-DD format,just search on internet to find the current yr and set the deadline to future date ok",
+    ),
   contactEmail: z
     .string()
     .email()

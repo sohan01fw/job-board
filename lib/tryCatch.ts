@@ -1,13 +1,12 @@
 // utils/withTryCatch.ts
 export async function withTryCatch<T>(
   fn: () => Promise<T>,
-  errorMessage: string,
-): Promise<{ error: boolean; data?: T; message: string }> {
+  msg: string,
+): Promise<T> {
   try {
-    const data = await fn();
-    return { error: false, data, message: "success" };
+    return await fn();
   } catch (err) {
     console.error(err);
-    return { error: true, message: errorMessage };
+    throw new Error(msg); // React Query will catch this
   }
 }
