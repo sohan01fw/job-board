@@ -8,6 +8,7 @@ import {
   Compass,
   CheckCircle,
   History,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,12 +17,32 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navigationItems = [
-  { icon: Home, label: "Home", path: "/dashboard" },
-  { icon: Briefcase, label: "Jobs", path: "/dashboard/jobs" },
-  { icon: Compass, label: "Discover", path: "/dashboard/discover" },
-  { icon: MessageSquare, label: "Messages", path: "/dashboard/messages" },
-  { icon: User, label: "Profile", path: "/dashboard/user/profile" },
-  { icon: History, label: "History", path: "/dashboard/history" },
+  { icon: Home, label: "Home", path: "/dashboard", active: true },
+  { icon: Briefcase, label: "Jobs", path: "/dashboard/jobs", active: true },
+  {
+    icon: Compass,
+    label: "Discover",
+    path: "/dashboard/discover",
+    active: false,
+  },
+  {
+    icon: MessageSquare,
+    label: "Messages",
+    path: "/dashboard/messages",
+    active: false,
+  },
+  {
+    icon: User,
+    label: "Profile",
+    path: "/dashboard/user/profile",
+    active: true,
+  },
+  {
+    icon: History,
+    label: "History",
+    path: "/dashboard/history",
+    active: false,
+  },
 ];
 
 export function Sidebar() {
@@ -51,10 +72,14 @@ export function Sidebar() {
                 isActive
                   ? "bg-gray-800 text-white  font-medium"
                   : "text-gray-600 hover:bg-gray-100 hover:text-black",
+                !item.active && "opacity-50 cursor-not-allowed",
               )}
             >
               <item.icon className="w-5 h-5" />
               <span className="truncate">{item.label}</span>
+              <div className="flex items-center gap-2">
+                {!item.active && <Lock className="w-4 h-4" />}
+              </div>
             </Link>
           );
         })}

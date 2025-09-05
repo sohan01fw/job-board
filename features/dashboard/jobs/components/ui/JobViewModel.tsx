@@ -11,8 +11,8 @@ import {
 import { Eye } from "lucide-react";
 import { EyeTooltip } from "./Tooltip";
 import { JobData } from "@/features/dashboard/types";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import ApplyDialog from "./JobApplyModel";
 
 export default function JobViewModel({ job }: { job: JobData }) {
   return (
@@ -56,9 +56,7 @@ export default function JobViewModel({ job }: { job: JobData }) {
             </DialogDescription>
           </DialogHeader>
 
-          <Button className="bg-green-600 hover:bg-green-500 text-white">
-            Apply
-          </Button>
+          <ApplyDialog job={job} />
         </div>
 
         {/* Job meta */}

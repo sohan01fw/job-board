@@ -1,10 +1,13 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GetAllPostedJobs } from "@/features/dashboard/recruiter/actions";
 import { PostJobForm } from "@/features/dashboard/recruiter/components/Postajob";
+import { PostedJobs } from "@/features/dashboard/recruiter/components/PostedJobs";
 import { JobPreview } from "@/features/dashboard/recruiter/components/PreviewJob";
-import { authUser } from "@/lib/Actions/Users";
+import { getUser } from "@/lib/Actions/Users";
 
 export default async function Dashboard() {
-  const user = await authUser();
+  const user = await getUser();
+  const jobs = await GetAllPostedJobs({ userId: user.id });
   return (
     <Tabs defaultValue="postajob" className="m-5 ">
       <TabsList>
@@ -46,6 +49,7 @@ export default async function Dashboard() {
 
       <TabsContent value="applicants">
         {/* Applicants list goes here */}
+        <PostedJobs jobs={jobs} />
       </TabsContent>
 
       <TabsContent value="history">

@@ -1,20 +1,19 @@
 "use server";
 
-import { prisma } from "@/lib/Prisma";
-import { withTryCatch } from "@/lib/tryCatch";
 import { JobData } from "../types";
-
-export async function CreateJobPost(job: JobData, email: string) {
-  return withTryCatch(async () => {
-    return prisma.jobPost.create({
-      data: {
-        ...job,
-        user: { connect: { email } },
-      },
-    });
-  }, "Error while creating job post");
-}
+import {
+  CreateJobPost,
+  getAllApplicantsByJob,
+  getAllJobPosts,
+} from "./lib/query";
 
 export async function createJob(job: JobData, email: string) {
   return CreateJobPost(job, email);
+}
+
+export async function GetAllPostedJobs({ userId }: { userId?: string }) {
+  return await getAllJobPosts({ userId });
+}
+export async function GetAllApplicants({ jobId }: { jobId: string }) {
+  return await getAllApplicantsByJob({ jobId });
 }

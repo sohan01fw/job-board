@@ -1,7 +1,7 @@
 import { JobFilters } from "./Job-filters";
 import { JobList } from "./Job-list";
 
-export function JobBoard() {
+export async function JobBoard() {
   return (
     <div className="flex  w-full bg-background">
       {/* Main Content */}

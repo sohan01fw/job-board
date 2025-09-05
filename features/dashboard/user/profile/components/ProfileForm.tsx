@@ -39,6 +39,7 @@ import { skillSuggestions } from "../constants";
 import { Progress } from "@/components/ui/progress";
 import { UserData } from "@/types/Forms";
 import { useUpdateUser } from "../hooks/useUpdateUser";
+import { getFileUrl, uploadFile } from "@/lib/Actions/FileUpload";
 
 export function ProfileForm({ user }: { user: UserData }) {
   const [newSkill, setNewSkill] = useState("");
@@ -135,7 +136,31 @@ export function ProfileForm({ user }: { user: UserData }) {
   };
 
   const onSubmit = async (formData: any) => {
-    await updateUser(user.email, formData, dirtyFields);
+    let resumeUrl = user.resume; // keep old resume by default
+
+    // If user selected a new resume file (not the same as before)
+    if (formData.resume && formData.resume !== user.resume) {
+      // Upload to Supabase bucket
+      await uploadFile({
+        imageUrl: formData.resume, // assuming ResumeUpload gives base64/file object
+        bucketName: "resume",
+        fileName: `${user.id}.pdf`,
+      });
+
+      // Get public URL from Supabase
+      const { publicUrl } = await getFileUrl({
+        fileName: `${user.id}.pdf`,
+        bucketName: "resume",
+      });
+      resumeUrl = publicUrl;
+    }
+
+    // Update user with new data, replacing resume if changed
+    await updateUser(
+      user.email,
+      { ...formData, resume: resumeUrl },
+      dirtyFields,
+    );
   };
 
   return (
