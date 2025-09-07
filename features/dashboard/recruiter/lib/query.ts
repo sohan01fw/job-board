@@ -65,3 +65,34 @@ export async function getAllApplicantsByJob({ jobId }: { jobId: string }) {
     return applicants;
   }, "Error while getting applicants for the job");
 }
+
+//update status
+
+export async function updateJobApplicationStatus({
+  applicationId,
+  status,
+}: {
+  applicationId: string;
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
+}) {
+  return withTryCatch(async () => {
+    const updatedApp = await prisma.jobApplication.update({
+      where: { id: applicationId },
+      data: { status },
+      include: {
+        user: true,
+        job: true,
+      },
+    });
+
+    // 2️⃣ Create a notification for the applicant
+    await prisma.notification.create({
+      data: {
+        userId: updatedApp.userId,
+        jobApplicationId: updatedApp.id,
+        message: `Your application for ${updatedApp.job.title} is now ${status}`,
+      },
+    });
+    return updatedApp;
+  }, "Error while updating job application status");
+}

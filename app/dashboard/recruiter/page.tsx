@@ -13,7 +13,6 @@ export default async function Dashboard() {
       <TabsList>
         <TabsTrigger value="postajob">Post a Job</TabsTrigger>
         <TabsTrigger value="applicants">Applicants</TabsTrigger>
-        <TabsTrigger value="history">History</TabsTrigger>
       </TabsList>
 
       <TabsContent value="postajob">
@@ -50,10 +49,6 @@ export default async function Dashboard() {
       <TabsContent value="applicants">
         {/* Applicants list goes here */}
         <PostedJobs jobs={jobs} />
-      </TabsContent>
-
-      <TabsContent value="history">
-        {/* Job posting history goes here */}
       </TabsContent>
     </Tabs>
   );

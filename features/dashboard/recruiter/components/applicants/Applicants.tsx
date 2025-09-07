@@ -4,25 +4,10 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
-type Applicant = {
-  id: string;
-  coverLetter: string;
-  status: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    img?: string;
-    phone?: string;
-    experience?: string;
-    github?: string;
-    linkedin?: string;
-    resume?: string;
-  };
-};
+import Link from "next/link";
+import { StatusSelect } from "../ui/StatusDropdown";
+import { Applicant } from "../../types";
 
 export default function Applicants({ applicants }: { applicants: any }) {
   const [selected, setSelected] = useState<Applicant | null>(null);
@@ -33,7 +18,7 @@ export default function Applicants({ applicants }: { applicants: any }) {
       <div className="w-full md:w-1/3 border-r">
         <ScrollArea className="h-full">
           <div className="p-4 space-y-3">
-            {applicants.map((applicant: any) => (
+            {applicants.map((applicant: Applicant) => (
               <Card
                 key={applicant.id}
                 className={`cursor-pointer transition hover:bg-muted ${
@@ -69,7 +54,7 @@ export default function Applicants({ applicants }: { applicants: any }) {
             <div>
               <h2 className="text-xl font-semibold flex items-center gap-2">
                 {selected.user.name}
-                <Badge variant="outline">{selected.status}</Badge>
+                <StatusSelect applicants={selected} />
               </h2>
               <p className="text-sm text-muted-foreground">
                 {selected.user.email}
@@ -78,6 +63,45 @@ export default function Applicants({ applicants }: { applicants: any }) {
                 <p className="text-sm text-muted-foreground">
                   {selected.user.phone}
                 </p>
+              )}
+              {selected.user.github && (
+                <div className="mt-2">
+                  Github:
+                  <Link
+                    href={`${selected.user.github}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm ml-2  text-muted-foreground"
+                  >
+                    {selected.user.github}
+                  </Link>
+                </div>
+              )}
+              {selected.user.linkedin && (
+                <div className="mt-2">
+                  Github:
+                  <a
+                    href={`https://linkedin.com/in/${selected.user.linkedin}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-muted-foreground"
+                  >
+                    {selected.user.linkedin}
+                  </a>
+                </div>
+              )}
+              {selected.user.website && (
+                <div className="mt-2">
+                  Website:
+                  <a
+                    href={`${selected.user.website}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-muted-foreground"
+                  >
+                    {selected.user.website}
+                  </a>
+                </div>
               )}
             </div>
 

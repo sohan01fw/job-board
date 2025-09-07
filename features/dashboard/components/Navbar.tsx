@@ -1,6 +1,4 @@
 "use client";
-
-import { Bell } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -27,10 +25,19 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { NotificationsDropdown } from "../notifications/Notifications";
 
 type Status = "IDLE" | "OPENTOWORK" | "HIRING";
 
-export function Header({ img, email }: { img: string; email: string }) {
+export function Header({
+  img,
+  email,
+  uId,
+}: {
+  img: string;
+  email: string;
+  uId: string;
+}) {
   const { loading, updateStatus } = useUpdateStatus();
   const router = useRouter();
   const [selectedValue, setSelectedValue] = useState<Status>("IDLE");
@@ -113,8 +120,7 @@ export function Header({ img, email }: { img: string; email: string }) {
         )}
         <ThemeToggle />
         <div className="relative">
-          <Bell className="w-5 h-5 hover:cursor-pointer" />
-          <span className="absolute -top-2 -right-1 w-2 h-2 bg-green-500 rounded-full"></span>
+          <NotificationsDropdown userId={uId} />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger className=" outline-none border-none focus:outline-none focus:border-none">
