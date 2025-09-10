@@ -21,6 +21,7 @@ import { useJobPostStore } from "../stores/postJobStore";
 import { AiInputModel } from "./ui/AiInputModel";
 import { useCreateJobPost } from "../hooks/useJobPost";
 import { UserData } from "@/types/Forms";
+import { embedJobProfile } from "@/lib/ai/embed/jobPostEmbed";
 
 const jobPostSchema = z.object({
   title: z.string().min(1, "Job title is required"),
@@ -60,7 +61,6 @@ export function PostJobForm({ user }: { user: UserData }) {
   const [newBenefit, setNewBenefit] = useState("");
   const [newSkill, setNewSkill] = useState("");
   const { mutateAsync, isPending } = useCreateJobPost();
-
   const {
     register,
     handleSubmit,
@@ -138,7 +138,8 @@ export function PostJobForm({ user }: { user: UserData }) {
   };
 
   const onSubmit = async (data: JobPostFormData) => {
-    await mutateAsync({ job: data, email: user.email });
+    const resData = await mutateAsync({ job: data, email: user.email });
+    embedJobProfile({ jobId: resData.id, jobData: data });
     reset();
     useJobPostStore.getState().resetForm();
   };

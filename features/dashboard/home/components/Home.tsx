@@ -1,5 +1,3 @@
-"use client";
-
 import StatsGrid from "./StatGrid";
 import RecentActivity from "./RecentActivity";
 import RecommendJob from "./RecommendJob";

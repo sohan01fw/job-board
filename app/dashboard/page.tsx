@@ -6,13 +6,14 @@ import {
 } from "@/features/dashboard/user/profile/actions";
 import { getFileUrl, uploadFile } from "@/lib/Actions/FileUpload";
 import { authUser, CheckUser } from "@/lib/Actions/Users";
+import { embedUserProfile } from "@/lib/ai/embed/userProfileEmbed";
 
 export default async function page() {
   const user = await authUser();
   const isUser = await CheckUser(user.email);
   if (!isUser) {
-    console.log("creating user");
     await CreateUser(user);
+    embedUserProfile({ userId: user.id, userData: user });
     await uploadFile({
       imageUrl: user.img,
       bucketName: "avatars",

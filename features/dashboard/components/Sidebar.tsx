@@ -7,8 +7,8 @@ import {
   MessageSquare,
   Compass,
   CheckCircle,
-  History,
   Lock,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -38,9 +38,9 @@ const navigationItems = [
     active: true,
   },
   {
-    icon: History,
-    label: "History",
-    path: "/dashboard/history",
+    icon: Settings,
+    label: "Setting",
+    path: "/dashboard/setting",
     active: false,
   },
 ];

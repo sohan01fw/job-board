@@ -40,6 +40,7 @@ import { Progress } from "@/components/ui/progress";
 import { UserData } from "@/types/Forms";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 import { getFileUrl, uploadFile } from "@/lib/Actions/FileUpload";
+import { embedUserProfile } from "@/lib/ai/embed/userProfileEmbed";
 
 export function ProfileForm({ user }: { user: UserData }) {
   const [newSkill, setNewSkill] = useState("");
@@ -155,12 +156,18 @@ export function ProfileForm({ user }: { user: UserData }) {
       resumeUrl = publicUrl;
     }
 
-    // Update user with new data, replacing resume if changed
+    // 1️⃣ Update user with new data
     await updateUser(
       user.email,
       { ...formData, resume: resumeUrl },
       dirtyFields,
     );
+
+    // 2️⃣ Generate & save embedding after update
+    await embedUserProfile({
+      userId: user.id,
+      userData: { ...user, ...formData, resume: resumeUrl }, // merged fresh data
+    });
   };
 
   return (

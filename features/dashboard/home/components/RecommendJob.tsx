@@ -9,8 +9,13 @@ import { ArrowUpRight, Building2, MapPin, TrendingUp } from "lucide-react";
 import { recommendedJobs } from "../constant";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+// import { getUser } from "@/lib/Actions/Users";
+// import { RecommendJobsAI } from "./ai/RecomendedJobAi";
 
-export default function RecommendJob() {
+export default async function RecommendJob() {
+  // const user = await getUser();
+  // const jobs = await RecommendJobsAI({ user: user, topN: 5 });
+
   return (
     <Card>
       <CardHeader>

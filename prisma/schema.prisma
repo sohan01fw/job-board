@@ -93,6 +93,7 @@ model JobPost {
   benefits            String[]
   skills              String[]
   applicationDeadline String
+  embedding           Float[]
   contactEmail        String
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
@@ -122,6 +123,7 @@ model User {
   relocate    Boolean  @default(false)
   img         String? // profileImage
   resume      String?
+  embedding   Float[]
   status      Status   @default(IDLE)
   createdAt   DateTime @default(now())
 
