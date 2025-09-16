@@ -41,10 +41,12 @@ import { UserData } from "@/types/Forms";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 import { getFileUrl, uploadFile } from "@/lib/Actions/FileUpload";
 import { embedUserProfile } from "@/lib/ai/embed/userProfileEmbed";
+import { useProfileStore } from "@/lib/stores/useProfileStore";
 
 export function ProfileForm({ user }: { user: UserData }) {
   const [newSkill, setNewSkill] = useState("");
-  const [profileCompletion, setProfileCompletion] = useState(0);
+  const [completeProfile, setCompleteProfile] = useState(0);
+  const setProfileCompletion = useProfileStore((s) => s.setProfileCompletion);
   const { updateUser } = useUpdateUser();
 
   const {
@@ -53,6 +55,7 @@ export function ProfileForm({ user }: { user: UserData }) {
     watch,
     setValue,
     formState: { errors, isValid, isDirty, dirtyFields },
+    reset,
     trigger,
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -104,14 +107,15 @@ export function ProfileForm({ user }: { user: UserData }) {
     if (watchedFields.github) completedFields++;
 
     const completion = Math.round((completedFields / totalFields) * 100);
-    setProfileCompletion(completion);
+    setCompleteProfile(completion);
+    setProfileCompletion(completion); // update store
   }, [watchedFields]);
 
   const addSkill = (skill: string) => {
     if (skill.trim() && !watchedFields.skills?.includes(skill.trim())) {
       const updatedSkills = [...(watchedFields.skills || []), skill.trim()];
       setValue("skills", updatedSkills, {
-        shouldDirty: false,
+        shouldDirty: true,
       });
       setNewSkill("");
       trigger("skills");
@@ -121,7 +125,9 @@ export function ProfileForm({ user }: { user: UserData }) {
   const removeSkill = (skillToRemove: string) => {
     const updatedSkills =
       watchedFields.skills?.filter((skill) => skill !== skillToRemove) || [];
-    setValue("skills", updatedSkills);
+    setValue("skills", updatedSkills, {
+      shouldDirty: true,
+    });
     trigger("skills");
   };
 
@@ -163,6 +169,7 @@ export function ProfileForm({ user }: { user: UserData }) {
       dirtyFields,
     );
 
+    reset(formData, { keepValues: true, keepDirty: false, keepIsValid: true });
     // 2️⃣ Generate & save embedding after update
     await embedUserProfile({
       userId: user.id,
@@ -179,12 +186,12 @@ export function ProfileForm({ user }: { user: UserData }) {
               Profile Completion
             </h3>
             <span className="text-2xl font-bold text-green-600">
-              {profileCompletion}%
+              {completeProfile}%
             </span>
           </div>
-          <Progress value={profileCompletion} className="h-3" />
+          <Progress value={completeProfile} className="h-3" />
           <p className="text-sm text-green-600 mt-2">
-            {profileCompletion < 100
+            {completeProfile < 100
               ? "Complete your profile to increase your visibility to employers"
               : "Great! Your profile is complete"}
           </p>

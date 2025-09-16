@@ -8,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { handleLogOutBtn } from "./ui/logout";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
   Select,
@@ -17,15 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import {
   useFetchUserFields,
   useUpdateStatus,
-} from "../user/profile/hooks/useUpdateUser";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useRouter } from "next/navigation";
-import { NotificationsDropdown } from "../notifications/Notifications";
+} from "@/features/dashboard/user/profile/hooks/useUpdateUser";
+import { NotificationsDropdown } from "@/features/dashboard/notifications/Notifications";
+import { handleLogOutBtn } from "./logout";
+import { SelectSkeleton } from "@/lib/LoadingUi";
 
 type Status = "IDLE" | "OPENTOWORK" | "HIRING";
 
@@ -38,47 +38,41 @@ export function Header({
   email: string;
   uId: string;
 }) {
-  const { loading, updateStatus } = useUpdateStatus();
   const router = useRouter();
-  const [selectedValue, setSelectedValue] = useState<Status>("IDLE");
-  const {
-    data,
-    fetchFields,
-    loading: loadingFields,
-  } = useFetchUserFields({ email });
 
-  useEffect(() => {
-    const fetchUserFields = async () => {
-      await fetchFields({ fields: "status" }); // pass fields you need
-    };
-    fetchUserFields();
-  }, [selectedValue]);
+  const { user: data, isLoading } = useFetchUserFields(email);
+  const updateStatus = useUpdateStatus({ email });
 
-  const handleUpdateStatus = async (status: Status) => {
-    await updateStatus({ email, status });
-    setSelectedValue(status);
+  const handleUpdateStatus = (status: Status) => {
+    updateStatus.mutate({ status }); // optimistic update
   };
 
   const handlePostJobBtn = async () => {
-    router.push("/dashboard/recruiter");
+    router.push("/dashboard/recruiter/postjob");
   };
+  const today = new Date(); // Gets the current date
+  const options: any = { weekday: "long", day: "numeric", month: "long" };
+  const shortDate = new Intl.DateTimeFormat("en-US", options).format(today);
+
   return (
-    <header className="h-16 border-b border-border bg-background px-6 flex items-center justify-between">
+    <header className="h-20 md:h-16 border-b border-border bg-background px-6  flex items-center justify-between">
       {/* Date */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-10  sm:p-2 ">
-        <div className="text-sm sm:text-lg text-muted-foreground">
-          <span className="w-2 h-2 bg-green-500  rounded-full"></span>
-          Friday, 23 August
+        <div className="text-sm sm:text-lg text-muted-foreground flex items-center gap-2 font-medium">
+          {shortDate}
         </div>
 
-        {loadingFields ? (
-          <Skeleton className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded-2xl" />
+        {isLoading ? (
+          <SelectSkeleton />
         ) : (
           <Select
-            defaultValue={data.status}
+            defaultValue={data?.status}
             onValueChange={(val: Status) => handleUpdateStatus(val)}
           >
-            <SelectTrigger className="w-40 rounded-2xl" loading={loading}>
+            <SelectTrigger
+              className="w-40 rounded-2xl"
+              loading={updateStatus.isPending}
+            >
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
@@ -111,12 +105,8 @@ export function Header({
 
       {/* Right Section */}
       <div className="flex items-center gap-4">
-        {loadingFields ? (
-          <Skeleton className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-md" />
-        ) : (
-          data.status === "HIRING" && (
-            <Button onClick={handlePostJobBtn}>Post a Job</Button>
-          )
+        {data.status === "HIRING" && (
+          <Button onClick={handlePostJobBtn}>Post a Job</Button>
         )}
         <ThemeToggle />
         <div className="relative">

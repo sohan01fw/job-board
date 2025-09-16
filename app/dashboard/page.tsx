@@ -1,38 +1,20 @@
 // import { DashboardLayout } from "@/features/dashboard/components/DashboardLayout";
+
 import DashboardHome from "@/features/dashboard/home/components/Home";
-import {
-  CreateUser,
-  updateUserImage,
-} from "@/features/dashboard/user/profile/actions";
-import { getFileUrl, uploadFile } from "@/lib/Actions/FileUpload";
-import { authUser, CheckUser } from "@/lib/Actions/Users";
-import { embedUserProfile } from "@/lib/ai/embed/userProfileEmbed";
+import { createUser } from "@/features/dashboard/home/lib/createUser";
+import { getUser } from "@/lib/Actions/Users";
 
 export default async function page() {
-  const user = await authUser();
-  const isUser = await CheckUser(user.email);
-  if (!isUser) {
-    await CreateUser(user);
-    embedUserProfile({ userId: user.id, userData: user });
-    await uploadFile({
-      imageUrl: user.img,
-      bucketName: "avatars",
-      fileName: `${user.id}.png`,
-    });
-    const url = await getFileUrl({
-      fileName: `${user.id}.png`,
-      bucketName: "avatars",
-    });
+  const user = await getUser();
 
-    await updateUserImage({
-      userId: user.id,
-      imageUrl: url.publicUrl || "",
-    });
+  if (!user.id) {
+    await createUser(user);
   }
+
   return (
     <div>
       {/*<DashboardLayout />*/}
-      <DashboardHome />
+      <DashboardHome user={user} />
     </div>
   );
 }

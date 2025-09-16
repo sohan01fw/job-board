@@ -2,6 +2,7 @@
 import { toast } from "sonner";
 import { useGetAllJob } from "../hooks/useGetAllJobs";
 import { JobCard } from "./Job-Card";
+import JobCardSkeleton from "./ui/JobCardSkeleton";
 // import { colors } from "../lib/constant";
 
 export function JobList() {
@@ -10,7 +11,14 @@ export function JobList() {
 
   if (error) return toast.error(error.message);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div>
+        <JobCardSkeleton />
+        <JobCardSkeleton />
+        <JobCardSkeleton />
+      </div>
+    );
 
   if (jobs?.length === 0) return <div>No jobs found</div>;
   return (

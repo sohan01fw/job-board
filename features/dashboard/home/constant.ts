@@ -1,40 +1,3 @@
-import { BookmarkPlus, Briefcase, Eye, Users } from "lucide-react";
-
-const stats = [
-  {
-    title: "Total Applications",
-    value: "24",
-    change: "+12%",
-    trend: "up",
-    icon: Briefcase,
-    description: "Applications this month",
-  },
-  {
-    title: "Profile Views",
-    value: "1,247",
-    change: "+8%",
-    trend: "up",
-    icon: Eye,
-    description: "Views this week",
-  },
-  {
-    title: "Saved Jobs",
-    value: "18",
-    change: "+3",
-    trend: "up",
-    icon: BookmarkPlus,
-    description: "Jobs saved recently",
-  },
-  {
-    title: "Interview Invites",
-    value: "5",
-    change: "+2",
-    trend: "up",
-    icon: Users,
-    description: "Pending interviews",
-  },
-];
-
 const recentActivity = [
   {
     type: "application",
@@ -97,4 +60,4 @@ const recommendedJobs = [
   },
 ];
 
-export { stats, recentActivity, recommendedJobs };
+export { recentActivity, recommendedJobs };

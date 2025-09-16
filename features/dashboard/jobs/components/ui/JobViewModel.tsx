@@ -9,10 +9,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Eye } from "lucide-react";
-import { EyeTooltip } from "./Tooltip";
 import { JobData } from "@/features/dashboard/types";
 import { Badge } from "@/components/ui/badge";
 import ApplyDialog from "./JobApplyModel";
+import { EyeTooltip } from "@/components/Tooltip";
 
 export default function JobViewModel({ job }: { job: JobData }) {
   return (

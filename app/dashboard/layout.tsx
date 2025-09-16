@@ -1,7 +1,7 @@
+import { Header } from "@/components/Navbar";
+import { Sidebar } from "@/components/Sidebar";
 import ThemeProviderWrapper from "@/components/ThemeProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Header } from "@/features/dashboard/components/Navbar";
-import { Sidebar } from "@/features/dashboard/components/Sidebar";
 import { getUser } from "@/lib/Actions/Users";
 import { ReactQueryProvider } from "@/lib/ReactQueryProvider";
 import type { Metadata } from "next";
@@ -22,25 +22,27 @@ export default async function RootLayout({
     <ThemeProviderWrapper>
       <ReactQueryProvider>
         <TooltipProvider>
-          <div className="min-h-screen grid grid-rows-[auto_1fr] lg:grid-cols-[250px_1fr]">
-            {/* Sidebar sticky left */}
-            <aside className="row-span-full hidden lg:block sticky top-0 left-0 h-screen z-50">
+          <div className="min-h-screen grid grid-cols-[80px_1fr] lg:grid-cols-[250px_1fr]">
+            {/* Sidebar always visible, left */}
+            <aside className="sticky top-0 left-0 h-screen z-50">
               <Sidebar />
             </aside>
 
-            {/* Header sticky top */}
-            <header className="col-span-1 sticky top-0 z-40 bg-white ml-1">
-              <Header
-                email={user?.email}
-                img={user?.img || ""}
-                uId={user?.id}
-              />
-            </header>
+            {/* Right side: header + content stacked */}
+            <div className="flex flex-col min-h-screen">
+              {/* Header sticky top */}
+              <header className="sticky top-0 z-40 bg-white">
+                <Header
+                  email={user?.email}
+                  img={user?.img || ""}
+                  uId={user?.id}
+                />
+              </header>
 
-            {/* Main content centered */}
-            <main className="">{children}</main>
-
-            <Toaster richColors />
+              {/* Children */}
+              <main className="flex-1">{children}</main>
+              <Toaster richColors />
+            </div>
           </div>
         </TooltipProvider>
       </ReactQueryProvider>

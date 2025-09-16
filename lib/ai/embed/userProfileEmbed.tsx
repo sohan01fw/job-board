@@ -1,8 +1,8 @@
 "use server";
 
 import { google } from "@ai-sdk/google";
-import { User } from "@prisma/client";
 import { prisma } from "@/lib/Prisma";
+import { UserData } from "@/types/Forms";
 
 // Initialize embedding model
 const embeddingModel = google.textEmbedding("gemini-embedding-001");
@@ -12,7 +12,7 @@ export async function embedUserProfile({
   userData,
 }: {
   userId: string;
-  userData: User;
+  userData: UserData;
 }) {
   // 1. Convert user data JSON object into a descriptive string
   const profileText = `

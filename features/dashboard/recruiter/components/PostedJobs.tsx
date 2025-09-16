@@ -1,3 +1,5 @@
+"use client";
+
 import {
   MoreHorizontal,
   MapPin,
@@ -11,14 +13,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PostedJobsType } from "../types";
 import Link from "next/link";
+import { PostedJobFilter } from "./PostedJobFilter";
+import { usePostedJobs } from "../hooks/useGetPostedJobs";
 
-export const dynamic = "force-dynamic";
+export function PostedJobs({ userId }: { userId: string }) {
+  const { data: jobs, isLoading, isError } = usePostedJobs({ userId });
 
-export function PostedJobs({ jobs }: { jobs: PostedJobsType[] }) {
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error</div>;
+
   if (!jobs || jobs.length === 0) return <div>No jobs found</div>;
 
   return (
     <div className="space-y-4 mt-5">
+      <PostedJobFilter />
       <div className="space-y-4 h-[30rem] overflow-auto">
         {jobs?.map((job: PostedJobsType, index: number) => (
           <Card
@@ -89,7 +97,7 @@ export function PostedJobs({ jobs }: { jobs: PostedJobsType[] }) {
               {/* Footer */}
 
               <Link
-                href={`recruiter/applicants?job_id=${job.id}`}
+                href={`applicants?job_id=${job.id}`}
                 className="flex items-center justify-between gap-2 mt-2 w-48 p-2 text-sm font-medium text-muted-foreground bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center gap-2">

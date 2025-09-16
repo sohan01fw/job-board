@@ -2,7 +2,8 @@ import { toast } from "sonner";
 import { getUserFields, UpdateUserProfile } from "../actions";
 import { Status, User } from "@prisma/client";
 import { useLoading } from "@/lib/Hooks/useLoading";
-import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useUserStore } from "@/lib/stores/useUserStatusStore";
 
 export const useUpdateUser = () => {
   const { loading, withLoading } = useLoading();
@@ -29,39 +30,41 @@ export const useUpdateUser = () => {
   return { updateUser, loading };
 };
 
-export const useUpdateStatus = () => {
-  const { loading, withLoading } = useLoading();
+//for status
+export function useUpdateStatus({ email }: { email: string }) {
+  const { updateStatusLocal } = useUserStore();
 
-  const updateStatus = ({ email, status }: { email: string; status: Status }) =>
-    withLoading(async () => {
-      const result = await UpdateUserProfile(email, { status });
-      toast.success("Status updated!", {
-        duration: 1500,
-        position: "bottom-right",
-      });
-      return result;
-    });
+  const mutation = useMutation({
+    mutationFn: ({ status }: { status: Status }) =>
+      UpdateUserProfile(email, { status }),
+    onMutate: ({ status }) => {
+      // Optimistic update
+      updateStatusLocal(status);
+    },
+    onSuccess: () => {
+      toast.success("Status updated!", { duration: 1500 });
+    },
+    onError: (err: any) => {
+      toast.error(err.message || "Failed to update");
+    },
+  });
 
-  return { updateStatus, loading };
-};
+  return mutation;
+}
 
 type UserField = keyof Omit<User, "id" | "email">;
 
-export const useFetchUserFields = ({ email }: { email: string }) => {
-  const { loading, withLoading } = useLoading();
-  const [data, setData] = useState<Partial<User>>({});
+export const useFetchUserFields = (email: string) => {
+  const { setUser, user } = useUserStore();
 
-  const fetchFields = ({ fields }: { fields: UserField | UserField[] }) =>
-    withLoading(async () => {
-      try {
-        const result = await getUserFields(email, fields);
-        setData(result || {});
-        return result;
-      } catch (err: any) {
-        toast.error(err.message || "Fetch failed", { duration: 1500 });
-        throw err;
-      }
-    });
+  const query = useQuery({
+    queryKey: ["user", email],
+    queryFn: async () => {
+      const data = await getUserFields(email, ["status"] as UserField[]);
+      setUser(data);
+      return data;
+    },
+  });
 
-  return { fetchFields, data, loading };
+  return { user, ...query };
 };

@@ -1,8 +1,54 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { stats } from "../constant";
-import { TrendingUp } from "lucide-react";
+"use client";
 
-export default function StatsGrid() {
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TrendingUp, UserPlus } from "lucide-react";
+import { Briefcase, Eye, Users } from "lucide-react";
+import { UserData } from "@/types/Forms";
+import { useUserStats } from "../hooks/useUserStat";
+import StatsGridSkeleton from "./ui/StatGridSkeleton";
+
+export default function StatsGrid({ user }: { user: UserData }) {
+  const { data, isLoading, isError } = useUserStats(user);
+
+  if (isLoading) return <StatsGridSkeleton />;
+  if (isError || !data) return <p>Failed to load stats</p>;
+
+  const { jobstat, jobAppCount } = data;
+
+  const stats = [
+    {
+      title: "Total Applications",
+      value: jobstat.value,
+      change: `+${jobstat.change}`,
+      trend: jobstat.trend,
+      icon: Briefcase,
+      description: "Applications this week",
+    },
+    {
+      title: "Profile Views",
+      value: "1,247",
+      change: "+8%",
+      trend: "up",
+      icon: Eye,
+      description: "Views this week",
+    },
+    {
+      title: "Followers",
+      value: "18",
+      change: "+3",
+      trend: "up",
+      icon: UserPlus,
+      description: "New followers this week",
+    },
+    {
+      title: "Interview Invites",
+      value: jobAppCount.value,
+      change: `+${jobAppCount.change}`,
+      trend: jobAppCount.trend,
+      icon: Users,
+      description: "Pending interviews this week",
+    },
+  ];
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat, index) => {

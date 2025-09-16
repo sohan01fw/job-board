@@ -10,33 +10,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useJobSortStore } from "../lib/stores/sortstore";
-import { useJobFilterStore } from "../lib/stores/filterStore";
+import { usePostedJobsFilterStore } from "../stores/filterPostedJobs";
+import { usePostedJobSortStore } from "../stores/sortPostedJobs";
 
-const filterOptions = ["Remote only", "fulltime", "Internship"];
-const sortOptions = [
-  "Newest",
-  "Oldest",
-  "Salary High → Low",
-  "Salary Low → High",
-];
+const filterOptions = ["hasApplicants", "noApplicants"];
+const sortOptions = ["Newest", "Oldest"];
 
-export function JobFilters() {
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+export function PostedJobFilter() {
+  const [activeFilters, setActiveFilters] = useState<string>("");
   const [activeSort, setActiveSort] = useState<string>("Newest");
-  const { setSort } = useJobSortStore();
-  const { setFilter } = useJobFilterStore();
+  const { setSort } = usePostedJobSortStore();
+  const { setFilter } = usePostedJobsFilterStore();
 
   const addFilter = (filter: string) => {
     if (!activeFilters.includes(filter)) {
-      setActiveFilters([...activeFilters, filter]);
-      setFilter([...activeFilters, filter]);
+      setActiveFilters(filter);
+      setFilter(filter);
     }
   };
 
-  const removeFilter = (filter: string) => {
-    setActiveFilters(activeFilters.filter((f) => f !== filter));
-    setFilter(activeFilters.filter((f) => f !== filter));
+  const removeFilter = () => {
+    setActiveFilters("");
+    setFilter("");
   };
 
   return (
@@ -89,17 +84,18 @@ export function JobFilters() {
         <Badge variant="outline" className="gap-1">
           Sort: {activeSort}
         </Badge>
-        {activeFilters.map((filter) => (
-          <Badge key={filter} variant="secondary" className="gap-1">
-            {filter}
+
+        <Badge key={activeFilters} variant="secondary" className="gap-1">
+          {activeFilters}
+          {activeFilters !== "" && (
             <button
-              onClick={() => removeFilter(filter)}
+              onClick={() => removeFilter()}
               className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
             >
               <X className="w-3 h-3" />
             </button>
-          </Badge>
-        ))}
+          )}
+        </Badge>
       </div>
     </div>
   );

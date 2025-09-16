@@ -48,9 +48,9 @@ const navigationItems = [
 export function Sidebar() {
   const pathname = usePathname();
   return (
-    <div className="w-64 h-screen bg-sidebar border-r border-sidebar-border p-4 flex flex-col">
+    <div className="w-20 lg:w-64 h-screen bg-sidebar border-r border-sidebar-border p-4 flex flex-col">
       {/* Logo */}
-      <div className="flex items-center gap-2 mb-8">
+      <div className="flex flex-col lg:flex-row items-center gap-2 mb-8">
         <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
           <CheckCircle className="w-5 h-5 text-primary-foreground" />
         </div>
@@ -76,8 +76,8 @@ export function Sidebar() {
               )}
             >
               <item.icon className="w-5 h-5" />
-              <span className="truncate">{item.label}</span>
-              <div className="flex items-center gap-2">
+              <span className="truncate hidden lg:inline">{item.label}</span>
+              <div className=" items-center gap-2 hidden lg:flex">
                 {!item.active && <Lock className="w-4 h-4" />}
               </div>
             </Link>
@@ -86,10 +86,10 @@ export function Sidebar() {
       </nav>
 
       {/* Promotional Card */}
-      <Card className="mt-auto bg-gradient-to-br from-purple-500 to-pink-500 text-white border-0">
+      <Card className="hidden lg:block mt-auto bg-gradient-to-br from-purple-500 to-pink-500 text-white border-0">
         <CardContent className="p-4">
-          <h3 className="font-bold text-sm mb-1">Elevated Figma</h3>
-          <h3 className="font-bold text-sm mb-2">Prototyping</h3>
+          <h3 className="font-bold text-sm mb-1">Elevated Your Idea</h3>
+          <h3 className="font-bold text-sm mb-2">Prototyping To Next Level</h3>
           <div className="flex items-center gap-2 mb-3">
             <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
               <span className="text-xs">🎨</span>

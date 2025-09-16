@@ -13,15 +13,31 @@ export async function CreateJobPost(job: JobData, email: string) {
   }, "Error while creating job post");
 }
 
-export async function getAllJobPosts({ userId }: { userId?: string }) {
+export async function getAllJobPosts({
+  sort,
+  filter,
+  userId,
+}: {
+  sort?: string;
+  filter?: string;
+  userId?: string;
+}) {
   return withTryCatch(async () => {
-    const result = await prisma.jobPost.findMany({
-      where: {
-        userId,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+    // Default sorting
+    let orderBy: any = { createdAt: "desc" };
+
+    switch (sort) {
+      case "Newest":
+        orderBy = { createdAt: "desc" };
+        break;
+      case "Oldest":
+        orderBy = { createdAt: "asc" };
+        break;
+    }
+
+    // Fetch jobs including jobApplications count
+    const data = await prisma.jobPost.findMany({
+      where: { userId },
       include: {
         _count: {
           select: {
@@ -29,6 +45,15 @@ export async function getAllJobPosts({ userId }: { userId?: string }) {
           },
         },
       },
+      orderBy,
+    });
+
+    // Apply applicant filter
+    const result = data.filter((job) => {
+      if (!filter) return true;
+      if (filter === "hasApplicants") return job._count.jobApplications > 0;
+      if (filter === "noApplicants") return job._count.jobApplications === 0;
+      return true;
     });
 
     return result;

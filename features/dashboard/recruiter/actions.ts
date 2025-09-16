@@ -13,8 +13,16 @@ export async function createJob(job: JobData, email: string) {
   return CreateJobPost(job, email);
 }
 
-export async function GetAllPostedJobs({ userId }: { userId?: string }) {
-  return await getAllJobPosts({ userId });
+export async function GetAllPostedJobs({
+  userId,
+  sort,
+  filter,
+}: {
+  sort?: string;
+  filter?: string;
+  userId?: string;
+}) {
+  return await getAllJobPosts({ userId, sort, filter });
 }
 export async function GetAllApplicants({ jobId }: { jobId: string }) {
   return await getAllApplicantsByJob({ jobId });

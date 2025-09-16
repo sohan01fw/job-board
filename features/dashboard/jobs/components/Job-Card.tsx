@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  MapPin,
-  Clock,
-  Bookmark,
-  MoreHorizontal,
-  FileText,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MapPin, Clock, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { JobData } from "../../types";
@@ -37,9 +30,6 @@ export function JobCard({ job }: { job: JobData }) {
 
           <div className="flex flex-row gap-2">
             <JobViewModel job={job} />
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal className="w-5 h-5" />
-            </Button>
           </div>
         </div>
 
@@ -82,9 +72,6 @@ export function JobCard({ job }: { job: JobData }) {
         </p>
         {/* Footer */}
         <div className="flex items-center justify-between">
-          <Button variant="ghost" size="icon" className="w-8 h-8">
-            <Bookmark className="w-4 h-4" />
-          </Button>
           <ApplyDialog job={job} />
         </div>
       </CardContent>

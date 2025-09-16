@@ -46,6 +46,26 @@ enum ApplicationStatus {
   REJECTED
 }
 
+enum ActivityType {
+  JOB_PENDING
+  JOB_ACCEPTED
+  JOB_REJECTED
+}
+
+model UserActivity {
+  id        String       @id @default(uuid())
+  userId    String
+  type      ActivityType
+  jobAppId  String
+  status    String?
+  createdAt DateTime     @default(now())
+
+  user           User            @relation(fields: [userId], references: [id])
+  jobApplication JobApplication? @relation(fields: [jobAppId], references: [id])
+
+  @@index([userId, createdAt])
+}
+
 model Notification {
   id               String          @id @default(uuid())
   user             User            @relation(fields: [userId], references: [id])
@@ -55,6 +75,17 @@ model Notification {
   message          String
   read             Boolean         @default(false)
   createdAt        DateTime        @default(now())
+}
+
+model ProfileView {
+  id       String   @id @default(uuid())
+  viewerId String
+  userId   String // whose profile was viewed
+  viewedAt DateTime @default(now())
+
+  // relations
+  viewer User @relation("viewer", fields: [viewerId], references: [id])
+  user   User @relation("viewed", fields: [userId], references: [id])
 }
 
 model JobApplication {
@@ -73,6 +104,7 @@ model JobApplication {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   Notifications Notification[]
+  UserActivity  UserActivity[]
 
   @@unique([jobId, userId])
 }
@@ -129,5 +161,8 @@ model User {
 
   jobs            JobPost[]
   jobApplications JobApplication[]
+  profileViews    ProfileView[]    @relation("viewed") // views received
+  viewsMade       ProfileView[]    @relation("viewer") // views made
   Notifications   Notification[]
+  userActivities  UserActivity[]
 }
