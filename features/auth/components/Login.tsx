@@ -60,12 +60,12 @@ export default function Login() {
     }
   }
   const handleLoginWithGoogle = async () => {
-    const { data, error } = await SupabaseGoogleLogin();
+    const { error } = await SupabaseGoogleLogin();
 
     if (error) {
       toast({ variant: "default", title: "Error,while login with google!" });
     }
-    console.log("user", data);
+    // console.log("user", data);
   };
   return (
     <div className="login-container flex justify-center">

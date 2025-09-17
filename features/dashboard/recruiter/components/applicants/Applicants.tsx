@@ -8,9 +8,14 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { StatusSelect } from "../ui/StatusDropdown";
 import { Applicant } from "../../types";
+import { useApplicants } from "../../hooks/useGetAllApplicants";
 
-export default function Applicants({ applicants }: { applicants: any }) {
+export default function Applicants({ jobId }: { jobId: string }) {
+  const { data: applicants, isLoading, isError } = useApplicants(jobId);
   const [selected, setSelected] = useState<Applicant | null>(null);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading applicants.</div>;
 
   return (
     <div className="flex flex-col md:flex-row h-screen border rounded-lg overflow-hidden">
@@ -18,7 +23,7 @@ export default function Applicants({ applicants }: { applicants: any }) {
       <div className="w-full md:w-1/3 border-r">
         <ScrollArea className="h-full">
           <div className="p-4 space-y-3">
-            {applicants.map((applicant: Applicant) => (
+            {(applicants as Applicant[]).map((applicant) => (
               <Card
                 key={applicant.id}
                 className={`cursor-pointer transition hover:bg-muted ${

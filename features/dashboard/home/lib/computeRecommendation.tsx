@@ -4,7 +4,7 @@ import { getJobsWithEmbeddings, getUserEmbedding } from "./query";
 import { google } from "@ai-sdk/google";
 import { UserData } from "@/types/Forms";
 
-export async function RecommendJobsAI({
+export async function computeJobsRecommendation({
   user,
   topN,
 }: {

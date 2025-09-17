@@ -17,7 +17,7 @@ export function WithRecruiterLayout({
 
   return (
     <div className="m-5">
-      <div className="flex flex-wrap sm:flex-nowrap border-b border-gray-300 mb-5">
+      <div className="flex flex-wrap sm:flex-nowrap  mb-5">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
           return (
@@ -25,8 +25,8 @@ export function WithRecruiterLayout({
               <div
                 className={`px-4 py-2 cursor-pointer rounded-t-lg transition-colors ${
                   isActive
-                    ? "bg-white text-blue-600 font-semibold shadow"
-                    : "text-gray-600 hover:text-blue-500"
+                    ? "bg-white  font-semibold shadow"
+                    : "text-gray-600 hover:text-gray-500"
                 }`}
               >
                 {tab.label}

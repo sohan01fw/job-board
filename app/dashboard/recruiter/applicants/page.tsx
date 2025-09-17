@@ -1,4 +1,3 @@
-import { GetAllApplicants } from "@/features/dashboard/recruiter/actions";
 import Applicants from "@/features/dashboard/recruiter/components/applicants/Applicants";
 
 export default async function ApplicantsPage({
@@ -9,14 +8,13 @@ export default async function ApplicantsPage({
 }) {
   const { job_id } = await searchParams;
   const jobId = Array.isArray(job_id) ? job_id[0] : (job_id ?? "");
-  const applicants = await GetAllApplicants({ jobId });
 
   return (
     <div className="p-4">
       {/*{applicants.map((app) => {
         return <Applicants applicants={app} key={app.id} />;
       })}*/}
-      <Applicants applicants={applicants} />
+      <Applicants jobId={jobId} />
     </div>
   );
 }

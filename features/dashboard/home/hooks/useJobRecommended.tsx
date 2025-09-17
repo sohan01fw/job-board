@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUser } from "@/lib/Actions/Users";
 import { UserData } from "@/types/Forms";
-import { RecommendJobsAI } from "../lib/RecomendedJobAi";
+import { RecommendJobsAI } from "../lib/recommendedJobsAi";
 
 export function useRecommendedJobs(topN: number = 5) {
   return useQuery({

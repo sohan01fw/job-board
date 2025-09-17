@@ -18,7 +18,7 @@ export default function RecommendJob() {
 
   return (
     <div className="space-y-4">
-      {recomendedJobs.map((job, index) => (
+      {recomendedJobs.map((job: any, index: number) => (
         <div
           key={index}
           className="p-4 border rounded-lg hover:shadow-sm transition-shadow"

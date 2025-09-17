@@ -12,22 +12,7 @@ export async function CreateUser(user: UserData): Promise<any> {
         id: user.id, // optional, prisma will generate uuid if not provided
         name: user.name || "",
         email: user.email,
-        phone: user.phone || "",
-        location: user.location || "",
-        title: user.title || "",
-        experience: user.experience || "",
-        education: user.education || "",
-        bio: user.bio || "",
-        skills: user.skills || [],
-        website: user.website || "",
-        linkedin: user.linkedin || "",
-        github: user.github || "",
-        jobType: user.jobType || [],
-        salaryRange: user.salaryRange || "",
-        remote: user.remote ?? false,
-        relocate: user.relocate ?? false,
         img: user.img || "",
-        resume: user.resume || "",
       },
     });
   }, "Error while creating user");

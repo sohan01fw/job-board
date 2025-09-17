@@ -2,10 +2,10 @@
 
 import DashboardHome from "@/features/dashboard/home/components/Home";
 import { createUser } from "@/features/dashboard/home/lib/createUser";
-import { getUser } from "@/lib/Actions/Users";
+import { getCachedUser } from "@/lib/redis";
 
 export default async function page() {
-  const user = await getUser();
+  const user = await getCachedUser();
 
   if (!user.id) {
     await createUser(user);
@@ -13,7 +13,6 @@ export default async function page() {
 
   return (
     <div>
-      {/*<DashboardLayout />*/}
       <DashboardHome user={user} />
     </div>
   );

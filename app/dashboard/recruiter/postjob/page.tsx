@@ -1,9 +1,9 @@
 import { PostJobForm } from "@/features/dashboard/recruiter/components/Postajob";
 import { JobPreview } from "@/features/dashboard/recruiter/components/PreviewJob";
-import { getUser } from "@/lib/Actions/Users";
+import { getCachedUser } from "@/lib/redis";
 
 export default async function PostAJob() {
-  const user = await getUser();
+  const user = await getCachedUser();
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
       {/* Form Section */}

@@ -11,6 +11,7 @@ import { ArrowUpRight, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProfileStore } from "@/lib/stores/useProfileStore";
 import LockedFeatureCard from "./LockedFeatureCard";
+import RecommendJob from "../RecommendJob";
 
 export function RecommendJobCard() {
   const profileCompletion = useProfileStore((s) => s.profileCompletion);
@@ -31,7 +32,7 @@ export function RecommendJobCard() {
         {profileCompletion < 80 && (
           <LockedFeatureCard profileCompletion={profileCompletion} />
         )}
-        {/*<RecommendJob />*/}
+        <RecommendJob />
         <Button
           variant="outline"
           className="w-full mt-4 bg-transparent"

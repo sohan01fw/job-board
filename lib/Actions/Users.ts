@@ -17,7 +17,6 @@ export async function authUser(): Promise<any> {
     img: data.user?.user_metadata.avatar_url || "",
   };
 }
-
 // check user in db
 export async function CheckUser(userEmail: string) {
   return withTryCatch(async () => {

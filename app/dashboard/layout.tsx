@@ -2,8 +2,8 @@ import { Header } from "@/components/Navbar";
 import { Sidebar } from "@/components/Sidebar";
 import ThemeProviderWrapper from "@/components/ThemeProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { getUser } from "@/lib/Actions/Users";
 import { ReactQueryProvider } from "@/lib/ReactQueryProvider";
+import { getCachedUser } from "@/lib/redis";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 
@@ -17,7 +17,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getUser();
+  const user = await getCachedUser();
   return (
     <ThemeProviderWrapper>
       <ReactQueryProvider>

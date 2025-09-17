@@ -13,20 +13,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PostedJobsType } from "../types";
 import Link from "next/link";
-import { PostedJobFilter } from "./PostedJobFilter";
 import { usePostedJobs } from "../hooks/useGetPostedJobs";
+import { PostedJobSkeleton } from "./ui/PostedJobSkeleton";
 
 export function PostedJobs({ userId }: { userId: string }) {
   const { data: jobs, isLoading, isError } = usePostedJobs({ userId });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div>
+        <PostedJobSkeleton />
+      </div>
+    );
   if (isError) return <div>Error</div>;
 
   if (!jobs || jobs.length === 0) return <div>No jobs found</div>;
 
   return (
-    <div className="space-y-4 mt-5">
-      <PostedJobFilter />
+    <div>
       <div className="space-y-4 h-[30rem] overflow-auto">
         {jobs?.map((job: PostedJobsType, index: number) => (
           <Card

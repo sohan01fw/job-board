@@ -34,7 +34,9 @@ export interface U {
   name?: string;
   img?: string;
 }
-export type UserData = Omit<User, "createdAt">;
+
+type UserData = Partial<Omit<UserData, "id" | "email">> &
+  Pick<UserData, "id" | "email">;
 export interface DataError {
   error: boolean;
   message: string;
