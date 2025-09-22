@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Briefcase, TrendingUp, Users } from "lucide-react";
+import Link from "next/link";
 
 export default function QuickActions() {
   return (
@@ -24,7 +25,7 @@ export default function QuickActions() {
             className="justify-start h-auto p-4 bg-transparent"
             asChild
           >
-            <a href="/dashboard/profile" aria-label="Update your profile">
+            <Link href="/dashboard/profile" aria-label="Update your profile">
               <Users
                 className="h-5 w-5 mr-3 text-green-600"
                 aria-hidden="true"
@@ -35,7 +36,7 @@ export default function QuickActions() {
                   Keep your info current
                 </div>
               </div>
-            </a>
+            </Link>
           </Button>
           <Button
             variant="outline"
@@ -60,7 +61,7 @@ export default function QuickActions() {
             className="justify-start h-auto p-4 bg-transparent"
             asChild
           >
-            <a href="/dashboard/messages" aria-label="Check your messages">
+            <Link href="/dashboard/messages" aria-label="Check your messages">
               <Users
                 className="h-5 w-5 mr-3 text-green-600"
                 aria-hidden="true"
@@ -71,14 +72,17 @@ export default function QuickActions() {
                   Check conversations
                 </div>
               </div>
-            </a>
+            </Link>
           </Button>
           <Button
             variant="outline"
             className="justify-start h-auto p-4 bg-transparent"
             asChild
           >
-            <a href="/dashboard/discover" aria-label="Discover new companies">
+            <Link
+              href="/dashboard/discover"
+              aria-label="Discover new companies"
+            >
               <TrendingUp
                 className="h-5 w-5 mr-3 text-green-600"
                 aria-hidden="true"
@@ -89,7 +93,7 @@ export default function QuickActions() {
                   Explore companies
                 </div>
               </div>
-            </a>
+            </Link>
           </Button>
         </div>
       </CardContent>

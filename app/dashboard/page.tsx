@@ -7,7 +7,7 @@ import { getCachedUser } from "@/lib/redis";
 export default async function page() {
   const user = await getCachedUser();
 
-  if (!user.id) {
+  if (!user.email) {
     await createUser(user);
   }
 

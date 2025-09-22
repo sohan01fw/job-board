@@ -29,10 +29,11 @@ export function RecommendJobCard() {
       </CardHeader>
       <CardContent>
         {/* Recommended Jobs content */}
-        {profileCompletion < 80 && (
+        {profileCompletion < 80 ? (
           <LockedFeatureCard profileCompletion={profileCompletion} />
+        ) : (
+          <RecommendJob />
         )}
-        <RecommendJob />
         <Button
           variant="outline"
           className="w-full mt-4 bg-transparent"

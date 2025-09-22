@@ -52,6 +52,31 @@ enum ActivityType {
   JOB_REJECTED
 }
 
+model Comment {
+  id        String   @id @default(uuid())
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+//this is for social feed schema
+model Post {
+  id        String    @id @default(uuid())
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  content   String
+  imageUrl  String[]
+  likes     Int       @default(0)
+  isLiked   Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  comments  Comment[]
+}
+
+//this is for job schemas
 model UserActivity {
   id        String       @id @default(uuid())
   userId    String
@@ -135,6 +160,20 @@ model JobPost {
   jobApplications JobApplication[]
 }
 
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id])
+  following User @relation("UserFollowers", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
 model User {
   id          String   @id @default(uuid())
   name        String?  @db.VarChar(255) // maps to fullName
@@ -165,4 +204,11 @@ model User {
   viewsMade       ProfileView[]    @relation("viewer") // views made
   Notifications   Notification[]
   userActivities  UserActivity[]
+  posts           Post[]
+  comments        Comment[]
+
+  // Follows I follow
+  following Follow[] @relation("UserFollowing")
+  // Users who follow me
+  followers Follow[] @relation("UserFollowers")
 }

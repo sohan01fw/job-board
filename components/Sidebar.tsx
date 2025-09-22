@@ -23,13 +23,13 @@ const navigationItems = [
     icon: Compass,
     label: "Discover",
     path: "/dashboard/discover",
-    active: false,
+    active: true,
   },
   {
     icon: MessageSquare,
     label: "Messages",
     path: "/dashboard/messages",
-    active: false,
+    active: true,
   },
   {
     icon: User,

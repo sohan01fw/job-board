@@ -18,12 +18,12 @@ export async function embedUserProfile({
   const profileText = `
     Job Title: ${userData.title ?? "Not specified"}.
     Bio: ${userData.bio ?? "Not specified"}.
-    Skills: ${userData.skills.join(", ")}.
+    Skills: ${userData?.skills?.join(", ")}.
     Experience Level: ${userData.experience ?? "Not specified"}.
-    Current Status: ${userData.status}.
+    Current Status: ${userData?.status}.
     Location: ${userData.location ?? "Not specified"}.
     Education: ${userData.education ?? "Not specified"}.
-    Seeking Job Types: ${userData.jobType.join(", ")}.
+    Seeking Job Types: ${userData?.jobType?.join(", ")}.
   `
     .trim()
     .replace(/\s+/g, " "); // Clean up whitespace for the model
