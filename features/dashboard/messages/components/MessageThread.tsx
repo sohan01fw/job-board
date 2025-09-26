@@ -1,182 +1,199 @@
 "use client";
 
-import type React from "react";
-
-import { useState } from "react";
-import {
-  Phone,
-  Video,
-  Info,
-  Smile,
-  Paperclip,
-  Send,
-  ThumbsUp,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Paperclip, Send, ThumbsUp, Smile } from "lucide-react";
+import { CachedUser } from "@/types/global";
+import Pusher from "pusher-js";
+import { sendMessagesAction } from "../action";
+import { useMessages } from "../hooks/useMessage";
+import Image from "next/image";
 
 interface MessageThreadProps {
   chatId: string;
-  onToggleUserInfo: () => void;
+  currentUser: CachedUser;
 }
 
-const messages = [
-  {
-    id: 1,
-    text: "godot with csharp ma ni herdai garxu",
-    sender: "other",
-    time: "6:41 PM",
-    type: "text",
-  },
-  {
-    id: 2,
-    text: "ma ta tetikai sakin hola vaneko without prior knowledge hunna raxa",
-    sender: "other",
-    time: "6:41 PM",
-    type: "text",
-  },
-  {
-    id: 3,
-    text: "free nai hudo raxa kati kura suprise gara malaai kehi create garera",
-    sender: "user",
-    time: "6:41 PM",
-    type: "text",
-  },
-  {
-    id: 4,
-    text: "ma progress ni share gardai garxu kunai kunai timi ni share gardai gara",
-    sender: "user",
-    time: "7:36 PM",
-    type: "text",
-  },
-  {
-    id: 5,
-    text: "Ok",
-    sender: "other",
-    time: "7:36 PM",
-    type: "text",
-  },
-];
+interface Message {
+  id: string;
+  text: string;
+  content?: string;
+  user: { id: string; name: string };
+  sender?: { id: string; name: string; img: string };
+  createdAt?: string;
+  created_at?: string;
+}
 
-export function MessageThread({ onToggleUserInfo }: MessageThreadProps) {
+export function MessageThread({ chatId, currentUser }: MessageThreadProps) {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const { data: msgData, isLoading: isLoadingMessages } = useMessages({
+    chatId,
+  });
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      // Handle sending message
-      setNewMessage("");
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, msgData]);
+
+  // Subscribe to realtime updates
+  useEffect(() => {
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+      authEndpoint: "/api/pusher/auth",
+    });
+
+    const channel = pusher.subscribe(`private-chat-${chatId}`);
+    channel.bind("new-message", (message: Message) => {
+      setMessages((prev) => [...prev, message]);
+    });
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+      pusher.disconnect();
+    };
+  }, [chatId]);
+
+  // Initial load
+
+  useEffect(() => {
+    if (msgData) {
+      const mappedMessages: Message[] = msgData.map((msg) => ({
+        id: msg.id,
+        text: msg.content, // Prisma uses `content`
+        content: msg.content,
+        user: { id: msg.sender.id, name: msg.sender.name ?? "Unknown" },
+        sender: {
+          id: msg.sender.id,
+          name: msg.sender.name ?? "Unknown",
+          img: msg.sender.img ?? "",
+        },
+        createdAt: msg.createdAt.toString(),
+      }));
+
+      setMessages(mappedMessages);
     }
+  }, [msgData]);
+
+  // Handle send
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return;
+
+    await sendMessagesAction({
+      userId: currentUser.id,
+      chatId,
+      content: newMessage,
+    });
+    setNewMessage("");
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  if (isLoadingMessages) return <div>Loading...</div>;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-        <div className="flex items-center">
-          <Avatar className="w-10 h-10">
-            <AvatarImage src="/professional-man.png" alt="Prabhat Nepal" />
-            <AvatarFallback className="bg-green-600 text-white">
-              PN
-            </AvatarFallback>
-          </Avatar>
-          <div className="ml-3">
-            <h2 className="text-gray-900 font-semibold">Prabhat Nepal</h2>
-            <p className="text-sm text-gray-500">Active 32m ago</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-gray-600 hover:bg-gray-100"
-          >
-            <Phone className="w-5 h-5" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-gray-600 hover:bg-gray-100"
-          >
-            <Video className="w-5 h-5" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-gray-600 hover:bg-gray-100"
-            onClick={onToggleUserInfo}
-          >
-            <Info className="w-5 h-5" />
-          </Button>
-        </div>
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Chat
+        </h2>
+        <Button
+          size="sm"
+          variant="outline"
+          className="text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600"
+        >
+          User Info
+        </Button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-          >
+      <div className="flex-1 flex flex-col p-4 space-y-3 overflow-y-auto">
+        {messages.map((msg) => {
+          const isSelf =
+            msg.user?.id === currentUser.id ||
+            msg.sender?.id === currentUser.id;
+          const text = msg.text || msg.content;
+          const createdAt = msg.createdAt || msg.created_at;
+
+          return (
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                message.sender === "user"
-                  ? "bg-green-600 text-white"
-                  : "bg-white text-gray-900 border border-gray-200"
+              key={msg.id}
+              className={`flex items-end gap-2 ${
+                isSelf ? "justify-end" : "justify-start"
               }`}
             >
-              <p className="text-sm">{message.text}</p>
-              <p
-                className={`text-xs mt-1 ${message.sender === "user" ? "text-green-100" : "text-gray-500"}`}
+              {/* Show avatar only if friend */}
+              {!isSelf && msg.sender?.img && (
+                <Image
+                  src={msg.sender.img}
+                  alt={msg.sender.name}
+                  width={32}
+                  height={32}
+                  className="rounded-full object-cover border border-gray-300 dark:border-gray-600"
+                />
+              )}
+
+              <div
+                className={`max-w-[75%] sm:max-w-[65%] lg:max-w-[55%] px-4 py-2 rounded-2xl shadow-sm transition-colors duration-200 ${
+                  isSelf
+                    ? "bg-green-600 text-white rounded-br-none"
+                    : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-bl-none"
+                }`}
               >
-                {message.time}
-              </p>
+                <p className="text-sm whitespace-pre-wrap break-words">
+                  {text}
+                </p>
+                <p className="text-xs mt-1 text-gray-500 dark:text-gray-400 text-right">
+                  {createdAt &&
+                    new Date(createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
+        <div ref={bottomRef} />
       </div>
 
-      {/* Message Input */}
-      <div className="p-4 border-t border-gray-200 bg-white">
+      {/* Input */}
+      <div className="flex-shrink-0 p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="flex items-center gap-3">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <Paperclip className="w-5 h-5" />
+          <Button size="sm" variant="ghost">
+            <Paperclip className="w-5 h-5 text-gray-500 dark:text-gray-300" />
           </Button>
 
           <div className="flex-1 relative">
             <Input
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
               placeholder="Type a message..."
-              className="bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500 pr-12"
+              className="bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 pr-12 rounded-full focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
             />
             <Button
               size="sm"
               variant="ghost"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
             >
-              <Smile className="w-4 h-4" />
+              <Smile className="w-5 h-5 text-gray-500 dark:text-gray-300" />
             </Button>
           </div>
 
           {newMessage.trim() ? (
             <Button
               size="sm"
+              className="bg-green-600 hover:bg-green-700 text-white rounded-full p-2"
               onClick={handleSendMessage}
-              className="bg-green-600 hover:bg-green-700 text-white"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -184,7 +201,7 @@ export function MessageThread({ onToggleUserInfo }: MessageThreadProps) {
             <Button
               size="sm"
               variant="ghost"
-              className="text-green-600 hover:text-green-700"
+              className="text-green-600 hover:text-green-700 p-2"
             >
               <ThumbsUp className="w-5 h-5" />
             </Button>

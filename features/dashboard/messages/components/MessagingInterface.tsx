@@ -1,35 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { ChatList } from "./ChatList";
+import { useChatStore } from "../lib/store/chat";
 import { MessageThread } from "./MessageThread";
-import { UserInfo } from "./UserInfo";
+import { CachedUser } from "@/types/global";
 
-export function MessagingInterface() {
-  const [selectedChat, setSelectedChat] = useState("prabhat-nepal");
-  const [showUserInfo, setShowUserInfo] = useState(true);
-
+export function MessagingInterface({
+  user,
+  id,
+}: {
+  user: CachedUser;
+  id: string;
+}) {
+  const { loading } = useChatStore();
+  if (loading) return <div>Loading...</div>;
   return (
-    <div className="flex h-screen bg-white">
-      {/* Chat List Sidebar */}
-      <div className="w-80 border-r border-gray-200 flex flex-col">
-        <ChatList selectedChat={selectedChat} onSelectChat={setSelectedChat} />
+    <div className="flex flex-col w-[90vw] h-[80vh] lg:h-[90vh] lg:w-[67vw] bg-gray-50 dark:bg-gray-900">
+      {/* Full-width, full-height Chat Area */}
+      <div className="flex-1">
+        <MessageThread chatId={id} currentUser={user} />
       </div>
-
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
-        <MessageThread
-          chatId={selectedChat}
-          onToggleUserInfo={() => setShowUserInfo(!showUserInfo)}
-        />
-      </div>
-
-      {/* User Info Sidebar */}
-      {showUserInfo && (
-        <div className="w-80 border-l border-gray-200">
-          <UserInfo />
-        </div>
-      )}
     </div>
   );
 }
