@@ -1,12 +1,13 @@
 "use client";
 
-import { UserPlus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAllUsersExcept } from "../hooks/useSuggestionUsers";
 import { CachedUser } from "@/types/global";
 import { useFollowUser } from "../hooks/useFollow";
+import { ConfirmDialog } from "@/components/confirmDialog";
 
 export function SuggestedConnections({
   currentUser,
@@ -14,10 +15,10 @@ export function SuggestedConnections({
   currentUser: CachedUser;
 }) {
   const { data: users = [], isLoading } = useAllUsersExcept(currentUser.id);
-  const { mutate: followUser, isPending: isFollowing } = useFollowUser();
+  const { mutateAsync: followUser, isPending: isFollowing } = useFollowUser();
 
   if (isLoading) return <div>Loading...</div>;
-  if (!users.length) {
+  if (!users.length || users.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -74,20 +75,18 @@ export function SuggestedConnections({
 
                 {/* Follow button */}
                 <div className="flex gap-2 mt-2">
-                  <Button
-                    size="sm"
-                    className="h-7 text-xs"
-                    onClick={() =>
-                      followUser({
+                  <ConfirmDialog
+                    title="Follow"
+                    description="Confirm you want to follow this user?"
+                    variant="outline"
+                    confirmText={isFollowing ? "Following..." : "Follow"}
+                    onConfirmAction={async () =>
+                      await followUser({
                         followerId: currentUser.id,
                         followingId: user.id,
                       })
                     }
-                    disabled={isFollowing} // optional: disable while loading
-                  >
-                    <UserPlus className="w-3 h-3 mr-1" />
-                    {isFollowing ? "Following..." : "Follow"}
-                  </Button>
+                  />
                 </div>
               </div>
             </div>

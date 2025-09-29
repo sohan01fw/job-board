@@ -12,7 +12,7 @@ export default async function Discover() {
       {/* Main Feed */}
       <div className="lg:col-span-3 space-y-6">
         <CreatePost userData={user} />
-        <PostList />
+        <PostList userData={user} />
       </div>
 
       {/* Sidebar */}

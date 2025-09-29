@@ -21,6 +21,7 @@ export async function createPostAction(args: {
   authorId: string;
   content: string;
   imageUrl?: string[];
+  jobId?: string;
 }) {
   return createPost(args);
 }
@@ -35,20 +36,20 @@ export async function getMyPostsAction(args: {
 }) {
   return getMyPosts(args);
 }
-export async function deleteMyPostAction(postId: string) {
+export async function deleteMyPostAction({ postId }: { postId: string }) {
   return deleteMyPost(postId);
 }
 
 export async function likePostAction({
   postId,
   isLiked,
-  likes,
+  userId,
 }: {
   postId: string;
   isLiked: boolean;
-  likes: number;
+  userId: string;
 }) {
-  return likePostQuery({ postId, isLiked, likes });
+  return likePostQuery({ postId, isLiked, userId });
 }
 // Wrap server-only queries in actions
 export async function createCommentAction(args: {

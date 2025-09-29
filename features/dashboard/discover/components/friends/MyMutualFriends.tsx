@@ -2,11 +2,12 @@
 
 import { Card, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useFriendsAndFollowers, useUnfollowUser } from "../hooks/useFollow";
+import { useFriendsAndFollowers, useUnfollowUser } from "../../hooks/useFollow";
 import { CachedUser } from "@/types/global";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { MessageCircle } from "lucide-react";
+import { ConfirmDialog } from "@/components/confirmDialog";
 
 export default function MyMutualFriends({
   currentUser,
@@ -15,7 +16,7 @@ export default function MyMutualFriends({
 }) {
   const router = useRouter();
   const { data, isLoading } = useFriendsAndFollowers(currentUser?.id || "");
-  const { mutate: unfollowUser, isPending } = useUnfollowUser();
+  const { mutateAsync: unfollowUser, isPending } = useUnfollowUser();
 
   if (isLoading) return <div>Loading...</div>;
   if (!data) return <div>No mutual friends</div>;
@@ -24,12 +25,6 @@ export default function MyMutualFriends({
 
   if (!mutualFriends.length) return <div>No mutual friends yet.</div>;
 
-  const handleUnfollow = async () => {
-    unfollowUser({
-      followerId: currentUser.id,
-      followingId: mutualFriends[0].id,
-    });
-  };
   return (
     <div className="space-y-4">
       {mutualFriends.map((user) => (
@@ -68,15 +63,18 @@ export default function MyMutualFriends({
                   <MessageCircle className="w-4 h-4" />
                   Message
                 </Button>
-                <Button
+                <ConfirmDialog
+                  title="Unfollow"
+                  description="Are you sure you want to unfollow? This might remove conversations with this user."
+                  confirmText={isPending ? "Unfollowing..." : "Unfollow"}
                   variant="outline"
-                  size="sm"
-                  onClick={handleUnfollow}
-                  disabled={isPending}
-                  className="shrink-0"
-                >
-                  {isPending ? "Unfollowing..." : "Unfollow"}
-                </Button>
+                  onConfirmAction={async () =>
+                    await unfollowUser({
+                      followerId: currentUser.id,
+                      followingId: user.id,
+                    })
+                  }
+                />
               </div>
             </div>
           </CardHeader>

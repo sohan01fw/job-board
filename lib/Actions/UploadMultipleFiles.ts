@@ -45,3 +45,46 @@ export async function uploadMultipleFiles({
     return uploadedUrls; // array of strings
   }, "Error uploading multiple files");
 }
+
+export async function deleteFilesFromBucket({
+  bucketName,
+  filePaths,
+}: {
+  bucketName: string;
+  filePaths: string[]; // should be the full paths you uploaded (like "public/authorId-timestamp-filename")
+}) {
+  return withTryCatch(async () => {
+    if (!filePaths || filePaths.length === 0)
+      throw new Error("No file paths provided");
+
+    const { error } = await supabase.storage.from(bucketName).remove(filePaths);
+    if (error) throw error;
+
+    return { success: true };
+  }, "Error deleting files from storage");
+}
+
+export async function deleteFilesByUrl({
+  bucketName,
+  urls,
+}: {
+  bucketName: string;
+  urls: string[];
+}) {
+  return withTryCatch(async () => {
+    if (!urls || urls.length === 0) throw new Error("No URLs provided");
+
+    // Extract the path after `/object/public/<bucketName>/`
+    const filePaths = urls.map((url) => {
+      const match = url.split(`/object/public/${bucketName}/`)[1];
+      if (!match)
+        throw new Error(`Invalid URL for bucket ${bucketName}: ${url}`);
+      return match;
+    });
+
+    const { error } = await supabase.storage.from(bucketName).remove(filePaths);
+    if (error) throw error;
+
+    return { success: true };
+  }, "Error deleting files from storage");
+}

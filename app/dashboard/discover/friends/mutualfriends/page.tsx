@@ -1,4 +1,4 @@
-import MyMutualFriends from "@/features/dashboard/discover/components/MyMutualFriends";
+import MyMutualFriends from "@/features/dashboard/discover/components/friends/MyMutualFriends";
 import { getCachedUser } from "@/lib/redis";
 
 export default async function MutualFriends() {

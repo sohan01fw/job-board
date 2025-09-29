@@ -1,7 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, MessageCircle, Share2 } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  DollarSign,
+  Heart,
+  MapPin,
+  MessageCircle,
+  Share2,
+  Users,
+} from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,27 +22,34 @@ import { PostUser } from "../types";
 import { useComments, useCreateComment } from "../hooks/useComment";
 import { ShowComments } from "./ui/ShowComments";
 import { useLikePost } from "../hooks/usePost";
+import { CachedUser } from "@/types/global";
 
 interface PostCardProps {
   post: PostUser;
+  currentUser: CachedUser;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, currentUser }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
-  const { mutate: createComment } = useCreateComment();
+  const { mutate: createComment } = useCreateComment({ user: currentUser });
   const { data: comments } = useComments({ postId: post.id });
-  const {
-    mutate: likePost,
-    isLiked,
-    likes,
-  } = useLikePost(post.id, post.isLiked, post.likes);
 
+  const initialIsLiked =
+    post?.postlikes?.some((like) => like.userId === currentUser.id) ?? false;
+  const initialLikes = post?.postlikes?.length ?? 0;
+
+  const { likePost, isLiked, likes } = useLikePost({
+    postId: post.id,
+    userId: currentUser.id,
+    initialLikes,
+    initialIsLiked,
+  });
   const handleSubmitComment = () => {
     if (commentText.trim()) {
       createComment({
         postId: post.id,
-        authorId: post.author.id,
+        authorId: currentUser.id,
         content: commentText,
       });
       setCommentText("");
@@ -75,34 +91,6 @@ export function PostCard({ post }: PostCardProps) {
         <div className="space-y-4">
           <p className="text-foreground leading-relaxed">{post.content}</p>
 
-          {/* Job Details */}
-          {/*{post.type === "job" && post.jobDetails && (
-            <Card className="bg-muted/50 border-l-4 border-l-primary">
-              <CardContent className="p-4">
-                <h4 className="font-semibold text-foreground mb-2">
-                  {post.jobDetails.title}
-                </h4>
-                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {post.jobDetails.location}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {post.jobDetails.type}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="w-4 h-4" />
-                    {post.jobDetails.salary}
-                  </div>
-                </div>
-                <Button size="sm" className="mt-3">
-                  Apply Now
-                </Button>
-              </CardContent>
-            </Card>
-          )}*/}
-
           {/* Post Image */}
 
           {post.imageUrl && post.imageUrl.length > 0 && (
@@ -124,6 +112,52 @@ export function PostCard({ post }: PostCardProps) {
             </div>
           )}
 
+          {/* Job Details */}
+          {post.jobs && (
+            <Card className="bg-muted/50 border-l-4 border-l-primary">
+              <CardContent className="p-4">
+                <h4 className="font-semibold text-foreground mb-2">
+                  {post.jobs.title}
+                </h4>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {post.jobs.company}
+                </p>
+
+                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    {post.jobs.location}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {post.jobs.jobType} {/* fulltime/parttime etc */}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="w-4 h-4" />
+                    {
+                      post.jobs.currency
+                    } {post.jobs.minSalary.toLocaleString()} -{" "}
+                    {post.jobs.maxSalary.toLocaleString()}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {new Date(
+                      post.jobs.applicationDeadline,
+                    ).toLocaleDateString()}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    {post.jobs._count?.jobApplications ?? 0} applicants
+                  </div>
+                </div>
+
+                <Button size="sm" className="mt-3">
+                  Apply Now
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Interaction Buttons */}
           <div className="flex items-center justify-between pt-2 border-t">
             <div className="flex items-center gap-4">
@@ -139,7 +173,6 @@ export function PostCard({ post }: PostCardProps) {
                 <Heart className={cn("w-4 h-4", isLiked && "fill-current")} />
                 {likes}
               </Button>
-
               <Button
                 variant="ghost"
                 size="sm"
@@ -147,7 +180,7 @@ export function PostCard({ post }: PostCardProps) {
                 className="gap-2 hover:text-primary"
               >
                 <MessageCircle className="w-4 h-4" />
-                {comments?.length}
+                {comments?.length ?? <div>loading...</div>}
               </Button>
 
               <Button

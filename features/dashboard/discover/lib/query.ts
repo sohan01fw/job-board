@@ -12,10 +12,12 @@ export async function createPost({
   authorId,
   content,
   imageUrl,
+  jobId,
 }: {
   authorId: string;
   content: string;
   imageUrl?: string[];
+  jobId?: string;
 }): Promise<Post> {
   return withTryCatch(async () => {
     return prisma.post.create({
@@ -23,6 +25,7 @@ export async function createPost({
         authorId,
         content,
         imageUrl,
+        jobsId: jobId,
       },
     });
   }, "Error while creating post");
@@ -44,7 +47,20 @@ export async function getFeed({
       take: limit,
       skip,
       orderBy: { createdAt: "desc" },
-      include: { author: true, comments: true },
+      include: {
+        author: true,
+        comments: true,
+        postlikes: true,
+        jobs: {
+          include: {
+            _count: {
+              select: {
+                jobApplications: true,
+              },
+            },
+          },
+        },
+      },
     });
   }, "Error while fetching feed");
 }
@@ -70,6 +86,7 @@ export async function getMyPosts({
       include: {
         author: true,
         comments: true,
+        postlikes: true,
       },
     });
   }, "Error while fetching my posts");
@@ -89,21 +106,23 @@ export async function deleteMyPost(postId: string) {
 
 export const likePostQuery = async ({
   postId,
+  userId,
   isLiked,
-  likes,
 }: {
   postId: string;
+  userId: string;
   isLiked: boolean;
-  likes: number;
 }) =>
   withTryCatch(async () => {
-    return prisma.post.update({
-      where: { id: postId },
-      data: {
-        isLiked: isLiked,
-        likes: likes,
-      },
-    });
+    if (isLiked) {
+      await prisma.postLike.deleteMany({ where: { postId, userId } });
+    } else {
+      await prisma.postLike.create({ data: { postId, userId } });
+    }
+
+    const likes = await prisma.postLike.count({ where: { postId } });
+
+    return { likes };
   }, "Error while liking post");
 
 // ---------------------

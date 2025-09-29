@@ -13,6 +13,27 @@ export async function CreateJobPost(job: JobData, email: string) {
   }, "Error while creating job post");
 }
 
+export async function getPostedJobById({
+  jobId,
+  userId,
+}: {
+  jobId: string;
+  userId: string;
+}) {
+  return withTryCatch(async () => {
+    const job = await prisma.jobPost.findUnique({
+      where: { id: jobId, userId: userId },
+      include: {
+        _count: {
+          select: {
+            jobApplications: true,
+          },
+        },
+      },
+    });
+    return job;
+  }, "Error while fetching job by id");
+}
 export async function getAllJobPosts({
   sort,
   filter,

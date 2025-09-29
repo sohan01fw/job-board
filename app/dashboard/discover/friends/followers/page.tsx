@@ -1,4 +1,4 @@
-import MyFollowers from "@/features/dashboard/discover/components/MyFollowers";
+import MyFollowers from "@/features/dashboard/discover/components/friends/MyFollowers";
 import { getCachedUser } from "@/lib/redis";
 
 export default async function Followers() {

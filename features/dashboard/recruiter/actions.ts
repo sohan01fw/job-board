@@ -6,13 +6,22 @@ import {
   CreateJobPost,
   getAllApplicantsByJob,
   getAllJobPosts,
+  getPostedJobById,
   updateJobApplicationStatus,
 } from "./lib/query";
 
 export async function createJob(job: JobData, email: string) {
   return CreateJobPost(job, email);
 }
-
+export async function getPostedJobByIdAction({
+  jobId,
+  userId,
+}: {
+  jobId: string;
+  userId: string;
+}) {
+  return await getPostedJobById({ jobId, userId });
+}
 export async function GetAllPostedJobs({
   userId,
   sort,

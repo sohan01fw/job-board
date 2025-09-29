@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { ImageIcon, Briefcase, X } from "lucide-react";
+import { ImageIcon, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,42 +10,42 @@ import { EmojiPicker } from "./ui/EmojiPicker";
 import { CachedUser } from "@/types/global";
 import { useUserStore } from "@/lib/stores/useUserStatusStore";
 import { useCreatePost } from "../hooks/usePost";
-import { uploadMultipleFiles } from "@/lib/Actions/UploadMultipleFiles";
 import Image from "next/image";
+import { AttachJobDialog } from "./ui/AttachJobDialog";
+import { useJobStore } from "../lib/stores/JobStore";
+import { useGetPostedJobById } from "../../recruiter/hooks/useGetPostedJobs";
+import { AttachedJobCard } from "./ui/AttachedJobCard";
 
 export function CreatePost({ userData }: { userData: CachedUser }) {
   const [postContent, setPostContent] = useState("");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { jobId, clearJobId } = useJobStore();
 
   const { user } = useUserStore();
-  const { mutate: createPost } = useCreatePost();
+  const { mutateAsync: createPost, isPending: isPosting } = useCreatePost({
+    userData,
+  });
 
+  const { data: job, isLoading: isLoadingJob } = useGetPostedJobById({
+    jobId: jobId || "",
+    userId: userData.id || "",
+  });
   const handlePost = async () => {
     if (!postContent.trim() && selectedImages.length === 0) return;
 
-    let uploadedUrls: string[] = [];
-
-    if (selectedImages.length > 0) {
-      // Upload all selected images at once
-      uploadedUrls = await uploadMultipleFiles({
-        files: selectedImages, // <-- pass array of Files
-        bucketName: "post-images",
-        authorId: userData.id, // <-- used for naming
-      });
-    }
-
-    createPost({
-      authorId: userData.id,
+    await createPost({
       content: postContent,
-      imageUrl: uploadedUrls, // array of strings
+      images: selectedImages,
+      jobId: jobId || "",
     });
 
-    // Reset states
+    // Reset UI states immediately
     setPostContent("");
     setSelectedImages([]);
     setImagePreviews([]);
+    clearJobId();
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +109,19 @@ export function CreatePost({ userData }: { userData: CachedUser }) {
                 ))}
               </div>
             )}
+            {/*to show attached job*/}
+            {job && (
+              <AttachedJobCard
+                title={job.title}
+                company={job.company}
+                location={job.location}
+                minSalary={job.minSalary}
+                maxSalary={job.maxSalary}
+                currency={job.currency}
+                applicationDeadline={job.applicationDeadline}
+                applicants={job._count?.jobApplications ?? 0}
+              />
+            )}
 
             <div className="flex items-center justify-between pt-1">
               <div className="flex items-center gap-1.5">
@@ -132,14 +145,10 @@ export function CreatePost({ userData }: { userData: CachedUser }) {
                 </Button>
 
                 {user.status === "HIRING" && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 px-2 text-muted-foreground hover:text-primary"
-                  >
-                    <Briefcase className="w-4 h-4" />
-                    <span className="hidden sm:inline">Attach Job</span>
-                  </Button>
+                  <AttachJobDialog
+                    userId={userData.id!}
+                    loading={isLoadingJob}
+                  />
                 )}
 
                 <EmojiPicker
@@ -151,10 +160,14 @@ export function CreatePost({ userData }: { userData: CachedUser }) {
 
               <Button
                 onClick={handlePost}
-                disabled={!postContent.trim() && selectedImages.length === 0}
+                disabled={
+                  isPosting ||
+                  (postContent.trim().length === 0 &&
+                    selectedImages.length === 0)
+                }
                 className="h-8 px-4 rounded-full bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
               >
-                Post
+                {isPosting ? "Posting..." : "Post"}
               </Button>
             </div>
           </div>

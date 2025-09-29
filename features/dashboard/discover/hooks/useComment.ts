@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createCommentAction, getCommentsByPostAction } from "../action";
+import { CachedUser } from "@/types/global";
 
 // ---------------------
 // GET COMMENTS
@@ -23,7 +24,7 @@ export function useComments({ postId }: { postId: string }) {
 // ---------------------
 // CREATE COMMENT
 // ---------------------
-export function useCreateComment() {
+export function useCreateComment({ user }: { user: CachedUser }) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -35,12 +36,25 @@ export function useCreateComment() {
       const comment = await createCommentAction(args);
       return comment;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["comments", variables.postId],
-      });
+    onSuccess: (newComment, variables) => {
+      queryClient.setQueryData(
+        ["comments", variables.postId],
+        (old: any[] = []) => [
+          ...old,
+          {
+            ...newComment,
+            author: {
+              id: variables.authorId,
+              name: user?.name || "Unknown",
+              img: user?.img || null,
+            },
+          },
+        ],
+      );
+
       toast.success("Comment added!");
     },
+
     onError: (error: any) => {
       console.error("Failed to create comment", error);
       toast.error(error?.message || "Failed to create comment");

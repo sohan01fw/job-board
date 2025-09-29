@@ -1,4 +1,4 @@
-import { Comment, User } from "@prisma/client";
+import { Comment, JobPost, PostLike, User } from "@prisma/client";
 
 export type UserCmts = {
   id: string;
@@ -8,15 +8,20 @@ export type UserCmts = {
   createdAt: Date;
 };
 
+type JobWithCount = JobPost & {
+  _count?: {
+    jobApplications: number;
+  };
+};
 export type PostUser = {
   id: string;
   authorId: string;
   author: User;
   comments: Comment[];
+  postlikes: PostLike[];
+  jobs?: JobWithCount | null;
   content: string;
   imageUrl: string[];
-  likes: number;
-  isLiked: boolean;
   createdAt: Date;
   updatedAt: Date;
 };

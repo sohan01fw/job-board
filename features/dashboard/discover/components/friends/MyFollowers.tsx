@@ -2,9 +2,9 @@
 
 import { Card, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useFollowUser, useFriendsAndFollowers } from "../hooks/useFollow";
+import { useFollowUser, useFriendsAndFollowers } from "../../hooks/useFollow";
 import { CachedUser } from "@/types/global";
-import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/confirmDialog";
 
 export default function MyFollowers({
   currentUser,
@@ -12,7 +12,8 @@ export default function MyFollowers({
   currentUser: CachedUser;
 }) {
   const { data, isLoading } = useFriendsAndFollowers(currentUser?.id || "");
-  const { mutate: followUser, isPending: isFollowingBack } = useFollowUser();
+  const { mutateAsync: followUser, isPending: isFollowingBack } =
+    useFollowUser();
 
   if (isLoading) return <div>Loading...</div>;
   if (!data) return <div>No followers</div>;
@@ -21,9 +22,6 @@ export default function MyFollowers({
   const followers = [...data.followersOnly];
 
   if (!followers.length) return <div>No one is following you yet.</div>;
-  const handleFollowBack = () => {
-    followUser({ followerId: currentUser.id, followingId: followers[0].id });
-  };
 
   return (
     <div className="space-y-4">
@@ -53,15 +51,18 @@ export default function MyFollowers({
               </div>
 
               {/* Right: Action */}
-              <Button
+              <ConfirmDialog
+                title="Follow Back"
+                description="Confirm you want to follow this user?"
                 variant="outline"
-                size="sm"
-                onClick={handleFollowBack}
-                disabled={isFollowingBack}
-                className="shrink-0"
-              >
-                {isFollowingBack ? "Following Back..." : "Follow Back"}
-              </Button>
+                confirmText={isFollowingBack ? "Following..." : "Follow"}
+                onConfirmAction={async () =>
+                  await followUser({
+                    followerId: currentUser.id,
+                    followingId: user.id,
+                  })
+                }
+              />
             </div>
           </CardHeader>
         </Card>

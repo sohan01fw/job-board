@@ -50,6 +50,18 @@ export function useFollowUser() {
       return await followUserAction(params);
     },
     onSuccess: (_, { followerId, followingId }) => {
+      queryClient.setQueryData(["suggestion-users"], (old: any) =>
+        old ? old.filter((user: any) => user.id !== followingId) : old,
+      );
+      queryClient.setQueryData(
+        ["friendsAndFollowers", followerId],
+        (old: any) => ({
+          ...old,
+          friends:
+            old?.friends?.filter((f: any) => f.id !== followingId) || old,
+        }),
+      );
+
       queryClient.invalidateQueries({
         queryKey: ["friendsAndFollowers", followerId],
       });
@@ -68,25 +80,48 @@ export function useFollowUser() {
   });
 }
 
+interface UnfollowParams {
+  followerId: string;
+  followingId: string;
+}
+
 export function useUnfollowUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: { followerId: string; followingId: string }) => {
-      return await unfollowUserAction(params);
+    mutationFn: async ({ followerId, followingId }: UnfollowParams) => {
+      return await unfollowUserAction({ followerId, followingId });
     },
+
+    // 1️⃣ Apply cache update AFTER successful server response
     onSuccess: (_, { followerId, followingId }) => {
+      // Remove unfollowed user from friends
+      queryClient.setQueryData(
+        ["friendsAndFollowers", followerId],
+        (old: any) => ({
+          ...old,
+          friends:
+            old?.friends?.filter((f: any) => f.id !== followingId) || old,
+        }),
+      );
+
+      // Optionally add back to suggestions
+      queryClient.setQueryData(["suggestion-users"], (old: any) =>
+        old ? [...old, { id: followingId }] : [{ id: followingId }],
+      );
+
+      // Refetch to sync with server just in case
       queryClient.invalidateQueries({
         queryKey: ["friendsAndFollowers", followerId],
       });
       queryClient.invalidateQueries({
         queryKey: ["friendsAndFollowers", followingId],
       });
-      queryClient.invalidateQueries({
-        queryKey: ["suggestion-users"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["suggestion-users"] });
+
       toast.success("User unfollowed!");
     },
+
     onError: (error: any) => {
       console.error(error);
       toast.error(error?.message || "Failed to unfollow user");
