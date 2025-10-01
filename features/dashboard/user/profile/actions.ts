@@ -3,6 +3,7 @@ import { prisma } from "@/lib/Prisma";
 import { withTryCatch } from "@/lib/tryCatch";
 import { UserData } from "@/types/Forms";
 import { User } from "@prisma/client";
+import { UpdateUserProfile } from "./lib/query";
 
 // create user
 export async function CreateUser(user: UserData): Promise<any> {
@@ -19,16 +20,14 @@ export async function CreateUser(user: UserData): Promise<any> {
 }
 
 // update user profile
-export async function UpdateUserProfile(
-  email: string,
-  data: Partial<Omit<User, "id" | "email">>, // any user fields except id/email
-): Promise<any> {
-  return withTryCatch(async () => {
-    return await prisma.user.update({
-      where: { email },
-      data, // only provided fields are updated
-    });
-  }, "Error while updating user profile");
+export async function updateUserProfileAction({
+  email,
+  data,
+}: {
+  email: string;
+  data: Partial<Omit<User, "id" | "email">>;
+}) {
+  return await UpdateUserProfile({ data, email });
 }
 
 export async function updateUserImage({

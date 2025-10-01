@@ -95,13 +95,14 @@ model Post {
 
 //this is for job schemas
 model UserActivity {
-  id        String       @id @default(uuid())
-  userId    String
-  type      ActivityType
-  jobAppId  String
-  followId  String?
-  status    String?
-  createdAt DateTime     @default(now())
+  id           String       @id @default(uuid())
+  userId       String
+  type         ActivityType
+  jobAppId     String?
+  followId     String?
+  targetUserId String?
+  status       String?
+  createdAt    DateTime     @default(now())
 
   user           User            @relation(fields: [userId], references: [id])
   jobApplication JobApplication? @relation(fields: [jobAppId], references: [id])
@@ -181,10 +182,11 @@ model JobPost {
 }
 
 model Follow {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   followerId  String
   followingId String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
 
   follower  User @relation("UserFollowing", fields: [followerId], references: [id])
   following User @relation("UserFollowers", fields: [followingId], references: [id])
@@ -225,7 +227,7 @@ model ChatParticipant {
 
 model User {
   id          String   @id @default(uuid())
-  name        String?  @db.VarChar(255) // maps to fullName
+  name        String   @db.VarChar(255) // maps to fullName
   email       String   @unique
   phone       String?  @unique
   location    String?

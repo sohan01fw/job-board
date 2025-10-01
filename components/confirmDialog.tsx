@@ -26,6 +26,7 @@ interface ConfirmDialogProps {
     | "ghost"
     | null; // Button variant
   cancelText?: string; // Cancel button text
+  confirmTextColor?: string;
   onConfirmAction: () => Promise<any>;
   onCancel?: () => void; // Optional cancel callback
   icon?: React.ReactNode; // Optional icon
@@ -36,6 +37,7 @@ export function ConfirmDialog({
   title,
   description,
   confirmText = "Delete",
+  confirmTextColor,
   cancelText = "Cancel",
   onConfirmAction,
   variant,
@@ -83,9 +85,9 @@ export function ConfirmDialog({
             {cancelText}
           </Button>
           <Button
-            variant="destructive"
             onClick={handleConfirm}
             disabled={loading}
+            className={confirmTextColor}
           >
             {confirmText}
           </Button>

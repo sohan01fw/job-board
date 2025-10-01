@@ -21,7 +21,7 @@ export function ChatList({ user }: ChatListProps) {
   const { id } = useParams();
 
   if (isLoading) return <div>Loading...</div>;
-  if (!data || !data.friends.length) return <div>No mutual friends yet.</div>;
+  if (!data || !data?.friends?.length) return <div>No mutual friends yet.</div>;
 
   const mutualFriends = data.friends;
 

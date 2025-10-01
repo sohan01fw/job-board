@@ -23,7 +23,7 @@ export default function MyMutualFriends({
 
   const mutualFriends = data.friends; // only mutual follows
 
-  if (!mutualFriends.length) return <div>No mutual friends yet.</div>;
+  if (!mutualFriends?.length) return <div>No mutual friends yet.</div>;
 
   return (
     <div className="space-y-4">

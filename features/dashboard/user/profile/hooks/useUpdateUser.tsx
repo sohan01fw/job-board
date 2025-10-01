@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { getUserFields, UpdateUserProfile } from "../actions";
+import { getUserFields, updateUserProfileAction } from "../actions";
 import { Status, User } from "@prisma/client";
 import { useLoading } from "@/lib/Hooks/useLoading";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -19,7 +19,10 @@ export const useUpdateUser = () => {
           ([key]) => dirtyFields[key as keyof typeof dirtyFields],
         ),
       );
-      const result = await UpdateUserProfile(email, filteredData);
+      const result = await updateUserProfileAction({
+        data: filteredData,
+        email,
+      });
       toast.success("Profile updated successfully!", {
         duration: 1500,
         position: "top-right",
@@ -36,7 +39,7 @@ export function useUpdateStatus({ email }: { email: string }) {
 
   const mutation = useMutation({
     mutationFn: ({ status }: { status: Status }) =>
-      UpdateUserProfile(email, { status }),
+      updateUserProfileAction({ email, data: { status } }),
     onMutate: ({ status }) => {
       // Optimistic update
       updateStatusLocal(status);

@@ -23,6 +23,7 @@ import { useComments, useCreateComment } from "../hooks/useComment";
 import { ShowComments } from "./ui/ShowComments";
 import { useLikePost } from "../hooks/usePost";
 import { CachedUser } from "@/types/global";
+import JobViewModel from "../../jobs/components/ui/JobViewModel";
 
 interface PostCardProps {
   post: PostUser;
@@ -72,7 +73,10 @@ export function PostCard({ post, currentUser }: PostCardProps) {
               </h3>
 
               {post.author.status === "HIRING" && (
-                <Badge variant="secondary" className="text-xs">
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                >
                   Hiring
                 </Badge>
               )}
@@ -114,7 +118,7 @@ export function PostCard({ post, currentUser }: PostCardProps) {
 
           {/* Job Details */}
           {post.jobs && (
-            <Card className="bg-muted/50 border-l-4 border-l-primary">
+            <Card className="bg-muted/50 border-l-4 border-l-green-500">
               <CardContent className="p-4">
                 <h4 className="font-semibold text-foreground mb-2">
                   {post.jobs.title}
@@ -151,9 +155,9 @@ export function PostCard({ post, currentUser }: PostCardProps) {
                   </div>
                 </div>
 
-                <Button size="sm" className="mt-3">
-                  Apply Now
-                </Button>
+                <div className="mt-5">
+                  <JobViewModel job={post.jobs} />
+                </div>
               </CardContent>
             </Card>
           )}

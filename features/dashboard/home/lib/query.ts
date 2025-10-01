@@ -151,6 +151,16 @@ async function getUserActivities({ userId }: { userId: string }) {
             job: { select: { title: true, company: true, location: true } },
           },
         },
+        follow: {
+          include: {
+            follower: {
+              select: { id: true, name: true, img: true, email: true },
+            },
+            following: {
+              select: { id: true, name: true, img: true, email: true },
+            },
+          },
+        },
       },
     });
     return activities;

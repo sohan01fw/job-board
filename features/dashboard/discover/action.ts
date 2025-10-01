@@ -81,14 +81,14 @@ export async function followUserAction(args: {
   followerId: string;
   followingId: string;
 }) {
-  return await followUser(args.followerId, args.followingId);
+  return await followUser(args);
 }
 
 export async function unfollowUserAction(args: {
   followerId: string;
   followingId: string;
 }) {
-  return await unfollowUser(args.followerId, args.followingId);
+  return await unfollowUser(args);
 }
 export async function getFriendsAndFollowersAction(userId: string) {
   return await getFriendsAndFollowers(userId);

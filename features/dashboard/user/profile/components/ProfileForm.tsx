@@ -60,7 +60,7 @@ export function ProfileForm({ user }: { user: UserData }) {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: user.name || "",
+      name: user.name || "",
       email: user.email || "",
       phone: user.phone || "",
       location: user.location || "",
@@ -88,7 +88,7 @@ export function ProfileForm({ user }: { user: UserData }) {
     const totalFields = 15; // Total important fields
     let completedFields = 0;
 
-    if (watchedFields.fullName) completedFields++;
+    if (watchedFields.name) completedFields++;
     if (watchedFields.email) completedFields++;
     if (watchedFields.phone) completedFields++;
     if (watchedFields.location) completedFields++;
@@ -229,18 +229,18 @@ export function ProfileForm({ user }: { user: UserData }) {
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="fullName" className="text-green-700 font-medium">
-                Full Name <span className="text-red-500">*</span>
+                Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="fullName"
-                {...register("fullName")}
+                {...register("name")}
                 placeholder="Enter your full name"
                 className="h-12 text-lg"
                 aria-required="true"
               />
-              {errors.fullName && (
+              {errors.name && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.fullName.message}
+                  {errors.name.message}
                 </p>
               )}
             </div>

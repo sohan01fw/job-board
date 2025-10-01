@@ -21,6 +21,7 @@ export default function JobViewModel({ job }: { job: JobData }) {
         <div className="cursor-pointer">
           <EyeTooltip>
             <Eye size={14} />
+            view job
           </EyeTooltip>
         </div>
       </DialogTrigger>

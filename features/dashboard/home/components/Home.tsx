@@ -1,7 +1,6 @@
 import StatsGrid from "./StatGrid";
 import { RecentActivity } from "./RecentActivity";
 import QuickActions from "./QuickActions";
-import { UserData } from "@/types/Forms";
 import {
   Card,
   CardContent,
@@ -12,8 +11,9 @@ import {
 import { ArrowUpRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RecommendJobCard } from "./ui/RecommendJobCard";
+import { CachedUser } from "@/types/global";
 
-export default function DashboardHome({ user }: { user: UserData }) {
+export default function DashboardHome({ user }: { user: CachedUser }) {
   return (
     <div className="space-y-6 m-5">
       {/* Welcome Section */}

@@ -55,7 +55,10 @@ export default function MyFollowers({
                 title="Follow Back"
                 description="Confirm you want to follow this user?"
                 variant="outline"
-                confirmText={isFollowingBack ? "Following..." : "Follow"}
+                confirmTextColor="bg-green-500"
+                confirmText={
+                  isFollowingBack ? "Following Back..." : "Follow Back"
+                }
                 onConfirmAction={async () =>
                   await followUser({
                     followerId: currentUser.id,

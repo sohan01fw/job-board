@@ -2,8 +2,9 @@
 
 import { prisma } from "@/lib/Prisma";
 import { withTryCatch } from "@/lib/tryCatch";
-import { Post, User } from "@prisma/client";
+import { Post, Prisma, User } from "@prisma/client";
 import { PostUser, UserCmts } from "../types";
+import { pusherServer } from "@/lib/pusher";
 
 // ---------------------
 // CREATE POST
@@ -165,10 +166,12 @@ export const getAllUsersExceptQuery = async (
       where: {
         NOT: [
           { id: currentUserId }, // exclude self
+
           {
             followers: {
               some: {
                 followerId: currentUserId, // exclude users already followed by me
+                deletedAt: null,
               },
             },
           },
@@ -189,11 +192,16 @@ export async function getFriendsAndFollowers(userId: string) {
     const friends = await prisma.follow.findMany({
       where: {
         followerId: userId, // I follow them
+        deletedAt: null,
         followingId: {
           // AND they follow me
           in: await prisma.follow
             .findMany({
-              where: { followerId: { not: userId }, followingId: userId },
+              where: {
+                followerId: { not: userId },
+                followingId: userId,
+                deletedAt: null,
+              },
               select: { followerId: true },
             })
             .then((rows) => rows.map((r) => r.followerId)),
@@ -207,10 +215,15 @@ export async function getFriendsAndFollowers(userId: string) {
     const followingOnly = await prisma.follow.findMany({
       where: {
         followerId: userId, // I follow them
+        deletedAt: null,
         followingId: {
           notIn: await prisma.follow
             .findMany({
-              where: { followerId: { not: userId }, followingId: userId }, // people who follow me
+              where: {
+                followerId: { not: userId },
+                followingId: userId,
+                deletedAt: null,
+              }, // people who follow me
               select: { followerId: true },
             })
             .then((rows) => rows.map((r) => r.followerId)),
@@ -223,10 +236,11 @@ export async function getFriendsAndFollowers(userId: string) {
     const followersOnly = await prisma.follow.findMany({
       where: {
         followingId: userId, // they follow me
+        deletedAt: null,
         followerId: {
           notIn: await prisma.follow
             .findMany({
-              where: { followerId: userId }, // people I follow
+              where: { followerId: userId, deletedAt: null }, // people I follow
               select: { followingId: true },
             })
             .then((rows) => rows.map((r) => r.followingId)),
@@ -243,20 +257,197 @@ export async function getFriendsAndFollowers(userId: string) {
   }, "Error fetching friends and followers");
 }
 
-export async function followUser(followerId: string, followingId: string) {
+// follow user
+
+export async function followUser({
+  followerId,
+  followingId,
+}: {
+  followerId: string;
+  followingId: string;
+}) {
   return withTryCatch(async () => {
-    await prisma.follow.create({
-      data: { followerId, followingId },
+    // 1️⃣ Check if follow exists
+    let follow = await prisma.follow.findUnique({
+      where: { followerId_followingId: { followerId, followingId } },
+      include: { follower: true, following: true },
     });
+
+    if (follow) {
+      // Restore soft-deleted follow if needed
+      if (follow.deletedAt) {
+        follow = await prisma.follow.update({
+          where: { id: follow.id },
+          data: { deletedAt: null },
+          include: { follower: true, following: true }, // ✅ match the type
+        });
+      }
+    } else {
+      // Create new follow
+      follow = await prisma.follow.create({
+        data: { followerId, followingId, deletedAt: null },
+        include: { follower: true, following: true },
+      });
+    }
+    if (!follow) {
+      throw new Error("Follow not found");
+    }
+    // 2️⃣ Create UserActivity for follower (who followed)
+    await prisma.userActivity.create({
+      data: {
+        userId: followerId,
+        type: "FOLLOW",
+        followId: follow.id,
+        status: "NEW_FOLLOWER",
+      } as Prisma.UserActivityUncheckedCreateInput,
+    });
+
+    // 3️⃣ Create UserActivity for following (who got followed)
+    await prisma.userActivity.create({
+      data: {
+        userId: followingId,
+        type: "FOLLOW",
+        followId: follow.id,
+        status: "NEW_FOLLOWING",
+      } as Prisma.UserActivityUncheckedCreateInput,
+    });
+
+    // 4️⃣ Pusher events
+    await pusherServer.trigger(
+      `private-follow-${followingId}`,
+      "new-follower",
+      {
+        id: follow.id,
+        follower: {
+          id: follow.follower.id,
+          name: follow.follower.name,
+          img: follow.follower.img,
+        },
+        createdAt: follow.createdAt,
+      },
+    );
+
+    await pusherServer.trigger(
+      `private-follow-${followerId}`,
+      "new-following",
+      {
+        id: follow.id,
+        following: {
+          id: follow.following.id,
+          name: follow.following.name,
+          img: follow.following.img,
+        },
+        createdAt: follow.createdAt,
+      },
+    );
+
+    // 5️⃣ Mutual follow check (ignore soft-deleted)
+    const mutual = await prisma.follow.findFirst({
+      where: {
+        followerId: followingId,
+        followingId: followerId,
+        deletedAt: null,
+      },
+      include: { follower: true, following: true },
+    });
+
+    if (mutual) {
+      // 🔔 UserActivity for follow accepted
+      await prisma.userActivity.create({
+        data: {
+          userId: followerId,
+          type: "FOLLOW_ACCEPTED",
+          followId: follow.id,
+          status: "ACCEPTED",
+        } as Prisma.UserActivityUncheckedCreateInput,
+      });
+
+      await prisma.userActivity.create({
+        data: {
+          userId: followingId,
+          type: "FOLLOW_ACCEPTED",
+          followId: follow.id,
+          status: "ACCEPTED",
+        } as Prisma.UserActivityUncheckedCreateInput,
+      });
+
+      // 🔔 Trigger follow-accepted events
+      await pusherServer.trigger(
+        `private-follow-${followerId}`,
+        "follow-accepted",
+        {
+          friend: {
+            id: follow.following.id,
+            name: follow.following.name,
+            img: follow.following.img,
+          },
+          createdAt: new Date(),
+        },
+      );
+
+      await pusherServer.trigger(
+        `private-follow-${followingId}`,
+        "follow-accepted",
+        {
+          friend: {
+            id: follow.follower.id,
+            name: follow.follower.name,
+            img: follow.follower.img,
+          },
+          createdAt: new Date(),
+        },
+      );
+    }
+
     return { success: true };
   }, "Error following user");
 }
 
-export async function unfollowUser(followerId: string, followingId: string) {
+// 🔥 Unfollow user
+export async function unfollowUser({
+  followerId,
+  followingId,
+}: {
+  followerId: string;
+  followingId: string;
+}) {
   return withTryCatch(async () => {
-    await prisma.follow.delete({
+    // 🔔 Create UserActivity for unfollow
+    const follow = await prisma.follow.update({
       where: { followerId_followingId: { followerId, followingId } },
+      data: { deletedAt: new Date() },
     });
+    await prisma.userActivity.create({
+      data: {
+        userId: followerId,
+        type: "UNFOLLOW",
+        status: "REMOVED_FOLLOWING",
+        followId: follow.id,
+      } as Prisma.UserActivityUncheckedCreateInput,
+    });
+
+    await prisma.userActivity.create({
+      data: {
+        userId: followingId,
+        type: "UNFOLLOW",
+        status: "REMOVED_FOLLOWER",
+        followId: follow.id,
+      } as Prisma.UserActivityUncheckedCreateInput,
+    });
+
+    // 🔔 Trigger Pusher events
+    await pusherServer.trigger(
+      `private-follow-${followingId}`,
+      "removed-follower",
+      { followerId },
+    );
+
+    await pusherServer.trigger(
+      `private-follow-${followerId}`,
+      "removed-following",
+      { followingId },
+    );
+
     return { success: true };
   }, "Error unfollowing user");
 }

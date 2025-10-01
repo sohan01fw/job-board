@@ -79,6 +79,7 @@ export function SuggestedConnections({
                     title="Follow"
                     description="Confirm you want to follow this user?"
                     variant="outline"
+                    confirmTextColor="bg-green-500"
                     confirmText={isFollowing ? "Following..." : "Follow"}
                     onConfirmAction={async () =>
                       await followUser({

@@ -29,18 +29,46 @@ export function getActivityConfig(activity: any): ActivityItem {
           },
         ],
       };
-    case "FOLLOW":
+
+    case "FOLLOW": {
+      const isActorFollower = activity.userId === activity.follow?.followerId;
+
       return {
         id: activity.id,
         type: activity.type,
-        title: `You followed ${activity.targetUser?.name ?? "someone"}`,
+        title: isActorFollower
+          ? `You followed ${activity.follow?.following?.name ?? "someone"}`
+          : `${activity.follow?.follower?.name ?? "Someone"} followed you`,
       };
-    case "FOLLOWED_BY":
+    }
+
+    case "UNFOLLOW": {
+      const isActorFollower = activity.userId === activity.follow?.followerId;
+
       return {
         id: activity.id,
         type: activity.type,
-        title: `${activity.sourceUser?.name ?? "Someone"} followed you`,
+        title: isActorFollower
+          ? `You unfollowed ${activity.follow?.following?.name ?? "someone"}`
+          : `${activity.follow?.follower?.name ?? "Someone"} unfollowed you`,
       };
+    }
+
+    case "FOLLOW_ACCEPTED": {
+      const acceptedBy = activity.follow?.follower; // the one who accepted
+      const requestedBy = activity.follow?.following; // the one who sent the original follow
+
+      const isCurrentUserAccepted = activity.userId === acceptedBy?.id;
+
+      return {
+        id: activity.id,
+        type: activity.type,
+        title: isCurrentUserAccepted
+          ? `You accepted ${requestedBy?.name ?? "someone"}'s follow request`
+          : `${acceptedBy?.name ?? "Someone"} accepted your follow request`,
+      };
+    }
+
     default:
       return {
         id: activity.id,
