@@ -122,17 +122,6 @@ model Notification {
   createdAt        DateTime        @default(now())
 }
 
-model ProfileView {
-  id       String   @id @default(uuid())
-  viewerId String
-  userId   String // whose profile was viewed
-  viewedAt DateTime @default(now())
-
-  // relations
-  viewer User @relation("viewer", fields: [viewerId], references: [id])
-  user   User @relation("viewed", fields: [userId], references: [id])
-}
-
 model JobApplication {
   id          String @id @default(uuid())
   coverLetter String
@@ -244,6 +233,7 @@ model User {
   remote      Boolean  @default(false)
   relocate    Boolean  @default(false)
   img         String? // profileImage
+  views       Int      @default(0)
   resume      String?
   embedding   Float[]
   status      Status   @default(IDLE)
@@ -251,8 +241,6 @@ model User {
 
   jobs            JobPost[]
   jobApplications JobApplication[]
-  profileViews    ProfileView[]    @relation("viewed") // views received
-  viewsMade       ProfileView[]    @relation("viewer") // views made
   Notifications   Notification[]
   userActivities  UserActivity[]
   posts           Post[]

@@ -4,6 +4,7 @@ import { ApplicationStatus } from "@prisma/client";
 import { JobData } from "../types";
 import {
   CreateJobPost,
+  deleteJob,
   getAllApplicantsByJob,
   getAllJobPosts,
   getPostedJobById,
@@ -44,4 +45,8 @@ export async function updateJobAppStatus({
   status: ApplicationStatus;
 }) {
   return await updateJobApplicationStatus({ applicationId, status });
+}
+
+export async function deleteJobPostAction({ jobId }: { jobId: string }) {
+  return await deleteJob({ jobId });
 }

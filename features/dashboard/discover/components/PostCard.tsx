@@ -24,6 +24,7 @@ import { ShowComments } from "./ui/ShowComments";
 import { useLikePost } from "../hooks/usePost";
 import { CachedUser } from "@/types/global";
 import JobViewModel from "../../jobs/components/ui/JobViewModel";
+import Link from "next/link";
 
 interface PostCardProps {
   post: PostUser;
@@ -60,7 +61,10 @@ export function PostCard({ post, currentUser }: PostCardProps) {
   return (
     <Card className="w-full">
       <CardHeader className="pb-3">
-        <div className="flex items-start gap-3">
+        <Link
+          href={`/dashboard/user/${post.author.id}`}
+          className="flex items-start gap-3"
+        >
           <Avatar className="w-12 h-12">
             <AvatarImage src={post.author.img || "/placeholder.svg"} />
             <AvatarFallback>{"A"}</AvatarFallback>
@@ -82,13 +86,10 @@ export function PostCard({ post, currentUser }: PostCardProps) {
               )}
             </div>
             <p className="text-sm text-muted-foreground truncate">
-              {post.author.name}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {post.createdAt.toLocaleDateString()}
+              {post.author.title ?? "Not An Enginner"}
             </p>
           </div>
-        </div>
+        </Link>
       </CardHeader>
 
       <CardContent className="pt-0">

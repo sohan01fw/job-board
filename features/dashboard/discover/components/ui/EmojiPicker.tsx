@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import data from "@emoji-mart/data";
 import { Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,13 +11,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import dynamic from "next/dynamic";
 
-const Picker = dynamic(() => import("@emoji-mart/react"), { ssr: true });
+const Picker = dynamic(() => import("@emoji-mart/react"), { ssr: false }); // SSR false
 
-export function EmojiPicker({
-  onSelectAction,
-}: {
+interface EmojiPickerProps {
   onSelectAction: (emoji: string) => void;
-}) {
+  text?: string;
+}
+
+export const EmojiPicker = memo(function EmojiPicker({
+  onSelectAction,
+  text,
+}: EmojiPickerProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -33,7 +37,7 @@ export function EmojiPicker({
           className="h-8 px-2 text-muted-foreground hover:text-primary"
         >
           <Smile className="w-5 h-5 text-muted-foreground" />
-          Feeling
+          {text ?? ""}
         </Button>
       </DropdownMenuTrigger>
 
@@ -41,10 +45,9 @@ export function EmojiPicker({
         className="p-0 border-none shadow-none bg-transparent"
         align="start"
       >
-        {mounted === true ? (
+        {mounted ? (
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="h-80 overflow-y-auto no-scrollbar">
-              {/* 👈 fixed height + scroll */}
               <Picker
                 data={data}
                 onEmojiSelect={(emoji: any) => onSelectAction(emoji.native)}
@@ -60,4 +63,4 @@ export function EmojiPicker({
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+});

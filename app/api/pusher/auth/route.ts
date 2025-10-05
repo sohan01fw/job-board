@@ -33,10 +33,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (channel.startsWith("private-user-notification-")) {
+      const targetUserId = channel.replace("private-user-notification-", "");
+      // only allow subscribing to your own notification channel
+      if (targetUserId !== user.id) {
+        return new NextResponse("Forbidden", { status: 403 });
+      }
+    }
+
     // 🎯 You can add more channel types here later...
 
     // ✅ Authorize with Pusher
-    const authResponse = pusherServer.authorizeChannel(socketId, channel);
+    const authResponse = pusherServer.authorizeChannel(socketId, channel, {
+      user_id: user.id,
+    });
     return NextResponse.json(authResponse);
   } catch (err) {
     console.error(err);

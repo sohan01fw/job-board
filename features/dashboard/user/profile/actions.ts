@@ -3,7 +3,11 @@ import { prisma } from "@/lib/Prisma";
 import { withTryCatch } from "@/lib/tryCatch";
 import { UserData } from "@/types/Forms";
 import { User } from "@prisma/client";
-import { UpdateUserProfile } from "./lib/query";
+import {
+  getUserById,
+  updateProfileViews,
+  UpdateUserProfile,
+} from "./lib/query";
 
 // create user
 export async function CreateUser(user: UserData): Promise<any> {
@@ -60,4 +64,14 @@ export const getUserFields = async (
     where: { email },
     select,
   });
+};
+export const getUserByIdAction = async ({ userId }: { userId: string }) => {
+  return await getUserById({ userId });
+};
+export const updateProfileViewsAction = async ({
+  userId,
+}: {
+  userId: string;
+}) => {
+  return await updateProfileViews({ userId });
 };

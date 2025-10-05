@@ -21,14 +21,18 @@ export async function createPostAction(args: {
   authorId: string;
   content: string;
   imageUrl?: string[];
-  jobId?: string;
+  jobId?: string | null;
 }) {
   return createPost(args);
 }
 
-export async function getFeedAction(args?: { limit?: number; skip?: number }) {
+export async function getFeedAction(args?: {
+  limit?: number;
+  cursor?: string | null;
+}) {
   return getFeed(args || {});
 }
+
 export async function getMyPostsAction(args: {
   userId: string;
   limit?: number;
@@ -90,6 +94,10 @@ export async function unfollowUserAction(args: {
 }) {
   return await unfollowUser(args);
 }
-export async function getFriendsAndFollowersAction(userId: string) {
+export async function getFriendsAndFollowersAction({
+  userId,
+}: {
+  userId: string;
+}) {
   return await getFriendsAndFollowers(userId);
 }

@@ -13,7 +13,7 @@ export default function StatsGrid({ user }: { user: UserData }) {
   if (isLoading) return <StatsGridSkeleton />;
   if (isError || !data) return <p>Failed to load stats</p>;
 
-  const { jobstat, jobAppCount } = data;
+  const { jobstat, jobAppCount, profileViews, followerCount } = data;
 
   const stats = [
     {
@@ -26,17 +26,17 @@ export default function StatsGrid({ user }: { user: UserData }) {
     },
     {
       title: "Profile Views",
-      value: "1,247",
-      change: "+8%",
-      trend: "up",
+      value: profileViews?.value,
+      change: `+${profileViews?.change}`,
+      trend: profileViews?.trend,
       icon: Eye,
       description: "Views this week",
     },
     {
       title: "Followers",
-      value: "18",
-      change: "+3",
-      trend: "up",
+      value: followerCount?.value,
+      change: `+${followerCount?.change}`,
+      trend: followerCount?.trend,
       icon: UserPlus,
       description: "New followers this week",
     },

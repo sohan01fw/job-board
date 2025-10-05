@@ -21,7 +21,7 @@ export function useFriendsAndFollowers(userId: string) {
       followingOnly: User[];
       followersOnly: User[];
     }> => {
-      return await getFriendsAndFollowersAction(userId);
+      return await getFriendsAndFollowersAction({ userId });
     },
     enabled: !!userId,
   });

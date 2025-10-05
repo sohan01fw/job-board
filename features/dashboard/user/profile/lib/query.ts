@@ -50,3 +50,23 @@ export async function UpdateUserProfile({
     return updated;
   }, "Error updating user profile");
 }
+
+export async function getUserById({ userId }: { userId: string }) {
+  return withTryCatch(async () => {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      omit: {
+        embedding: true,
+      },
+    });
+    return user;
+  }, "Error while checking user");
+}
+export async function updateProfileViews({ userId }: { userId: string }) {
+  return withTryCatch(async () => {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { views: { increment: 1 } },
+    });
+  }, "Error while checking user");
+}

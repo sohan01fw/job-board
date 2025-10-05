@@ -1,23 +1,29 @@
 "use client";
 
 import {
-  MoreHorizontal,
   MapPin,
   Clock,
   Users,
   SquareArrowOutUpRight,
   FileText,
+  Trash2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PostedJobsType } from "../types";
 import Link from "next/link";
-import { usePostedJobs } from "../hooks/useGetPostedJobs";
+import { useDeleteJob, usePostedJobs } from "../hooks/useGetPostedJobs";
 import { PostedJobSkeleton } from "./ui/PostedJobSkeleton";
+import { ConfirmDialog } from "@/components/confirmDialog";
+import { useUserStore } from "@/lib/stores/useUserStatusStore";
 
 export function PostedJobs({ userId }: { userId: string }) {
   const { data: jobs, isLoading, isError } = usePostedJobs({ userId });
+  const { mutateAsync: deleteJob, isPending: isDeleting } = useDeleteJob();
+  const {
+    user: { status },
+  } = useUserStore();
 
   if (isLoading)
     return (
@@ -41,7 +47,7 @@ export function PostedJobs({ userId }: { userId: string }) {
               {/* Header */}
               <div className="flex items-start justify-between mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center font-bold text-primary">
+                  <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center font-bold text-primary">
                     {job.company[0]}
                   </div>
 
@@ -54,9 +60,20 @@ export function PostedJobs({ userId }: { userId: string }) {
                 </div>
 
                 <div className="flex flex-row gap-2">
-                  <Button variant="ghost" size="icon">
-                    <MoreHorizontal className="w-5 h-5" />
-                  </Button>
+                  {status === "HIRING" && (
+                    <ConfirmDialog
+                      icon={<Trash2 className="w-2 h-6" />}
+                      variant="destructive"
+                      description="Are u sure to Delete this Post?"
+                      onConfirmAction={async () => {
+                        await deleteJob({ jobId: job.id });
+                      }}
+                      confirmText={
+                        isDeleting ? "Deleting..." : "delete job post"
+                      }
+                      confirmTextColor="bg-red-500 "
+                    />
+                  )}
                 </div>
               </div>
 
@@ -102,7 +119,7 @@ export function PostedJobs({ userId }: { userId: string }) {
 
               <Link
                 href={`applicants?job_id=${job.id}`}
-                className="flex items-center justify-between gap-2 mt-2 w-48 p-2 text-sm font-medium text-muted-foreground bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                className={`${status !== "HIRING" && "pointer-events-none opacity-50"} flex items-center justify-between gap-2 mt-2 w-48 p-2 text-sm font-medium text-muted-foreground bg-gray-50 dark:bg-gray-800 hover:dark:bg-gray-700 rounded-lg hover:bg-gray-100 transition-colors`}
               >
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-primary" />

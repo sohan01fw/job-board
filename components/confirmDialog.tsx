@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 interface ConfirmDialogProps {
   trigger?: React.ReactNode; // Custom trigger button or element
-  title: string; // Dialog title
+  title?: string; // Dialog title
   description: string; // Dialog description/content
   confirmText?: string; // Confirm button text
   variant?:

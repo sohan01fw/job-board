@@ -18,7 +18,7 @@ export async function createPost({
   authorId: string;
   content: string;
   imageUrl?: string[];
-  jobId?: string;
+  jobId?: string | null;
 }): Promise<Post> {
   return withTryCatch(async () => {
     return prisma.post.create({
@@ -26,7 +26,7 @@ export async function createPost({
         authorId,
         content,
         imageUrl,
-        jobsId: jobId,
+        jobsId: jobId ?? null,
       },
     });
   }, "Error while creating post");
@@ -37,16 +37,16 @@ export async function createPost({
 // ---------------------
 
 export async function getFeed({
-  limit = 20,
-  skip = 0,
+  limit = 10,
+  cursor,
 }: {
   limit?: number;
-  skip?: number;
-}): Promise<PostUser[]> {
+  cursor?: string | null;
+}) {
   return withTryCatch(async () => {
-    return prisma.post.findMany({
-      take: limit,
-      skip,
+    const posts = await prisma.post.findMany({
+      take: limit + 1, // get one extra to check if there’s more
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
       orderBy: { createdAt: "desc" },
       include: {
         author: true,
@@ -55,14 +55,24 @@ export async function getFeed({
         jobs: {
           include: {
             _count: {
-              select: {
-                jobApplications: true,
-              },
+              select: { jobApplications: true },
             },
           },
         },
       },
     });
+
+    // Determine if there’s another page
+    let nextCursor: string | null = null;
+    if (posts.length > limit) {
+      const nextItem = posts.pop(); // remove extra item
+      nextCursor = nextItem!.id;
+    }
+
+    return {
+      posts,
+      nextCursor,
+    };
   }, "Error while fetching feed");
 }
 
@@ -248,11 +258,21 @@ export async function getFriendsAndFollowers(userId: string) {
       },
       include: { follower: true },
     });
+    const followerCount = followersOnly.length;
 
+    // Example: calculate change (you can replace with real logic)
+    const previousCount = followerCount > 0 ? followerCount - 1 : 0; // placeholder
+    const change = followerCount - previousCount;
+    const trend = change >= 0 ? "up" : "down";
     return {
       friends: friends.map((f) => f.following),
       followingOnly: followingOnly.map((f) => f.following),
       followersOnly: followersOnly.map((f) => f.follower),
+      followerCount: {
+        value: followerCount.toString(),
+        change: change,
+        trend,
+      },
     };
   }, "Error fetching friends and followers");
 }
@@ -318,7 +338,7 @@ export async function followUser({
       "new-follower",
       {
         id: follow.id,
-        follower: {
+        friend: {
           id: follow.follower.id,
           name: follow.follower.name,
           img: follow.follower.img,
@@ -328,11 +348,24 @@ export async function followUser({
     );
 
     await pusherServer.trigger(
+      `private-user-notification-${followingId}`,
+      "notification",
+      {
+        type: "follow",
+        friend: {
+          id: follow.follower.id,
+          name: follow.follower.name,
+          img: follow.follower.img,
+        },
+      },
+    );
+
+    await pusherServer.trigger(
       `private-follow-${followerId}`,
       "new-following",
       {
         id: follow.id,
-        following: {
+        friend: {
           id: follow.following.id,
           name: follow.following.name,
           img: follow.following.img,
@@ -412,8 +445,13 @@ export async function unfollowUser({
   followingId: string;
 }) {
   return withTryCatch(async () => {
+    const follow = await prisma.follow.findUnique({
+      where: { followerId_followingId: { followerId, followingId } },
+      include: { follower: true, following: true },
+    });
+
     // 🔔 Create UserActivity for unfollow
-    const follow = await prisma.follow.update({
+    const follows = await prisma.follow.update({
       where: { followerId_followingId: { followerId, followingId } },
       data: { deletedAt: new Date() },
     });
@@ -422,7 +460,7 @@ export async function unfollowUser({
         userId: followerId,
         type: "UNFOLLOW",
         status: "REMOVED_FOLLOWING",
-        followId: follow.id,
+        followId: follows.id,
       } as Prisma.UserActivityUncheckedCreateInput,
     });
 
@@ -431,7 +469,7 @@ export async function unfollowUser({
         userId: followingId,
         type: "UNFOLLOW",
         status: "REMOVED_FOLLOWER",
-        followId: follow.id,
+        followId: follows.id,
       } as Prisma.UserActivityUncheckedCreateInput,
     });
 
@@ -439,13 +477,39 @@ export async function unfollowUser({
     await pusherServer.trigger(
       `private-follow-${followingId}`,
       "removed-follower",
-      { followerId },
+      {
+        followerId,
+        friend: {
+          id: follow?.following.id,
+          name: follow?.following.name,
+          img: follow?.following.img,
+        },
+      },
     );
 
     await pusherServer.trigger(
       `private-follow-${followerId}`,
       "removed-following",
-      { followingId },
+      {
+        followingId,
+        friend: {
+          id: follow?.follower.id,
+          name: follow?.follower.name,
+          img: follow?.follower.img,
+        },
+      },
+    );
+    await pusherServer.trigger(
+      `private-user-notification-${followingId}`,
+      "notification",
+      {
+        type: "unfollow",
+        friend: {
+          id: follow?.follower.id,
+          name: follow?.follower.name,
+          img: follow?.follower.img,
+        },
+      },
     );
 
     return { success: true };

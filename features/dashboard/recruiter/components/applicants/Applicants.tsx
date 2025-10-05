@@ -9,12 +9,18 @@ import Link from "next/link";
 import { StatusSelect } from "../ui/StatusDropdown";
 import { Applicant } from "../../types";
 import { useApplicants } from "../../hooks/useGetAllApplicants";
+import SpinnerLoading from "@/components/spinnerLoading";
 
 export default function Applicants({ jobId }: { jobId: string }) {
   const { data: applicants, isLoading, isError } = useApplicants(jobId);
   const [selected, setSelected] = useState<Applicant | null>(null);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div>
+        <SpinnerLoading />
+      </div>
+    );
   if (isError) return <div>Error loading applicants.</div>;
 
   return (
@@ -31,7 +37,7 @@ export default function Applicants({ jobId }: { jobId: string }) {
                 }`}
                 onClick={() => setSelected(applicant)}
               >
-                <CardContent className="flex items-center gap-3 p-3">
+                <CardContent className="flex items-center gap-3 p-3 ">
                   <Avatar>
                     <AvatarImage src={applicant.user.img} />
                     <AvatarFallback>

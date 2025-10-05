@@ -1,45 +1,52 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Paperclip, Send, ThumbsUp, Smile } from "lucide-react";
-import { CachedUser } from "@/types/global";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  RefObject,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import Pusher from "pusher-js";
-import { sendMessagesAction } from "../action";
 import { useMessages } from "../hooks/useMessage";
 import Image from "next/image";
+import { Message, MessageThreadProps } from "../types";
+import ChatLoading from "./ui/ChatLoading";
 
-interface MessageThreadProps {
-  chatId: string;
-  currentUser: CachedUser;
+interface ExtendedProps extends MessageThreadProps {
+  setMessagesRef: RefObject<Dispatch<SetStateAction<Message[]>> | undefined>;
+  scrollRef: RefObject<() => void>;
 }
 
-interface Message {
-  id: string;
-  text: string;
-  content?: string;
-  user: { id: string; name: string };
-  sender?: { id: string; name: string; img: string };
-  createdAt?: string;
-  created_at?: string;
-}
-
-export function MessageThread({ chatId, currentUser }: MessageThreadProps) {
+export function MessageThread({
+  chatId,
+  currentUser,
+  setMessagesRef,
+  scrollRef,
+}: ExtendedProps) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
   const { data: msgData, isLoading: isLoadingMessages } = useMessages({
     chatId,
   });
 
-  const bottomRef = useRef<HTMLDivElement | null>(null);
+  // 🔽 Scroll to bottom function
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
-  // Scroll to bottom when messages change
+  // expose scroll function to parent
+  scrollRef.current = scrollToBottom;
+  setMessagesRef.current = setMessages;
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, msgData]);
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
-  // Subscribe to realtime updates
+  // 🔄 Subscribe to realtime updates
   useEffect(() => {
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
@@ -48,7 +55,10 @@ export function MessageThread({ chatId, currentUser }: MessageThreadProps) {
 
     const channel = pusher.subscribe(`private-chat-${chatId}`);
     channel.bind("new-message", (message: Message) => {
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === message.id)) return prev;
+        return [...prev.filter((m) => !m.id.startsWith("temp-")), message];
+      });
     });
 
     return () => {
@@ -58,13 +68,12 @@ export function MessageThread({ chatId, currentUser }: MessageThreadProps) {
     };
   }, [chatId]);
 
-  // Initial load
-
+  // 🧩 Initial load
   useEffect(() => {
     if (msgData) {
       const mappedMessages: Message[] = msgData.map((msg) => ({
         id: msg.id,
-        text: msg.content, // Prisma uses `content`
+        text: msg.content,
         content: msg.content,
         user: { id: msg.sender.id, name: msg.sender.name ?? "Unknown" },
         sender: {
@@ -79,37 +88,23 @@ export function MessageThread({ chatId, currentUser }: MessageThreadProps) {
     }
   }, [msgData]);
 
-  // Handle send
-  const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
-
-    await sendMessagesAction({
-      userId: currentUser.id,
-      chatId,
-      content: newMessage,
-    });
-    setNewMessage("");
-  };
-
-  if (isLoadingMessages) return <div>Loading...</div>;
+  if (isLoadingMessages)
+    return (
+      <div>
+        <ChatLoading />
+      </div>
+    );
 
   return (
     <div className="flex flex-col h-full w-full bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+      {/* 🧠 Header */}
+      <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           Chat
         </h2>
-        <Button
-          size="sm"
-          variant="outline"
-          className="text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600"
-        >
-          User Info
-        </Button>
       </div>
 
-      {/* Messages */}
+      {/* 💬 Scrollable Messages */}
       <div className="flex-1 flex flex-col p-4 space-y-3 overflow-y-auto">
         {messages.map((msg) => {
           const isSelf =
@@ -125,11 +120,10 @@ export function MessageThread({ chatId, currentUser }: MessageThreadProps) {
                 isSelf ? "justify-end" : "justify-start"
               }`}
             >
-              {/* Show avatar only if friend */}
               {!isSelf && msg.sender?.img && (
                 <Image
                   src={msg.sender.img}
-                  alt={msg.sender.name}
+                  alt={msg?.sender?.name ?? "Unknown"}
                   width={32}
                   height={32}
                   className="rounded-full object-cover border border-gray-300 dark:border-gray-600"
@@ -157,56 +151,7 @@ export function MessageThread({ chatId, currentUser }: MessageThreadProps) {
             </div>
           );
         })}
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Input */}
-      <div className="flex-shrink-0 p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="flex items-center gap-3">
-          <Button size="sm" variant="ghost">
-            <Paperclip className="w-5 h-5 text-gray-500 dark:text-gray-300" />
-          </Button>
-
-          <div className="flex-1 relative">
-            <Input
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 pr-12 rounded-full focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-            />
-            <Button
-              size="sm"
-              variant="ghost"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2"
-            >
-              <Smile className="w-5 h-5 text-gray-500 dark:text-gray-300" />
-            </Button>
-          </div>
-
-          {newMessage.trim() ? (
-            <Button
-              size="sm"
-              className="bg-green-600 hover:bg-green-700 text-white rounded-full p-2"
-              onClick={handleSendMessage}
-            >
-              <Send className="w-4 h-4" />
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-green-600 hover:text-green-700 p-2"
-            >
-              <ThumbsUp className="w-5 h-5" />
-            </Button>
-          )}
-        </div>
+        <div ref={messagesEndRef} />
       </div>
     </div>
   );

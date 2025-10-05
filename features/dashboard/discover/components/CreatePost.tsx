@@ -38,7 +38,7 @@ export function CreatePost({ userData }: { userData: CachedUser }) {
     await createPost({
       content: postContent,
       images: selectedImages,
-      jobId: jobId || "",
+      jobId: jobId ?? null,
     });
 
     // Reset UI states immediately
@@ -124,7 +124,7 @@ export function CreatePost({ userData }: { userData: CachedUser }) {
             )}
 
             <div className="flex items-center justify-between pt-1">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 mb-5">
                 {/* Image upload */}
                 <input
                   type="file"
@@ -144,7 +144,7 @@ export function CreatePost({ userData }: { userData: CachedUser }) {
                   <span className="hidden sm:inline">Photo</span>
                 </Button>
 
-                {user.status === "HIRING" && (
+                {user?.status === "HIRING" && (
                   <AttachJobDialog
                     userId={userData.id!}
                     loading={isLoadingJob}
@@ -152,6 +152,7 @@ export function CreatePost({ userData }: { userData: CachedUser }) {
                 )}
 
                 <EmojiPicker
+                  text="Feeling"
                   onSelectAction={(emoji) =>
                     setPostContent((prev) => prev + emoji)
                   }

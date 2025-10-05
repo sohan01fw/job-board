@@ -1,5 +1,10 @@
 // hooks/usePosts.ts
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   createPostAction,
@@ -14,15 +19,29 @@ import {
 } from "@/lib/Actions/UploadMultipleFiles";
 import { CachedUser } from "@/types/global";
 import { useState } from "react";
+import { PostUser } from "../types";
 
-export function useFeed(params?: { limit?: number; skip?: number }) {
-  return useQuery({
-    queryKey: ["feed", params],
-    queryFn: async () => {
-      return await getFeedAction(params);
+// Define what each page of feed returns
+type FeedResponse = {
+  posts: PostUser[];
+  nextCursor: string | null;
+};
+
+export function useFeed() {
+  return useInfiniteQuery<FeedResponse, Error>({
+    queryKey: ["feed"],
+    queryFn: async ({ pageParam }) => {
+      // ensure correct type (string | null)
+      const cursor = typeof pageParam === "string" ? pageParam : null;
+
+      // backend expects cursor (not skip)
+      return await getFeedAction({ cursor, limit: 6 });
     },
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
+    initialPageParam: null,
   });
 }
+
 export function useMyPosts(params: {
   userId: string;
   limit?: number;
@@ -45,12 +64,15 @@ export function useDeleteMyPost() {
       postImages,
     }: {
       postId: string;
-      postImages: string[];
+      postImages?: string[];
     }) => {
-      await deleteFilesByUrl({
-        bucketName: "post-images",
-        urls: postImages,
-      });
+      if (postImages && postImages?.length > 0) {
+        console.log("deleting images", postImages);
+        await deleteFilesByUrl({
+          bucketName: "post-images",
+          urls: postImages,
+        });
+      }
       await deleteMyPostAction({ postId });
       queryClient.invalidateQueries({ queryKey: ["myPosts"] });
       toast.success("Post deleted successfully!");
@@ -69,7 +91,7 @@ export function useCreatePost({ userData }: { userData: CachedUser }) {
     mutationFn: async (args: {
       content: string;
       images?: File[];
-      jobId?: string;
+      jobId?: string | null;
     }) => {
       let uploadedUrls: string[] = [];
 
@@ -90,26 +112,60 @@ export function useCreatePost({ userData }: { userData: CachedUser }) {
         jobId: args.jobId,
       });
     },
+
     onSuccess: (newPost) => {
-      // Immediately add the new post to the feed cache
+      // Update all queries with key "feed"
       queryClient
         .getQueryCache()
         .findAll()
         .forEach((query) => {
           if (query.queryKey[0] === "feed") {
-            queryClient.setQueryData(query.queryKey, (old: any[] = []) => [
-              {
-                ...newPost,
-                author: {
-                  id: userData.id,
-                  name: userData?.name || "Unknown",
-                  img: userData?.img || null,
-                },
-              },
-              ...old,
-            ]);
+            queryClient.setQueryData(query.queryKey, (oldData: any) => {
+              // If using infinite query
+              if (oldData?.pages) {
+                return {
+                  ...oldData,
+                  pages: oldData.pages.map((page: any, index: any) =>
+                    index === 0
+                      ? {
+                          ...page,
+                          posts: [
+                            {
+                              ...newPost,
+                              author: {
+                                id: userData.id,
+                                name: userData?.name || "Unknown",
+                                img: userData?.img || null,
+                              },
+                            },
+                            ...page.posts,
+                          ],
+                        }
+                      : page,
+                  ),
+                };
+              }
+
+              // Normal query fallback
+              const postsArray = oldData?.posts ?? [];
+              return {
+                ...oldData,
+                posts: [
+                  {
+                    ...newPost,
+                    author: {
+                      id: userData.id,
+                      name: userData?.name || "Unknown",
+                      img: userData?.img || null,
+                    },
+                  },
+                  ...postsArray,
+                ],
+              };
+            });
           }
         });
+
       toast.success("Post created successfully!");
     },
     onError: (error) => {

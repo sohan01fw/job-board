@@ -142,3 +142,13 @@ export async function updateJobApplicationStatus({
     return updatedApp;
   }, "Error while updating job application status");
 }
+
+export async function deleteJob({ jobId }: { jobId: string }) {
+  return withTryCatch(async () => {
+    await prisma.jobPost.delete({
+      where: { id: jobId },
+    });
+
+    return { success: true };
+  }, "Error while deleting job");
+}

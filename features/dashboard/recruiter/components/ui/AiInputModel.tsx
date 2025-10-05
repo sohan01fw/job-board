@@ -14,6 +14,7 @@ import { useJobPostStore } from "../../stores/postJobStore";
 import { readStreamableValue } from "@ai-sdk/rsc";
 import Spinner from "@/components/loadingSpinner";
 import { JobData } from "@/features/dashboard/types";
+import { useUserStore } from "@/lib/stores/useUserStatusStore";
 
 const placeholders = [
   "Create a job for Next.js dev...",
@@ -28,6 +29,7 @@ export function AiInputModel({ setValue }: { setValue: any }) {
   const [jobInput, setJobInput] = useState("");
   const [loading, setLoading] = useState(false);
   const { updateField } = useJobPostStore();
+  const { user } = useUserStore();
 
   const handleGenerateJob = async () => {
     if (jobInput.length < 10) {
@@ -76,7 +78,10 @@ export function AiInputModel({ setValue }: { setValue: any }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition flex gap-2 ">
+      <DialogTrigger
+        disabled={user.status !== "HIRING"}
+        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition flex gap-2 "
+      >
         {loading ? <span>Generating...</span> : <span>Create with AI</span>}
         {loading ? (
           <Spinner className="w-4 h-4 mt-0.5 animate-spin text-white" />

@@ -1,28 +1,66 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { getIcon } from "../lib/getAcitvityConfig";
-import { useUserActivities } from "../hooks/useUserActivites";
 import RecentActivitySkeleton from "./ui/RecentAcitvitySkeleton";
 import { CachedUser } from "@/types/global";
 import Pusher from "pusher-js";
 import Image from "next/image";
+import { useUserActivities } from "../hooks/useUserActivites";
+
+interface Activity {
+  id: string;
+  type: string;
+  title: string;
+  friend?: {
+    id: string;
+    name: string;
+    img: string;
+    email: string;
+  } | null;
+  status?: string;
+  createdAt: string;
+}
 
 export function RecentActivity({ user }: { user: CachedUser }) {
-  const { data: activities, isLoading, isError } = useUserActivities(user);
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useUserActivities(user);
 
-  // 🗂 Local state for realtime + initial data
-  const [localActivities, setLocalActivities] = useState<any[]>([]);
+  const [localActivities, setLocalActivities] = useState<Activity[]>([]);
 
-  // 📥 Sync initial load into local state
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    if (activities) {
-      setLocalActivities(activities);
+    if (data && "pages" in data) {
+      // TypeScript now knows pages exists
+      const allActivities = (data as any).pages.flatMap(
+        (page: any) => page.activities,
+      );
+      setLocalActivities(allActivities);
     }
-  }, [activities]);
+  }, [data]);
 
-  // 📡 Subscribe to Pusher realtime updates
+  // Infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (!hasNextPage || !loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) fetchNextPage();
+      },
+      { threshold: 1 },
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
+  // Realtime Pusher updates
   useEffect(() => {
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
@@ -32,7 +70,7 @@ export function RecentActivity({ user }: { user: CachedUser }) {
     const channel = pusher.subscribe(`private-follow-${user.id}`);
 
     const handleEvent = (type: string, data: any) => {
-      const newActivity = {
+      const newActivity: Activity = {
         id: crypto.randomUUID(),
         type,
         title:
@@ -54,30 +92,17 @@ export function RecentActivity({ user }: { user: CachedUser }) {
       setLocalActivities((prev) => [newActivity, ...prev]);
     };
 
-    channel.bind("new-follower", (data: any) => {
-      console.log("🔔 new-follower event received:", data);
-      handleEvent("new-follower", data);
-    });
-
-    channel.bind("new-following", (data: any) => {
-      console.log("➡️ new-following event received:", data);
-      handleEvent("new-following", data);
-    });
-
-    channel.bind("removed-follower", (data: any) => {
-      console.log("❌ removed-follower event received:", data);
-      handleEvent("removed-follower", data);
-    });
-
-    channel.bind("removed-following", (data: any) => {
-      console.log("❌ removed-following event received:", data);
-      handleEvent("removed-following", data);
-    });
-
-    channel.bind("follow-accepted", (data: any) => {
-      console.log("🤝 follow-accepted event received:", data);
-      handleEvent("follow-accepted", data);
-    });
+    [
+      "new-follower",
+      "new-following",
+      "removed-follower",
+      "removed-following",
+      "follow-accepted",
+    ].forEach((eventType) =>
+      channel.bind(eventType, (data: any) => {
+        handleEvent(eventType, data);
+      }),
+    );
 
     return () => {
       channel.unbind_all();
@@ -89,7 +114,6 @@ export function RecentActivity({ user }: { user: CachedUser }) {
   if (isLoading) return <RecentActivitySkeleton />;
   if (isError) return <p>Failed to load activities</p>;
 
-  // console.log(localActivities);
   return (
     <div className="space-y-4 h-[30rem] overflow-y-auto">
       {localActivities.map((a) => (
@@ -97,10 +121,7 @@ export function RecentActivity({ user }: { user: CachedUser }) {
           key={a.id}
           className="flex items-start space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
         >
-          {/* Activity Icon */}
           <div className="flex-shrink-0">{getIcon(a.type)}</div>
-
-          {/* Activity Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-foreground truncate">
@@ -116,14 +137,13 @@ export function RecentActivity({ user }: { user: CachedUser }) {
               )}
             </div>
 
-            {/* Friend info */}
             {a.friend && (
               <div className="flex items-center gap-2 mt-2">
                 <Image
                   src={a.friend.img}
                   alt={a.friend.name}
-                  width={24} // corresponds to w-6
-                  height={24} // corresponds to h-6
+                  width={24}
+                  height={24}
                   className="rounded-full object-cover ring-2 ring-border"
                 />
                 <span className="text-sm text-foreground font-medium">
@@ -134,6 +154,15 @@ export function RecentActivity({ user }: { user: CachedUser }) {
           </div>
         </div>
       ))}
+
+      {hasNextPage && (
+        <div
+          ref={loadMoreRef}
+          className="p-4 text-center text-muted-foreground"
+        >
+          {isFetchingNextPage ? "Loading more..." : "Scroll to load more"}
+        </div>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { CachedUser } from "@/types/global";
 import { useParams, useRouter } from "next/navigation";
 import { getOrCreateChatAction } from "../action";
 import { useChatStore } from "../lib/store/chat";
+import ChatListLoading from "./ui/ChatListLoading";
 
 interface ChatListProps {
   user: CachedUser;
@@ -20,7 +21,12 @@ export function ChatList({ user }: ChatListProps) {
   const router = useRouter();
   const { id } = useParams();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div>
+        <ChatListLoading />
+      </div>
+    );
   if (!data || !data?.friends?.length) return <div>No mutual friends yet.</div>;
 
   const mutualFriends = data.friends;
@@ -44,7 +50,7 @@ export function ChatList({ user }: ChatListProps) {
   return (
     <div className="flex flex-col bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4  dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             Chats
@@ -64,7 +70,7 @@ export function ChatList({ user }: ChatListProps) {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
           <Input
             placeholder="Search Messenger"
-            className="pl-10 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+            className="pl-10 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
           />
         </div>
       </div>

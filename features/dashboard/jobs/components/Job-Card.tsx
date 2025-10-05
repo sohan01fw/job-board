@@ -15,7 +15,7 @@ export function JobCard({ job }: { job: JobData }) {
         <div className="flex items-start justify-between mb-5">
           <div className="flex items-center gap-3">
             <div
-              className={`w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center font-bold text-primary`}
+              className={`w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center font-bold text-primary`}
             >
               {job.company[0]}
             </div>

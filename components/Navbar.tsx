@@ -26,6 +26,11 @@ import {
 import { NotificationsDropdown } from "@/features/dashboard/notifications/Notifications";
 import { handleLogOutBtn } from "./logout";
 import { SelectSkeleton } from "@/lib/LoadingUi";
+import { useEffect } from "react";
+import Pusher from "pusher-js";
+import { toast } from "sonner";
+import { useAudioUnlock } from "@/lib/audio";
+import Image from "next/image";
 
 type Status = "IDLE" | "OPENTOWORK" | "HIRING";
 
@@ -42,6 +47,68 @@ export function Header({
 
   const { user: data, isLoading } = useFetchUserFields(email);
   const updateStatus = useUpdateStatus({ email });
+
+  useAudioUnlock();
+  // 🔄 Subscribe to realtime updates
+  useEffect(() => {
+    if (!uId) return;
+
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+      authEndpoint: "/api/pusher/auth",
+    });
+
+    const channel = pusher.subscribe(`private-user-notification-${uId}`);
+
+    channel.bind("notification", (notif: any) => {
+      const { type, friend } = notif;
+
+      // Decide message, emoji & color
+      let message = "";
+      let emoji = "";
+
+      if (type === "follow") {
+        message = `${friend.name} followed you!`;
+        emoji = "🎉";
+      } else if (type === "unfollow") {
+        message = `${friend.name} unfollowed you.`;
+        emoji = "😢";
+      } else {
+        message = `${friend.name} did something!`;
+        emoji = "💬";
+      }
+      // Show toast with image
+      toast(`${emoji} ${message}`, {
+        icon: friend.img ? (
+          <Image
+            src={friend.img}
+            alt={friend.name}
+            width={24}
+            height={24}
+            className="rounded-full object-cover"
+          />
+        ) : undefined,
+        duration: 5000,
+        style: {
+          background:
+            type === "follow"
+              ? "#DCFCE7"
+              : type === "unfollow"
+                ? "#FEE2E2"
+                : "#F3F4F6",
+          color: "#111827",
+        },
+        position: "top-right",
+      }); // Play sound
+      new Audio("/notify.mp3").play().catch(() => {});
+    });
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+      pusher.disconnect();
+    };
+  }, [uId]);
 
   const handleUpdateStatus = (status: Status) => {
     updateStatus.mutate({ status }); // optimistic update
@@ -71,7 +138,7 @@ export function Header({
           >
             <SelectTrigger
               className="w-40 rounded-2xl"
-              loading={updateStatus.isPending}
+              loading={updateStatus?.isPending}
             >
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
@@ -105,7 +172,7 @@ export function Header({
 
       {/* Right Section */}
       <div className="flex items-center gap-4">
-        {data.status === "HIRING" && (
+        {data?.status === "HIRING" && (
           <Button onClick={handlePostJobBtn}>Post a Job</Button>
         )}
         <ThemeToggle />

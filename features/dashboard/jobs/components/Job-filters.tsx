@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useJobSortStore } from "../lib/stores/sortstore";
 import { useJobFilterStore } from "../lib/stores/filterStore";
+import JobSearchField from "./ui/JobSearchField";
 
 const filterOptions = ["Remote only", "fulltime", "Internship"];
 const sortOptions = [
@@ -40,66 +41,70 @@ export function JobFilters() {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Filter Controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2 bg-transparent">
-                <Filter className="w-4 h-4" />
-                Filter
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {filterOptions.map((opt) => (
-                <DropdownMenuItem key={opt} onClick={() => addFilter(opt)}>
-                  {opt}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <div className="space-y-4 flex justify-between">
+      <div className="space-y-4 ">
+        {/* Filter Controls */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2 bg-transparent">
+                  <Filter className="w-4 h-4" />
+                  Filter
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {filterOptions.map((opt) => (
+                  <DropdownMenuItem key={opt} onClick={() => addFilter(opt)}>
+                    {opt}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2 bg-transparent">
-                <ArrowUpDown className="w-4 h-4" />
-                Sort
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {sortOptions.map((opt) => (
-                <DropdownMenuItem
-                  key={opt}
-                  onClick={() => {
-                    setActiveSort(opt);
-                    setSort(opt);
-                  }}
-                >
-                  {opt}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2 bg-transparent">
+                  <ArrowUpDown className="w-4 h-4" />
+                  Sort
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {sortOptions.map((opt) => (
+                  <DropdownMenuItem
+                    key={opt}
+                    onClick={() => {
+                      setActiveSort(opt);
+                      setSort(opt);
+                    }}
+                  >
+                    {opt}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        {/* Filter & Sort Badges */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline" className="gap-1">
+            Sort: {activeSort}
+          </Badge>
+          {activeFilters.map((filter) => (
+            <Badge key={filter} variant="secondary" className="gap-1">
+              {filter}
+              <button
+                onClick={() => removeFilter(filter)}
+                className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </Badge>
+          ))}
         </div>
       </div>
-
-      {/* Filter & Sort Badges */}
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="outline" className="gap-1">
-          Sort: {activeSort}
-        </Badge>
-        {activeFilters.map((filter) => (
-          <Badge key={filter} variant="secondary" className="gap-1">
-            {filter}
-            <button
-              onClick={() => removeFilter(filter)}
-              className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
-            >
-              <X className="w-3 h-3" />
-            </button>
-          </Badge>
-        ))}
+      <div>
+        <JobSearchField />
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import {
   getAcceptedJobsCount,
   getJobStats,
   getJobsWithEmbeddings,
+  getProfileViews,
   getUserActivities,
   getUserApplicationStats,
   getUserEmbedding,
@@ -32,7 +33,19 @@ export const jobApplicantionsCount = async ({ userId }: { userId: string }) => {
   return count;
 };
 
-export const userActivities = async ({ userId }: { userId: string }) => {
-  const activities = await getUserActivities({ userId });
+export const userActivities = async ({
+  userId,
+  cursor,
+  limit,
+}: {
+  userId: string;
+  cursor?: string;
+  limit?: number;
+}) => {
+  const activities = await getUserActivities({ userId, cursor, limit });
   return activities;
+};
+export const getProfileViewsAction = async ({ userId }: { userId: string }) => {
+  const views = await getProfileViews(userId);
+  return views;
 };

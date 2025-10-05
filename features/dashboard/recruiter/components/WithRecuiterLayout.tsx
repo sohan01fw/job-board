@@ -25,7 +25,7 @@ export function WithRecruiterLayout({
               <div
                 className={`px-4 py-2 cursor-pointer rounded-t-lg transition-colors ${
                   isActive
-                    ? "bg-white  font-semibold shadow"
+                    ? "bg-white dark:bg-gray-700 font-semibold shadow"
                     : "text-gray-600 hover:text-gray-500"
                 }`}
               >

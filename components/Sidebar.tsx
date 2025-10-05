@@ -41,7 +41,7 @@ const navigationItems = [
     icon: Settings,
     label: "Setting",
     path: "/dashboard/setting",
-    active: false,
+    active: true,
   },
 ];
 

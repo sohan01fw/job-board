@@ -69,7 +69,7 @@ export async function deleteFilesByUrl({
   urls,
 }: {
   bucketName: string;
-  urls: string[];
+  urls?: string[];
 }) {
   return withTryCatch(async () => {
     if (!urls || urls.length === 0) throw new Error("No URLs provided");

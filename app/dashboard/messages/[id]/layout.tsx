@@ -14,9 +14,9 @@ export default async function RecruiterLayout({
   const user = await getCachedUser();
   return (
     <div>
-      <div className="ml-3  w-full lg:w-[83vw] overflow-auto flex  bg-white dark:bg-gray-900">
+      <div className="ml-3  w-full lg:w-[83vw] overflow-auto flex  dark:bg-gray-900">
         {/* Chat List Sidebar */}
-        <div className="w-80 hidden lg:block border-r border-gray-200 dark:border-gray-800 ">
+        <div className="w-80 hidden lg:block   ">
           <ChatList user={user} />
         </div>
         {children}

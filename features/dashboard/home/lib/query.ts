@@ -97,16 +97,6 @@ async function getUserApplicationStats({ userId }: { userId: string }) {
   }, "Error while fetching user application stats");
 }
 
-async function getProfileViewers(userId: string) {
-  return withTryCatch(async () => {
-    return prisma.profileView.findMany({
-      where: { userId },
-      include: { viewer: true }, // fetch viewer details
-      orderBy: { viewedAt: "desc" }, // latest first
-    });
-  }, "Error while fetching profile viewers");
-}
-
 async function getAcceptedJobsCount({ userId }: { userId: string }) {
   return withTryCatch(async () => {
     const now = new Date();
@@ -139,12 +129,22 @@ async function getAcceptedJobsCount({ userId }: { userId: string }) {
   }, "Error while fetching accepted jobs count");
 }
 
-async function getUserActivities({ userId }: { userId: string }) {
+// actions/getUserActivities.ts
+async function getUserActivities({
+  userId,
+  cursor,
+  limit = 7,
+}: {
+  userId: string;
+  cursor?: string; // activity id for pagination
+  limit?: number;
+}) {
   return withTryCatch(async () => {
     const activities = await prisma.userActivity.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
-      take: 20, // latest 20 activities
+      take: limit + 1, // fetch one extra to check if next page exists
+      ...(cursor && { skip: 1, cursor: { id: cursor } }),
       include: {
         jobApplication: {
           select: {
@@ -163,15 +163,49 @@ async function getUserActivities({ userId }: { userId: string }) {
         },
       },
     });
-    return activities;
+
+    let nextCursor: string | undefined = undefined;
+    if (activities.length > limit) {
+      const nextItem = activities.pop(); // remove the extra one
+      nextCursor = nextItem?.id;
+    }
+
+    return {
+      activities,
+      nextCursor,
+    };
   }, "Error while fetching user activities");
+}
+
+export async function getProfileViews(userId: string) {
+  // Fetch current views
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { views: true, createdAt: true },
+  });
+
+  if (!user) return null;
+
+  // Example logic to calculate change %
+  // You can store previous views in DB or calculate based on timestamp
+  const previousViews = user.views - Math.floor(Math.random() * 100); // placeholder
+  const change = user.views - previousViews;
+  const trend = change >= 0 ? "up" : "down";
+  const percentChange = previousViews
+    ? ((change / previousViews) * 100).toFixed(0)
+    : "0";
+
+  return {
+    value: user.views.toLocaleString(), // "1,247"
+    change: percentChange,
+    trend, // "up" or "down"
+  };
 }
 export {
   getJobsWithEmbeddings,
   getUserEmbedding,
   getJobStats,
   getUserApplicationStats,
-  getProfileViewers,
   getAcceptedJobsCount,
   getUserActivities,
 };

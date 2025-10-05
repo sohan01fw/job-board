@@ -22,6 +22,7 @@ import { AiInputModel } from "./ui/AiInputModel";
 import { useCreateJobPost } from "../hooks/useJobPost";
 import { UserData } from "@/types/Forms";
 import { embedJobProfile } from "@/lib/ai/embed/jobPostEmbed";
+import { useUserStore } from "@/lib/stores/useUserStatusStore";
 
 const jobPostSchema = z.object({
   title: z.string().min(1, "Job title is required"),
@@ -61,6 +62,10 @@ export function PostJobForm({ user }: { user: UserData }) {
   const [newBenefit, setNewBenefit] = useState("");
   const [newSkill, setNewSkill] = useState("");
   const { mutateAsync, isPending } = useCreateJobPost();
+  const {
+    user: { status },
+  } = useUserStore();
+
   const {
     register,
     handleSubmit,
@@ -540,6 +545,7 @@ export function PostJobForm({ user }: { user: UserData }) {
           ) : (
             <Button
               type="submit"
+              disabled={status !== "HIRING"}
               className="flex-1 bg-green-600 hover:bg-green-700"
             >
               Post Job

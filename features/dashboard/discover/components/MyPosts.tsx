@@ -14,6 +14,7 @@ import {
 } from "@/features/dashboard/discover/hooks/usePost";
 import Image from "next/image";
 import { ConfirmDialog } from "@/components/confirmDialog";
+import PostsLoadingSkeleton from "./ui/PostLoading";
 
 type Props = {
   userId: string;
@@ -24,7 +25,12 @@ export default function MyPosts({ userId }: Props) {
   const { mutateAsync: deletePost, isPending: isDeletingPost } =
     useDeleteMyPost();
 
-  if (isLoading) return <div>Loading your posts...</div>;
+  if (isLoading)
+    return (
+      <div>
+        <PostsLoadingSkeleton />
+      </div>
+    );
   if (isError) return <div>Error loading posts</div>;
   if (!posts?.length) return <div>No posts yet.</div>;
 
@@ -71,6 +77,7 @@ export default function MyPosts({ userId }: Props) {
               icon={<Trash2 className="w-4 h-4 mr-1" />}
               variant="destructive"
               description="Are u sure u wanna delete this post?"
+              confirmTextColor="text-red-600"
               onConfirmAction={async () =>
                 await deletePost({ postId: post.id, postImages: post.imageUrl })
               }

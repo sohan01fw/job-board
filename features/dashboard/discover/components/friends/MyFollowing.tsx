@@ -17,7 +17,7 @@ export default function MyFollowing({
   if (isLoading) return <div>Loading...</div>;
   if (!data) return <div>No following</div>;
 
-  const following = [...data.followingOnly];
+  const following = data?.followingOnly ? [...data.followingOnly] : [];
 
   if (!following.length) return <div>You are not following anyone yet.</div>;
 

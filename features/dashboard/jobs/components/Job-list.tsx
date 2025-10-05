@@ -1,36 +1,66 @@
 "use client";
+
 import { toast } from "sonner";
 import { useGetAllJob } from "../hooks/useGetAllJobs";
 import { JobCard } from "./Job-Card";
 import JobCardSkeleton from "./ui/JobCardSkeleton";
-// import { colors } from "../lib/constant";
+import { useEffect, useRef } from "react";
 
 export function JobList() {
-  const { data, isLoading, error } = useGetAllJob();
-  const jobs = data?.filter((job) => job.applied === false);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    error,
+    isLoading,
+  } = useGetAllJob();
 
-  if (error) return toast.error(error.message);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  if (isLoading)
-    return (
-      <div>
-        <JobCardSkeleton />
-        <JobCardSkeleton />
-        <JobCardSkeleton />
-      </div>
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (!hasNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) fetchNextPage();
+      },
+      { threshold: 1.0 },
     );
 
-  if (jobs?.length === 0) return <div>No jobs found</div>;
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
+  if (error) return toast.error(error.message);
+  if (isLoading)
+    return (
+      <>
+        <JobCardSkeleton />
+        <JobCardSkeleton />
+        <JobCardSkeleton />
+      </>
+    );
+
+  // ✅ Fix typing: assert `data` as InfiniteData<JobsResponse>
+  const jobs = (data as any)?.pages.flatMap((page: any) => page.jobs) ?? [];
+
+  const filtered = jobs.filter((job: any) => job.applied === false);
+
+  if (filtered.length === 0) return <div>No jobs found</div>;
+
   return (
-    <div className="space-y-4">
-      <div className="space-y-4 h-[28rem] overflow-auto">
-        {jobs?.map((job, index) => (
-          <JobCard
-            key={index}
-            job={job}
-            // color={colors[Math.floor(Math.random() * colors.length)]}
-          />
-        ))}
+    <div className="space-y-4 h-[28rem] overflow-auto">
+      {filtered.map((job: any) => (
+        <JobCard key={job.id} job={job} />
+      ))}
+
+      {/* Infinite scroll trigger */}
+      <div ref={loadMoreRef} className="h-10 flex justify-center items-center">
+        {isFetchingNextPage && <p>Loading...</p>}
+        {!hasNextPage && (
+          <p className="text-muted-foreground text-sm">No more jobs</p>
+        )}
       </div>
     </div>
   );
