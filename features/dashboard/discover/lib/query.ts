@@ -46,7 +46,7 @@ export async function getFeed({
   return withTryCatch(async () => {
     const posts = await prisma.post.findMany({
       take: limit + 1, // get one extra to check if there’s more
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      ...(cursor ? { cursor: { id: cursor } } : {}),
       orderBy: { createdAt: "desc" },
       include: {
         author: true,
@@ -98,9 +98,35 @@ export async function getMyPosts({
         author: true,
         comments: true,
         postlikes: true,
+        jobs: true,
       },
     });
   }, "Error while fetching my posts");
+}
+
+export async function getUserPostsWithJobs({ userId }: { userId: string }) {
+  return withTryCatch(async () => {
+    const posts = await prisma.post.findMany({
+      where: {
+        authorId: userId,
+        jobsId: {
+          not: null, // ✅ only posts that have a job linked
+        },
+      },
+      select: {
+        id: true,
+        content: true,
+        imageUrl: true,
+        createdAt: true,
+        jobsId: true, // ✅ include only job ID
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return { success: true, data: posts };
+  }, "Error while fetching user's posts with jobs");
 }
 
 export async function deleteMyPost(postId: string) {

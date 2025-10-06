@@ -7,7 +7,14 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trash2 } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  DollarSign,
+  MapPin,
+  Trash2,
+  Users,
+} from "lucide-react";
 import {
   useDeleteMyPost,
   useMyPosts,
@@ -71,7 +78,49 @@ export default function MyPosts({ userId }: Props) {
             )}
           </CardContent>
 
-          <CardFooter className="flex justify-end">
+          {/* Job Details */}
+          {post.jobs && (
+            <Card className="bg-muted/50 border-l-4 border-l-green-500">
+              <CardContent className="p-4">
+                <h4 className="font-semibold text-foreground mb-2">
+                  {post.jobs.title}
+                </h4>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {post.jobs.company}
+                </p>
+
+                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    {post.jobs.location}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {post.jobs.jobType} {/* fulltime/parttime etc */}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="w-4 h-4" />
+                    {
+                      post.jobs.currency
+                    } {post.jobs.minSalary.toLocaleString()} -{" "}
+                    {post.jobs.maxSalary.toLocaleString()}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {new Date(
+                      post.jobs.applicationDeadline,
+                    ).toLocaleDateString()}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    {post.jobs._count?.jobApplications ?? 0} applicants
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <CardFooter className="flex justify-end mt-5">
             <ConfirmDialog
               title="Delete Post"
               icon={<Trash2 className="w-4 h-4 mr-1" />}

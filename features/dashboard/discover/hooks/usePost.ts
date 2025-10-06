@@ -11,6 +11,7 @@ import {
   deleteMyPostAction,
   getFeedAction,
   getMyPostsAction,
+  getUserPostsWithJobsAction,
   likePostAction,
 } from "../action";
 import {
@@ -49,9 +50,18 @@ export function useMyPosts(params: {
 }) {
   return useQuery({
     queryKey: ["myPosts", params],
-    queryFn: async () => {
-      return await getMyPostsAction(params);
+    queryFn: async (): Promise<PostUser[]> => {
+      return (await getMyPostsAction(params)) as PostUser[];
     },
+  });
+}
+export function useGetUserPostsWithJobs({ userId }: { userId: string }) {
+  return useQuery({
+    queryKey: ["userPostsWithJobs", userId], // ✅ unique cache per user
+    queryFn: async () => {
+      return await getUserPostsWithJobsAction({ userId }); // ✅ pass userId to the server action
+    },
+    enabled: !!userId, // ✅ prevents running query until userId is ready
   });
 }
 
@@ -84,7 +94,13 @@ export function useDeleteMyPost() {
   });
 }
 
-export function useCreatePost({ userData }: { userData: CachedUser }) {
+export function useCreatePost({
+  userData,
+  job,
+}: {
+  userData: CachedUser;
+  job?: any;
+}) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -114,14 +130,13 @@ export function useCreatePost({ userData }: { userData: CachedUser }) {
     },
 
     onSuccess: (newPost) => {
-      // Update all queries with key "feed"
       queryClient
         .getQueryCache()
         .findAll()
         .forEach((query) => {
           if (query.queryKey[0] === "feed") {
             queryClient.setQueryData(query.queryKey, (oldData: any) => {
-              // If using infinite query
+              // Infinite query support
               if (oldData?.pages) {
                 return {
                   ...oldData,
@@ -137,6 +152,24 @@ export function useCreatePost({ userData }: { userData: CachedUser }) {
                                 name: userData?.name || "Unknown",
                                 img: userData?.img || null,
                               },
+                              jobs: job
+                                ? {
+                                    id: job.id,
+                                    title: job.title,
+                                    company: job.company,
+                                    location: job.location,
+                                    requirements: job.requirements,
+                                    skills: job.skills,
+                                    benefits: job.benefits,
+                                    minSalary: job.minSalary,
+                                    maxSalary: job.maxSalary,
+                                    currency: job.currency,
+                                    jobType: job.jobType,
+                                    applicationDeadline:
+                                      job.applicationDeadline,
+                                    _count: job._count,
+                                  }
+                                : null,
                             },
                             ...page.posts,
                           ],
@@ -158,6 +191,23 @@ export function useCreatePost({ userData }: { userData: CachedUser }) {
                       name: userData?.name || "Unknown",
                       img: userData?.img || null,
                     },
+                    jobs: job
+                      ? {
+                          id: job.id,
+                          title: job.title,
+                          company: job.company,
+                          location: job.location,
+                          requirements: job.requirements,
+                          skills: job.skills,
+                          benefits: job.benefits,
+                          minSalary: job.minSalary,
+                          maxSalary: job.maxSalary,
+                          currency: job.currency,
+                          jobType: job.jobType,
+                          applicationDeadline: job.applicationDeadline,
+                          _count: job._count,
+                        }
+                      : null,
                   },
                   ...postsArray,
                 ],
@@ -168,6 +218,7 @@ export function useCreatePost({ userData }: { userData: CachedUser }) {
 
       toast.success("Post created successfully!");
     },
+
     onError: (error) => {
       console.error("Failed to create post", error);
       toast.error(error?.message || "Failed to create post");

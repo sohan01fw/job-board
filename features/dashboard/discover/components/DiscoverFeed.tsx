@@ -31,7 +31,7 @@ export function PostList({ userData }: { userData: CachedUser }) {
           fetchNextPage();
         }
       },
-      { threshold: 1.0 },
+      { threshold: 0.1 },
     );
 
     if (loadMoreRef.current) observer.observe(loadMoreRef.current);

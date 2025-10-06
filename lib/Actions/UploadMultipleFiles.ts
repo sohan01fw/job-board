@@ -88,3 +88,37 @@ export async function deleteFilesByUrl({
     return { success: true };
   }, "Error deleting files from storage");
 }
+
+export async function deleteUserFilesById({
+  bucketName,
+  userId,
+}: {
+  bucketName: string;
+  userId: string;
+}) {
+  return withTryCatch(async () => {
+    // List all files in the bucket (public folder)
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .list("public", { limit: 1000 }); // adjust folder if needed
+
+    if (error) throw error;
+
+    // Filter files that start with userId
+    const userFiles = data
+      .filter((file) => file.name.startsWith(userId))
+      .map((file) => `public/${file.name}`);
+
+    if (userFiles.length === 0)
+      return { success: true, message: "No files found" };
+
+    // Remove only user files
+    const { error: removeError } = await supabase.storage
+      .from(bucketName)
+      .remove(userFiles);
+
+    if (removeError) throw removeError;
+
+    return { success: true, deletedFiles: userFiles.length };
+  }, "Error deleting user files from storage");
+}

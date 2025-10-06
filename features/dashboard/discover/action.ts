@@ -11,6 +11,7 @@ import {
   getFeed,
   getFriendsAndFollowers,
   getMyPosts,
+  getUserPostsWithJobs,
   isFollowing,
   likePostQuery,
   unfollowUser,
@@ -39,6 +40,9 @@ export async function getMyPostsAction(args: {
   skip?: number;
 }) {
   return getMyPosts(args);
+}
+export async function getUserPostsWithJobsAction(args: { userId: string }) {
+  return getUserPostsWithJobs(args);
 }
 export async function deleteMyPostAction({ postId }: { postId: string }) {
   return deleteMyPost(postId);

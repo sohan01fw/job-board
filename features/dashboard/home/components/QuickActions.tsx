@@ -25,7 +25,10 @@ export default function QuickActions() {
             className="justify-start h-auto p-4 bg-transparent"
             asChild
           >
-            <Link href="/dashboard/profile" aria-label="Update your profile">
+            <Link
+              href="/dashboard/user/profile"
+              aria-label="Update your profile"
+            >
               <Users
                 className="h-5 w-5 mr-3 text-green-600"
                 aria-hidden="true"

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/Prisma";
 import { withTryCatch } from "@/lib/tryCatch";
 import { JobData } from "../../types";
+import { pusherServer } from "@/lib/pusher";
 
 export async function CreateJobPost(job: JobData, email: string) {
   return withTryCatch(async () => {
@@ -113,7 +114,6 @@ export async function getAllApplicantsByJob({ jobId }: { jobId: string }) {
 }
 
 //update status
-
 export async function updateJobApplicationStatus({
   applicationId,
   status,
@@ -139,6 +139,18 @@ export async function updateJobApplicationStatus({
         message: `Your application for ${updatedApp.job.title} is now ${status}`,
       },
     });
+
+    await pusherServer.trigger(
+      `private-job-notification-${updatedApp.userId}`,
+      "job-notification",
+      {
+        jobId: updatedApp.jobId,
+        userId: updatedApp.userId,
+        message: `Your application for ${updatedApp.job.title} is now ${status}`,
+        createdAt: new Date().toISOString(),
+        read: false,
+      },
+    );
     return updatedApp;
   }, "Error while updating job application status");
 }

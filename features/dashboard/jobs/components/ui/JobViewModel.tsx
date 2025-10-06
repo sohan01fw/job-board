@@ -13,8 +13,15 @@ import { JobData } from "@/features/dashboard/types";
 import { Badge } from "@/components/ui/badge";
 import ApplyDialog from "./JobApplyModel";
 import { EyeTooltip } from "@/components/Tooltip";
+import { CachedUser } from "@/types/global";
 
-export default function JobViewModel({ job }: { job: JobData }) {
+export default function JobViewModel({
+  job,
+  user,
+}: {
+  job: JobData;
+  user?: CachedUser;
+}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -57,7 +64,7 @@ export default function JobViewModel({ job }: { job: JobData }) {
             </DialogDescription>
           </DialogHeader>
 
-          <ApplyDialog job={job} />
+          <ApplyDialog job={job} user={user} />
         </div>
 
         {/* Job meta */}

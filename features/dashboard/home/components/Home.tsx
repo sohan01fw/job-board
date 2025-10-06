@@ -8,8 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowUpRight, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Clock } from "lucide-react";
 import { RecommendJobCard } from "./ui/RecommendJobCard";
 import { CachedUser } from "@/types/global";
 
@@ -40,24 +39,11 @@ export default function DashboardHome({ user }: { user: CachedUser }) {
           <CardContent>
             {/* Recent Activity content */}
             <RecentActivity user={user} />
-            <Button
-              variant="outline"
-              className="w-full mt-4 bg-transparent"
-              asChild
-            >
-              <a
-                href="/dashboard/history"
-                aria-label="View all activity history"
-              >
-                View All Activity
-                <ArrowUpRight className="h-4 w-4 ml-2" aria-hidden="true" />
-              </a>
-            </Button>
           </CardContent>
         </Card>
 
         {/* Recommended Jobs */}
-        <RecommendJobCard />
+        <RecommendJobCard user={user} />
       </div>
       {/* Quick Actions */}
       <QuickActions />

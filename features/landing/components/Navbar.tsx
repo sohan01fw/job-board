@@ -97,15 +97,14 @@ function NavLinks({ mobile }: { mobile?: boolean }) {
       <button onClick={() => scrollTo("features")} className={btnStyle}>
         Features
       </button>
-      <button onClick={() => scrollTo("pricing")} className={btnStyle}>
-        Pricing
+      <button onClick={() => scrollTo("stats")} className={btnStyle}>
+        Stats
       </button>
-      {/* leave blog untouched per your request */}
-      <Link href="/blogs" className={btnStyle}>
-        Blog
-      </Link>
       <button onClick={() => scrollTo("testimonials")} className={btnStyle}>
         Testimonials
+      </button>
+      <button onClick={() => scrollTo("footer")} className={btnStyle}>
+        Contacts
       </button>
     </>
   );

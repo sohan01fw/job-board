@@ -1,10 +1,20 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useEffect, useRef } from "react";
+import { useScrollStore } from "../stores/scrollStore";
 
 export default function Footer() {
+  const ref = useRef<HTMLElement | null>(null);
+  const register = useScrollStore((s) => s.register);
+
+  useEffect(() => {
+    register("footer", ref.current);
+    return () => register("footer", null);
+  }, [register]);
   return (
-    <footer className="bg-gray-900 text-white py-16">
+    <footer ref={ref} className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div>

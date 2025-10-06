@@ -9,6 +9,7 @@ import { useParams, useRouter } from "next/navigation";
 import { getOrCreateChatAction } from "../action";
 import { useChatStore } from "../lib/store/chat";
 import ChatListLoading from "./ui/ChatListLoading";
+import Link from "next/link";
 
 interface ChatListProps {
   user: CachedUser;
@@ -27,7 +28,20 @@ export function ChatList({ user }: ChatListProps) {
         <ChatListLoading />
       </div>
     );
-  if (!data || !data?.friends?.length) return <div>No mutual friends yet.</div>;
+  if (!data || !data?.friends?.length)
+    return (
+      <div className="m-10">
+        No mutual friends yet. Visit
+        <Link
+          href="/dashboard/discover"
+          className="text-green-600 font-bold font-lg"
+        >
+          {" "}
+          discover
+        </Link>{" "}
+        page.
+      </div>
+    );
 
   const mutualFriends = data.friends;
 

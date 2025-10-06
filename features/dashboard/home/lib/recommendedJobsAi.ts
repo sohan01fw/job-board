@@ -26,6 +26,7 @@ export async function RecommendJobsAI({
   // no cache -> compute fresh
   const result = await computeJobsRecommendation({ user, topN });
 
+  if (result.length === 0) return [];
   // save in redis
   await redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
 

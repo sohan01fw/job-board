@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { JobData } from "../../types";
 import JobViewModel from "./ui/JobViewModel";
 import ApplyDialog from "./ui/JobApplyModel";
+import { CachedUser } from "@/types/global";
 
-export function JobCard({ job }: { job: JobData }) {
+export function JobCard({ job, user }: { job: JobData; user: CachedUser }) {
   return (
     <Card className="p-6 hover:shadow-lg transition-all rounded-2xl">
       <CardContent className="p-0">
@@ -29,7 +30,7 @@ export function JobCard({ job }: { job: JobData }) {
           </div>
 
           <div className="flex flex-row gap-2">
-            <JobViewModel job={job} />
+            <JobViewModel job={job} user={user} />
           </div>
         </div>
 
@@ -72,7 +73,7 @@ export function JobCard({ job }: { job: JobData }) {
         </p>
         {/* Footer */}
         <div className="flex items-center justify-between">
-          <ApplyDialog job={job} />
+          <ApplyDialog job={job} user={user} />
         </div>
       </CardContent>
     </Card>

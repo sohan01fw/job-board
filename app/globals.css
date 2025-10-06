@@ -10,6 +10,46 @@
     -ms-overflow-style: none; /* IE/Edge */
     scrollbar-width: none; /* Firefox */
 }
+
+@keyframes shake {
+    0% {
+        transform: rotate(0deg);
+    }
+    10% {
+        transform: rotate(-5deg);
+    }
+    20% {
+        transform: rotate(5deg);
+    }
+    30% {
+        transform: rotate(-5deg);
+    }
+    40% {
+        transform: rotate(5deg);
+    }
+    50% {
+        transform: rotate(-3deg);
+    }
+    60% {
+        transform: rotate(3deg);
+    }
+    70% {
+        transform: rotate(-2deg);
+    }
+    80% {
+        transform: rotate(2deg);
+    }
+    90% {
+        transform: rotate(-1deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.shake {
+    animation: shake 0.6s ease-in-out;
+}
 @layer base {
     :root {
         --background: 0 0% 100%;

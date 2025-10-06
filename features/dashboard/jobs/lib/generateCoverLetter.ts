@@ -12,7 +12,7 @@ export async function generateCoverLetter(
   job: JobApplicationData,
 ) {
   const { textStream } = streamText({
-    model: google("models/gemini-1.5-flash"),
+    model: google("gemini-2.0-flash"),
     messages: [
       {
         role: "system",

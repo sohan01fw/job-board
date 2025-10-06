@@ -113,6 +113,9 @@ export function RecentActivity({ user }: { user: CachedUser }) {
 
   if (isLoading) return <RecentActivitySkeleton />;
   if (isError) return <p>Failed to load activities</p>;
+  if (localActivities.length === 0) {
+    return <p>No recent activities.Please do something bro!</p>;
+  }
 
   return (
     <div className="space-y-4 h-[30rem] overflow-y-auto">

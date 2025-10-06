@@ -15,7 +15,7 @@ export async function GetAllJobs({
   filter?: string[];
   search?: string;
   cursor?: string;
-  limit?: number;
+  limit: number;
 }) {
   const user = await getUser();
   return await getAllJobs({ sort, filter, search, user, cursor, limit });

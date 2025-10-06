@@ -1,4 +1,7 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useRef } from "react";
+import { useScrollStore } from "../stores/scrollStore";
 
 const stats = [
   { number: "200k+", label: "Active Job Seekers" },
@@ -8,8 +11,15 @@ const stats = [
 ];
 
 export default function StatsSection() {
+  const ref = useRef<HTMLElement | null>(null);
+  const register = useScrollStore((s) => s.register);
+
+  useEffect(() => {
+    register("stats", ref.current);
+    return () => register("stats", null);
+  }, [register]);
   return (
-    <section className="py-20 bg-green-500">
+    <section ref={ref} className="py-20 bg-green-500">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-white mb-4">

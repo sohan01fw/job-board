@@ -1,3 +1,5 @@
+import LoginSkeleton from "@/features/auth/components/LoginSkeleton";
+
 export default function loading() {
-  return <div> loading.... </div>;
+  return <LoginSkeleton />;
 }

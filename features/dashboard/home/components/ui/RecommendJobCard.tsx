@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { useProfileStore } from "@/lib/stores/useProfileStore";
 import LockedFeatureCard from "./LockedFeatureCard";
 import RecommendJob from "../RecommendJob";
+import { CachedUser } from "@/types/global";
 
-export function RecommendJobCard() {
+export function RecommendJobCard({ user }: { user: CachedUser }) {
   const profileCompletion = useProfileStore((s) => s.profileCompletion);
 
   return (
@@ -32,7 +33,7 @@ export function RecommendJobCard() {
         {profileCompletion < 80 ? (
           <LockedFeatureCard profileCompletion={profileCompletion} />
         ) : (
-          <RecommendJob />
+          <RecommendJob user={user} />
         )}
         <Button
           variant="outline"

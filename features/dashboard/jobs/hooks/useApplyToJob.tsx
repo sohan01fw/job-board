@@ -1,9 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApplyJob } from "../action";
 import { toast } from "sonner";
 import { createUserActivities } from "@/lib/Actions/createActivity";
 
 export function useApplyJob() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
       coverLetter,
@@ -15,7 +16,9 @@ export function useApplyJob() {
       userId: string;
     }) => {
       // first apply to the job
-      const application = await ApplyJob({ coverLetter, jobId, userId });
+      const { application } = await ApplyJob({ coverLetter, jobId, userId });
+
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
 
       // then log the activity (note: jobAppId should be the JobApplication.id, not jobId)
       await createUserActivities({

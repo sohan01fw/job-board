@@ -31,6 +31,7 @@ import Pusher from "pusher-js";
 import { toast } from "sonner";
 import { useAudioUnlock } from "@/lib/audio";
 import Image from "next/image";
+import Link from "next/link";
 
 type Status = "IDLE" | "OPENTOWORK" | "HIRING";
 
@@ -189,9 +190,23 @@ export function Header({
           <DropdownMenuContent className="w-48 " align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Team</DropdownMenuItem>
+            {data?.status === "HIRING" && (
+              <Link href="/dashboard/recruiter/postjob">
+                <DropdownMenuItem className="hover:cursor-pointer">
+                  Recruiter Dashboard
+                </DropdownMenuItem>
+              </Link>
+            )}
+            <Link href="/dashboard/user/profile">
+              <DropdownMenuItem className="hover:cursor-pointer">
+                Profile
+              </DropdownMenuItem>
+            </Link>
+            <Link href="/dashboard/setting">
+              <DropdownMenuItem className="hover:cursor-pointer">
+                Setting
+              </DropdownMenuItem>
+            </Link>
             <DropdownMenuItem
               className="text-red-500 hover:cursor-pointer"
               onClick={handleLogOutBtn}

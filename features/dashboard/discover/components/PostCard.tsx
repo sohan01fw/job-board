@@ -6,6 +6,7 @@ import {
   Clock,
   DollarSign,
   Heart,
+  Loader2,
   MapPin,
   MessageCircle,
   Share2,
@@ -25,6 +26,7 @@ import { useLikePost } from "../hooks/usePost";
 import { CachedUser } from "@/types/global";
 import JobViewModel from "../../jobs/components/ui/JobViewModel";
 import Link from "next/link";
+import { EmojiPicker } from "./ui/EmojiPicker";
 
 interface PostCardProps {
   post: PostUser;
@@ -185,7 +187,11 @@ export function PostCard({ post, currentUser }: PostCardProps) {
                 className="gap-2 hover:text-primary"
               >
                 <MessageCircle className="w-4 h-4" />
-                {comments?.length ?? <div>loading...</div>}
+                {comments?.length ?? (
+                  <div>
+                    <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
+                  </div>
+                )}
               </Button>
 
               <Button
@@ -204,7 +210,7 @@ export function PostCard({ post, currentUser }: PostCardProps) {
             <div className="space-y-3 pt-3 border-t">
               <div className="flex gap-3">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src="/user-avatar.jpg" />
+                  <AvatarImage src={post.author.img ?? "/placeholder.svg"} />
                   <AvatarFallback>You</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 space-y-2">
@@ -215,6 +221,12 @@ export function PostCard({ post, currentUser }: PostCardProps) {
                     className="min-h-[80px] resize-none"
                   />
                   <div className="flex justify-end">
+                    <EmojiPicker
+                      text="feeling"
+                      onSelectAction={(e: any) => {
+                        setCommentText((prev) => prev + e);
+                      }}
+                    />
                     <Button
                       size="sm"
                       onClick={handleSubmitComment}

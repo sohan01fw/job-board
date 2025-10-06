@@ -19,7 +19,7 @@ export default function MyFollowers({
   if (!data) return <div>No followers</div>;
 
   // All users who follow me (friends + followersOnly)
-  const followers = [...data.followersOnly];
+  const followers = data.followersOnly ? [...data.followersOnly] : [];
 
   if (!followers.length) return <div>No one is following you yet.</div>;
 

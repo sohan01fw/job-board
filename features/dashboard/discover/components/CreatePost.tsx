@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { ImageIcon, X } from "lucide-react";
+import { ImageIcon, Loader2, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,14 +24,15 @@ export function CreatePost({ userData }: { userData: CachedUser }) {
   const { jobId, clearJobId } = useJobStore();
 
   const { user } = useUserStore();
-  const { mutateAsync: createPost, isPending: isPosting } = useCreatePost({
-    userData,
-  });
-
   const { data: job, isLoading: isLoadingJob } = useGetPostedJobById({
     jobId: jobId || "",
     userId: userData.id || "",
   });
+  const { mutateAsync: createPost, isPending: isPosting } = useCreatePost({
+    userData,
+    job,
+  });
+
   const handlePost = async () => {
     if (!postContent.trim() && selectedImages.length === 0) return;
 
@@ -168,7 +169,14 @@ export function CreatePost({ userData }: { userData: CachedUser }) {
                 }
                 className="h-8 px-4 rounded-full bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
               >
-                {isPosting ? "Posting..." : "Post"}
+                {isPosting ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-8 h-8 text-white-600 animate-spin" />
+                    Posting
+                  </div>
+                ) : (
+                  "Post"
+                )}
               </Button>
             </div>
           </div>

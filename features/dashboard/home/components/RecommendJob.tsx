@@ -8,13 +8,20 @@ import { useRecommendedJobs } from "../hooks/useJobRecommended";
 import RecommendJobSkeleton from "./ui/RecomendJobSkeleton";
 import { useUserStore } from "@/lib/stores/useUserStatusStore";
 import { DisabledBtnTooltip } from "@/components/Tooltip";
+import ApplyDialog from "../../jobs/components/ui/JobApplyModel";
+import { CachedUser } from "@/types/global";
 
-export default function RecommendJob() {
-  const { user } = useUserStore();
+export default function RecommendJob({ user }: { user: CachedUser }) {
+  const {
+    user: { status },
+  } = useUserStore();
   const { data: recomendedJobs, isLoading, isError } = useRecommendedJobs(5);
 
   if (isLoading) return <RecommendJobSkeleton />;
+
   if (isError || !recomendedJobs) return <p>Failed to load recommended jobs</p>;
+  if (recomendedJobs.length === 0)
+    return <p>No recommended jobs.Cause there is no any job left!</p>;
 
   return (
     <div className="space-y-4">
@@ -61,7 +68,7 @@ export default function RecommendJob() {
             </div>
 
             {user &&
-              (user.status !== "OPENTOWORK" ? (
+              (status !== "OPENTOWORK" ? (
                 <DisabledBtnTooltip>
                   <Button
                     asChild
@@ -73,12 +80,7 @@ export default function RecommendJob() {
                   </Button>
                 </DisabledBtnTooltip>
               ) : (
-                <Button
-                  size="sm"
-                  className="ml-4 bg-green-600 hover:bg-green-700"
-                >
-                  Apply
-                </Button>
+                <ApplyDialog job={job} user={user} />
               ))}
           </div>
         </div>

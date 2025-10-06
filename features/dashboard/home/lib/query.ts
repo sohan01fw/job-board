@@ -16,6 +16,7 @@ async function getJobsWithEmbeddings({ userId }: { userId: string }) {
       select: {
         id: true,
         title: true,
+        description: true,
         company: true,
         location: true,
         jobType: true,
@@ -23,6 +24,9 @@ async function getJobsWithEmbeddings({ userId }: { userId: string }) {
         minSalary: true,
         maxSalary: true,
         currency: true,
+        requirements: true,
+        benefits: true,
+        experience: true,
         skills: true,
         embedding: true,
         createdAt: true,
@@ -188,13 +192,13 @@ export async function getProfileViews(userId: string) {
 
   // Example logic to calculate change %
   // You can store previous views in DB or calculate based on timestamp
-  const previousViews = user.views - Math.floor(Math.random() * 100); // placeholder
+  // Example logic to calculate change %
+
+  const previousViews = user.views - 1; // assume one less before
   const change = user.views - previousViews;
   const trend = change >= 0 ? "up" : "down";
-  const percentChange = previousViews
-    ? ((change / previousViews) * 100).toFixed(0)
-    : "0";
-
+  const percentChange =
+    previousViews > 0 ? ((change / previousViews) * 100).toFixed(0) : "0";
   return {
     value: user.views.toLocaleString(), // "1,247"
     change: percentChange,

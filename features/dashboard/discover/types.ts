@@ -8,7 +8,7 @@ export type UserCmts = {
   createdAt: Date;
 };
 
-type JobWithCount = JobPost & {
+export type JobWithCount = JobPost & {
   _count?: {
     jobApplications: number;
   };

@@ -8,14 +8,14 @@ export async function getAllJobs({
   search,
   user,
   cursor,
-  limit = 3,
+  limit,
 }: {
   sort?: string;
   filter?: string[];
   search?: string;
   user: any;
   cursor?: string;
-  limit?: number;
+  limit: number;
 }) {
   return withTryCatch(async () => {
     let orderBy: any = { createdAt: "desc" };
@@ -51,7 +51,7 @@ export async function getAllJobs({
 
     const data = await prisma.jobPost.findMany({
       take: limit + 1, // +1 to check if there’s a next page
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      ...(cursor ? { cursor: { id: cursor } } : {}),
       where,
       orderBy,
       include: {
@@ -84,8 +84,24 @@ export async function ApplyJobApplication({
   coverLetter,
 }: JobApplication) {
   return withTryCatch(async () => {
-    return prisma.jobApplication.create({
+    // Correct check for existing application
+    const existing = await prisma.jobApplication.findFirst({
+      where: { userId, jobId },
+    });
+
+    if (existing) {
+      return {
+        success: false,
+        message: "You have already applied for this job",
+        application: existing,
+      };
+    }
+
+    // Create new application
+    const application = await prisma.jobApplication.create({
       data: { userId, jobId, coverLetter, status: "PENDING", viewed: false },
     });
+
+    return { application };
   }, "Error while applying for job");
 }

@@ -15,6 +15,7 @@ import { Briefcase, Plus } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePostedJobs } from "@/features/dashboard/recruiter/hooks/useGetPostedJobs";
 import { useJobStore } from "../../lib/stores/JobStore";
+import { useGetUserPostsWithJobs } from "../../hooks/usePost";
 
 interface AttachJobDialogProps {
   userId: string;
@@ -30,23 +31,38 @@ export function AttachJobDialog({
   const [loading, setLoading] = useState(false);
   const { data } = usePostedJobs({ userId }); // your hook
   const { setJobId } = useJobStore();
+  const { data: getPost, isLoading: isLoadingPost } = useGetUserPostsWithJobs({
+    userId,
+  });
 
   // fetch jobs only when dialog opens
+
   useEffect(() => {
     if (!open) return;
 
     setLoading(true);
     const fetchJobs = async () => {
       try {
-        setJobs(data || []);
+        // ✅ get all posted job IDs
+        const postedJobIds = getPost?.data
+          ?.filter((p) => p.jobsId)
+          .map((p) => p.jobsId);
+
+        // ✅ filter out already posted jobs
+        const availableJobs = (data || []).filter(
+          (job) => !postedJobIds?.includes(job.id),
+        );
+
+        setJobs(availableJobs);
       } finally {
         setLoading(false);
       }
     };
 
     fetchJobs();
-  }, [open, userId]);
+  }, [open, userId, data, getPost]);
 
+  if (isLoadingPost) return <div>Loading...</div>;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -64,7 +80,7 @@ export function AttachJobDialog({
 
       <DialogContent className="sm:max-w-2xl w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <DialogHeader>
-          <DialogTitle>Attach a Job</DialogTitle>
+          <DialogTitle>Attach a Available Job</DialogTitle>
           <DialogDescription>
             Select one of your posted jobs to attach to this post. Only one job
             can be attached.

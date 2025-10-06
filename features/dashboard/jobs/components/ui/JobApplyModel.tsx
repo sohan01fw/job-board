@@ -19,13 +19,17 @@ import { getUser } from "@/lib/Actions/Users";
 import { useUserStore } from "@/lib/stores/useUserStatusStore";
 import { DisabledBtnTooltip } from "@/components/Tooltip";
 import { useProfileStore } from "@/lib/stores/useProfileStore";
+import { CachedUser } from "@/types/global";
 
 interface ApplyDialogProps {
   job: JobApplicationData;
+  user?: CachedUser;
 }
 
-export default function ApplyDialog({ job }: ApplyDialogProps) {
-  const { user } = useUserStore();
+export default function ApplyDialog({ job, user }: ApplyDialogProps) {
+  const {
+    user: { status },
+  } = useUserStore();
   const [coverLetter, setCoverLetter] = React.useState("");
   const [error, setError] = React.useState("");
   const [isGenerating, setIsGenerating] = React.useState(false);
@@ -43,7 +47,7 @@ export default function ApplyDialog({ job }: ApplyDialogProps) {
     }
     setError("");
     mutate(
-      { coverLetter, jobId: job.id!, userId: job.userId! },
+      { coverLetter, jobId: job.id!, userId: user?.id ?? "" },
       {
         onSuccess: () => {
           setCoverLetter("");
@@ -70,7 +74,7 @@ export default function ApplyDialog({ job }: ApplyDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {user &&
-          (user?.status !== "OPENTOWORK" ? (
+          (status !== "OPENTOWORK" ? (
             <DisabledBtnTooltip>
               <Button
                 disabled={true}
@@ -124,7 +128,7 @@ export default function ApplyDialog({ job }: ApplyDialogProps) {
           </p>
           <p className="sm:col-span-2">
             <span className="font-medium">Benefits:</span>{" "}
-            {job.benefits.join(", ")}
+            {job?.benefits?.join(", ")}
           </p>
         </div>
 
@@ -145,7 +149,7 @@ export default function ApplyDialog({ job }: ApplyDialogProps) {
               Requirements:
             </h4>
             <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 text-sm sm:text-base">
-              {job.requirements.map((req, idx) => (
+              {job?.requirements?.map((req, idx) => (
                 <li key={idx}>{req}</li>
               ))}
             </ul>
@@ -155,7 +159,7 @@ export default function ApplyDialog({ job }: ApplyDialogProps) {
               Skills:
             </h4>
             <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 text-sm sm:text-base">
-              {job.skills.map((skill, idx) => (
+              {job?.skills?.map((skill, idx) => (
                 <li key={idx}>{skill}</li>
               ))}
             </ul>

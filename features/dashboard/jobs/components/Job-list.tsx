@@ -1,12 +1,13 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useGetAllJob } from "../hooks/useGetAllJobs";
 import { JobCard } from "./Job-Card";
 import JobCardSkeleton from "./ui/JobCardSkeleton";
-import { useEffect, useRef } from "react";
+import { CachedUser } from "@/types/global";
 
-export function JobList() {
+export function JobList({ user }: { user: CachedUser }) {
   const {
     data,
     fetchNextPage,
@@ -16,23 +17,32 @@ export function JobList() {
     isLoading,
   } = useGetAllJob();
 
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  // Intersection Observer for infinite scroll
+  // IntersectionObserver for infinite scroll
   useEffect(() => {
-    if (!hasNextPage) return;
+    if (!hasNextPage || !scrollRef.current || !loadMoreRef.current) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) fetchNextPage();
       },
-      { threshold: 1.0 },
+      {
+        root: scrollRef.current, // observe inside scrollable div
+        threshold: 0.1,
+      },
     );
 
-    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+    observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [hasNextPage, fetchNextPage]);
 
-  if (error) return toast.error(error.message);
+  if (error) {
+    toast.error(error.message);
+    return null;
+  }
+
   if (isLoading)
     return (
       <>
@@ -50,12 +60,11 @@ export function JobList() {
   if (filtered.length === 0) return <div>No jobs found</div>;
 
   return (
-    <div className="space-y-4 h-[28rem] overflow-auto">
+    <div ref={scrollRef} className="space-y-4 h-[28rem] overflow-auto">
       {filtered.map((job: any) => (
-        <JobCard key={job.id} job={job} />
+        <JobCard key={job.id} job={job} user={user} />
       ))}
 
-      {/* Infinite scroll trigger */}
       <div ref={loadMoreRef} className="h-10 flex justify-center items-center">
         {isFetchingNextPage && <p>Loading...</p>}
         {!hasNextPage && (

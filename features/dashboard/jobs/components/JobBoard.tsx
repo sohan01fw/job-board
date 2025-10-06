@@ -1,7 +1,9 @@
+import { getCachedUser } from "@/lib/redis";
 import { JobFilters } from "./Job-filters";
 import { JobList } from "./Job-list";
 
 export async function JobBoard() {
+  const user = await getCachedUser();
   return (
     <div className="flex  w-full bg-background">
       {/* Main Content */}
@@ -12,7 +14,7 @@ export async function JobBoard() {
             <JobFilters />
             {/* Scrollable JobList */}
             <div className="mt-6 flex-1 ">
-              <JobList />
+              <JobList user={user} />
             </div>
           </div>
         </main>

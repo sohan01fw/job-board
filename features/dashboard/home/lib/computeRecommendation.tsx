@@ -40,12 +40,15 @@ export async function computeJobsRecommendation({
 You are a job recommendation engine.
 User profile:
 - Title: ${user.title}
+- Description: ${user.description}
 - Location: ${user.location}
 - Experience: ${user.experience}
 - Education: ${user.education}
 - Skills: ${JSON.stringify(user.skills)}
 - Preferred Job Types: ${JSON.stringify(user.jobType)}
 - Salary Range: ${user.salaryRange}
+- Requirements: ${JSON.stringify(user.requirements)}
+- Benefits: ${JSON.stringify(user.benefits)}
 - Remote: ${user.remote}
 - Willing to Relocate: ${user.relocate}
 
@@ -55,6 +58,12 @@ Jobs: ${JSON.stringify(
       topCandidates.map((j) => ({
         id: j.id,
         title: j.title,
+        description: j.description || null,
+        company: j.company,
+        createdAt: j.createdAt,
+        experience: j.experience || null,
+        benifits: j.benefits || [],
+        currency: j.currency,
         location: j.location || null,
         jobType: j.jobType || null,
         maxSalary: j.maxSalary || null,

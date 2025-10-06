@@ -58,7 +58,7 @@ export default function MyMutualFriends({
                   size="sm"
                   variant="outline"
                   className="shrink-0 h-8 text-xs flex items-center gap-1"
-                  onClick={() => router.push(`/dashboard/messages/${user.id}`)}
+                  onClick={() => router.push(`/dashboard/messages`)}
                 >
                   <MessageCircle className="w-4 h-4" />
                   Message

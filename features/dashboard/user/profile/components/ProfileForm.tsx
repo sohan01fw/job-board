@@ -47,7 +47,7 @@ export function ProfileForm({ user }: { user: UserData }) {
   const [newSkill, setNewSkill] = useState("");
   const [completeProfile, setCompleteProfile] = useState(0);
   const setProfileCompletion = useProfileStore((s) => s.setProfileCompletion);
-  const { updateUser } = useUpdateUser();
+  const { updateUser, loading } = useUpdateUser();
 
   const {
     register,
@@ -179,18 +179,23 @@ export function ProfileForm({ user }: { user: UserData }) {
 
   return (
     <div className="space-y-8">
-      <Card className="border-green-200 bg-green-50">
+      <Card className="border border-green-200 bg-green-50 dark:border-green-700 dark:bg-gray-900 rounded-lg shadow-sm">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold text-green-800">
+            <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">
               Profile Completion
             </h3>
-            <span className="text-2xl font-bold text-green-600">
+            <span className="text-2xl font-bold text-green-600 dark:text-green-500">
               {completeProfile}%
             </span>
           </div>
-          <Progress value={completeProfile} className="h-3" />
-          <p className="text-sm text-green-600 mt-2">
+
+          <Progress
+            value={completeProfile}
+            className="h-3 w-full bg-green-200 dark:bg-gray-700 rounded-full [&>div]:bg-green-500 dark:[&>div]:bg-green-400"
+          />
+
+          <p className="text-sm mt-2 text-green-700 dark:text-green-300">
             {completeProfile < 100
               ? "Complete your profile to increase your visibility to employers"
               : "Great! Your profile is complete"}
@@ -420,7 +425,7 @@ export function ProfileForm({ user }: { user: UserData }) {
         </Card>
 
         {/* Skills */}
-        <Card className="border-green-200">
+        <Card className="border-green-200 dark:border-green-600">
           <CardHeader>
             <CardTitle className="text-green-800">
               Skills & Technologies
@@ -460,7 +465,7 @@ export function ProfileForm({ user }: { user: UserData }) {
                   <Badge
                     key={skill}
                     variant="outline"
-                    className="cursor-pointer hover:bg-green-50 border-green-200"
+                    className="cursor-pointer hover:bg-green-50 border-green-200 dark:hover:bg-green-800"
                     onClick={() => addSkill(skill)}
                   >
                     {skill}
@@ -710,14 +715,14 @@ export function ProfileForm({ user }: { user: UserData }) {
         <div className="flex justify-end  pt-3 sticky bottom-3 right-3">
           <Button
             type="submit"
-            disabled={!isDirty || !isValid}
+            disabled={!isDirty || !isValid || loading}
             className={`h-14 px-12 text-lg font-semibold ${
               isDirty && isValid
                 ? "bg-gray-800 hover:bg-gray-900 text-white"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
-            Update Profile 🚀
+            {loading ? "Updating Profile..." : "Update Profile 🚀"}{" "}
           </Button>
         </div>
       </form>

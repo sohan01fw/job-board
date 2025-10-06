@@ -40,6 +40,13 @@ export async function POST(req: NextRequest) {
         return new NextResponse("Forbidden", { status: 403 });
       }
     }
+    if (channel.startsWith("private-job-notification-")) {
+      const targetUserId = channel.replace("private-job-notification-", "");
+      // only allow subscribing to your own notification channel
+      if (targetUserId !== user.id) {
+        return new NextResponse("Forbidden", { status: 403 });
+      }
+    }
 
     // 🎯 You can add more channel types here later...
 

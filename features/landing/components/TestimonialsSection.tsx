@@ -1,5 +1,8 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { useScrollStore } from "../stores/scrollStore";
 
 const testimonials = [
   {
@@ -29,8 +32,15 @@ const testimonials = [
 ];
 
 export default function TestimonialsSection() {
+  const ref = useRef<HTMLElement | null>(null);
+  const register = useScrollStore((s) => s.register);
+
+  useEffect(() => {
+    register("testimonials", ref.current);
+    return () => register("testimonials", null);
+  }, [register]);
   return (
-    <section className="py-20 bg-gray-50">
+    <section ref={ref} className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
