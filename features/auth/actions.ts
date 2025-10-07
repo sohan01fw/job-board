@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/supabase_client";
+import { REDIRECT_URL } from "@/lib/url";
 
 // Supabase login through magic link
 export async function SupabaseMagicLinkLogin(emailValue: string | undefined) {
@@ -6,7 +7,7 @@ export async function SupabaseMagicLinkLogin(emailValue: string | undefined) {
     email: emailValue || "",
     options: {
       shouldCreateUser: true,
-      emailRedirectTo: process.env.PROD_SITE_REDIRECT_URL,
+      emailRedirectTo: REDIRECT_URL,
     },
   });
 
@@ -18,7 +19,7 @@ export async function SupabaseGoogleLogin() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: process.env.PROD_SITE_REDIRECT_URL,
+      redirectTo: REDIRECT_URL,
     },
   });
   return { data, error };

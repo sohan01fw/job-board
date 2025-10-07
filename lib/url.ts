@@ -1,4 +1,4 @@
-export const URL = `https://job-board-all.vercel.app`;
+export const SITE_URL = `https://job-board-all.vercel.app`;
 export const REDIRECT_URL = `https://job-board-all.vercel.app/auth/callback`;
 
 export const localURL = `http://localhost:3000`;

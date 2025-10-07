@@ -1,5 +1,6 @@
 "use server";
 import { supabaseServer } from "@/lib/supabase/supabase_server";
+import { SITE_URL } from "@/lib/url";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
     }
 
     // Redirect using production URL only
-    const redirectUrl = `${process.env.PROD_SITE_URL}${next}`;
+    const redirectUrl = `${SITE_URL}${next}`;
 
     return NextResponse.redirect(redirectUrl);
   } catch (err) {
