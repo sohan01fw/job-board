@@ -14,6 +14,7 @@ import {
 } from "./hooks/useGetNotifications";
 import { useState, useEffect } from "react";
 import Pusher from "pusher-js";
+import { BellSkeleton } from "./BellSkeleton";
 
 export function NotificationsDropdown({ userId }: { userId: string }) {
   const {
@@ -120,7 +121,7 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
     return "📢";
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <BellSkeleton />;
   if (error) return <div>Error: {error.message}</div>;
 
   return (
