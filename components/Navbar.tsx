@@ -57,6 +57,19 @@ export function Header({
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
       authEndpoint: "/api/pusher/auth",
+      authTransport: "ajax",
+      auth: {
+        headers: {},
+      },
+    });
+
+    (Pusher as any).XHR = function () {
+      const xhr = new XMLHttpRequest();
+      xhr.withCredentials = true; // 👈 send cookies/session
+      return xhr;
+    };
+    (pusher as any).connection.bind("connected", () => {
+      console.log("✅ Pusher connected");
     });
 
     const channel = pusher.subscribe(`private-user-notification-${uId}`);
