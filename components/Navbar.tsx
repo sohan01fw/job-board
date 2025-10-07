@@ -68,9 +68,6 @@ export function Header({
       xhr.withCredentials = true; // 👈 send cookies/session
       return xhr;
     };
-    (pusher as any).connection.bind("connected", () => {
-      console.log("✅ Pusher connected");
-    });
 
     const channel = pusher.subscribe(`private-user-notification-${uId}`);
 

@@ -62,9 +62,6 @@ export function MessageThread({
       xhr.withCredentials = true; // 👈 send cookies/session
       return xhr;
     };
-    (pusher as any).connection.bind("connected", () => {
-      console.log("✅ Pusher connected");
-    });
 
     const channel = pusher.subscribe(`private-chat-${chatId}`);
     channel.bind("new-message", (message: Message) => {
