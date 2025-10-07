@@ -51,17 +51,7 @@ export function MessageThread({
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
       authEndpoint: "/api/pusher/auth",
-      authTransport: "ajax",
-      auth: {
-        headers: {},
-      },
     });
-
-    (Pusher as any).XHR = function () {
-      const xhr = new XMLHttpRequest();
-      xhr.withCredentials = true; // 👈 send cookies/session
-      return xhr;
-    };
 
     const channel = pusher.subscribe(`private-chat-${chatId}`);
     channel.bind("new-message", (message: Message) => {

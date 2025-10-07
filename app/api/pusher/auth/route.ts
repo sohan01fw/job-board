@@ -1,19 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { pusherServer } from "@/lib/pusher";
 import { getCachedUser } from "@/lib/redis";
 import { prisma } from "@/lib/Prisma";
 
-// ✅ Force Node.js runtime so cookies/session are accessible
-export const runtime = "nodejs";
-
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    // ✅ Parse Pusher POST body (x-www-form-urlencoded)
-    const body = await req.text();
-    const formData = new URLSearchParams(body);
-
-    const socketId = formData.get("socket_id")!;
-    const channel = formData.get("channel_name")!;
+    const formData = await req.formData();
+    const socketId = formData.get("socket_id") as string;
+    const channel = formData.get("channel_name") as string;
 
     const user = await getCachedUser();
     if (!user)
@@ -29,40 +23,34 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    if (
-      channel.startsWith("private-follow-") ||
-      channel.startsWith("private-user-notification-") ||
-      channel.startsWith("private-job-notification-")
-    ) {
-      const targetUserId = channel.split("-").pop();
-      if (targetUserId !== user.id)
+    if (channel.startsWith("private-follow-")) {
+      const targetUserId = channel.replace("private-follow-", "");
+      if (targetUserId !== String(user.id))
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // ✅ Authorize channel
+    if (channel.startsWith("private-user-notification-")) {
+      const targetUserId = channel.replace("private-user-notification-", "");
+      if (targetUserId !== String(user.id))
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    if (channel.startsWith("private-job-notification-")) {
+      const targetUserId = channel.replace("private-job-notification-", "");
+      if (targetUserId !== String(user.id))
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const authResponse = pusherServer.authorizeChannel(socketId, channel, {
       user_id: user.id,
     });
 
     return NextResponse.json(authResponse, { status: 200 });
   } catch (err) {
-    console.error("Pusher auth error:", err);
+    console.error(err);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
     );
   }
-}
-
-// Optional: handle preflight (CORS) if needed
-export async function OPTIONS() {
-  const res = new NextResponse(null, { status: 204 });
-  res.headers.set(
-    "Access-Control-Allow-Origin",
-    "https://job-board-all.vercel.app",
-  );
-  res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.headers.set("Access-Control-Allow-Headers", "Content-Type");
-  res.headers.set("Access-Control-Allow-Credentials", "true");
-  return res;
 }

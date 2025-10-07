@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     }
 
     // Redirect using production URL only
-    const redirectUrl = `https://job-board-all.vercel.app${next}`;
+    const redirectUrl = `${process.env.PROD_SITE_URL}${next}`;
 
     return NextResponse.redirect(redirectUrl);
   } catch (err) {
