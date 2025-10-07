@@ -3,12 +3,12 @@ import { pusherServer } from "@/lib/pusher";
 import { getCachedUser } from "@/lib/redis";
 import { prisma } from "@/lib/Prisma";
 
-// Force Node.js runtime (cookies accessible)
+// ✅ Force Node.js runtime so cookies/session are accessible
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    // ✅ Parse Pusher POST body correctly
+    // ✅ Parse Pusher POST body (x-www-form-urlencoded)
     const body = await req.text();
     const formData = new URLSearchParams(body);
 
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // ✅ Authorize channel with Pusher
+    // ✅ Authorize channel
     const authResponse = pusherServer.authorizeChannel(socketId, channel, {
       user_id: user.id,
     });
@@ -54,12 +54,12 @@ export async function POST(req: Request) {
   }
 }
 
-// Optional: handle OPTIONS preflight for CORS
+// Optional: handle preflight (CORS) if needed
 export async function OPTIONS() {
   const res = new NextResponse(null, { status: 204 });
   res.headers.set(
     "Access-Control-Allow-Origin",
-    process.env.NEXT_PUBLIC_SITE_URL!,
+    "https://job-board-all.vercel.app",
   );
   res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.headers.set("Access-Control-Allow-Headers", "Content-Type");
