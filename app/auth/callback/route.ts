@@ -22,16 +22,8 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`/auth/auth-code-error`);
     }
 
-    // Set cookie manually if needed (optional if supabase server client already handles cookies)
-    // You can skip if your supabaseServer client already sets cookies automatically
-    // const response = NextResponse.redirect(redirectUrl);
-    // supabase.auth.setAuthCookie(response, data.session);
-
-    // Determine redirect URL
-    const redirectUrl =
-      process.env.NODE_ENV === "development"
-        ? `http://localhost:3000${next}`
-        : `https://job-board-all.vercel.app${next}`;
+    // Redirect using production URL only
+    const redirectUrl = `https://job-board-all.vercel.app${next}`;
 
     return NextResponse.redirect(redirectUrl);
   } catch (err) {

@@ -1,8 +1,7 @@
 import { supabase } from "@/lib/supabase/supabase_client";
 
-const REDIRECT_URL = process.env.NEXT_PUBLIC_SITE_URL
-  ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
-  : "http://localhost:3000/auth/callback"; // fallback for safety
+// Use only production URL
+const REDIRECT_URL = `https://job-board-all.vercel.app/auth/callback`;
 
 // Supabase login through magic link
 export async function SupabaseMagicLinkLogin(emailValue: string | undefined) {
