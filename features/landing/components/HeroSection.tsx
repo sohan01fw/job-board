@@ -6,8 +6,10 @@ import googlelogo from "@/app/assets/google.png";
 import notionlogo from "@/app/assets/notion.png";
 import { useEffect, useRef } from "react";
 import { useScrollStore } from "../stores/scrollStore";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection() {
+  const router = useRouter();
   const ref = useRef<HTMLElement | null>(null);
   const register = useScrollStore((s) => s.register);
 
@@ -36,7 +38,10 @@ export default function HeroSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-          <Button className="bg-green-500 hover:bg-green-600 text-white px-8 py-6  text-lg font-semibold rounded-full">
+          <Button
+            onClick={() => router.push("/dashboard")}
+            className="bg-green-500 hover:bg-green-600 text-white px-8 py-6  text-lg font-semibold rounded-full"
+          >
             Get Started
           </Button>
           <Button

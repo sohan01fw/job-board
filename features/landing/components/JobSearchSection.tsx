@@ -5,7 +5,7 @@ export default function JobSearchSection() {
   return (
     <section className="py-20 bg-white ">
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-16 items-center ">
+        <div className="grid lg:grid-cols-2 gap-16  items-center ">
           {/* Left Side - Work Experience & Skills */}
 
           <div className="relative max-w-md mx-auto md:max-w-none md:flex md:space-x-8 px-4 py-12  ">

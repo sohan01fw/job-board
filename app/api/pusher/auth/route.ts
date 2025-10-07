@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     const authResponse = pusherServer.authorizeChannel(socketId, channel, {
       user_id: user.id,
     });
-    return NextResponse.json(authResponse);
+    return new NextResponse(JSON.stringify(authResponse), { status: 200 });
   } catch (err) {
     console.error(err);
     return new NextResponse("Internal Error", { status: 500 });
