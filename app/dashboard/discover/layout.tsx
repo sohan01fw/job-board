@@ -3,7 +3,6 @@ import { DiscoverTabs } from "@/features/dashboard/discover/components/ui/Discov
 
 export const metadata: Metadata = {
   title: "Discover",
-  description: "Discover new posts and connections",
 };
 
 export default function DiscoverLayout({
