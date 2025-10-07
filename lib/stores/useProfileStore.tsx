@@ -13,7 +13,7 @@ export const useProfileStore = create<ProfileStore>()(
     (set) => ({
       profileCompletion: 20,
       setProfileCompletion: (value) => set({ profileCompletion: value }),
-      reset: () => set({ profileCompletion: 0 }),
+      reset: () => set({ profileCompletion: 20 }),
     }),
     {
       name: "profile-storage",
