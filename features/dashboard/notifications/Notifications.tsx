@@ -15,6 +15,7 @@ import {
 import { useState, useEffect } from "react";
 import Pusher from "pusher-js";
 import { BellSkeleton } from "./BellSkeleton";
+import { useAudioUnlock } from "@/lib/audio";
 
 export function NotificationsDropdown({ userId }: { userId: string }) {
   const {
@@ -80,6 +81,7 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
 
   const handleClose = () => setIsOpen(false);
 
+  useAudioUnlock();
   // Realtime Pusher updates
   useEffect(() => {
     if (!userId) return;
@@ -105,6 +107,7 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
       ]);
 
       setHasUnread(true);
+      new Audio("/nudge.mp3").play().catch(() => {});
     });
 
     return () => {
