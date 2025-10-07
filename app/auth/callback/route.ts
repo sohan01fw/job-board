@@ -1,36 +1,30 @@
 "use server";
 import { supabaseServer } from "@/lib/supabase/supabase_server";
 import { NextResponse } from "next/server";
-// The client you created from the Server-Side Auth instructions
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  // if "next" is in param, use it as the redirect URL
   const next = searchParams.get("next") ?? "/dashboard";
 
-  if (code) {
-    const supabase = await supabaseServer();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
-      const redirectUrl =
-        process.env.NODE_ENV === "development"
-          ? `${origin}${next}`
-          : `https://job-board-all.vercel.app${next}`;
-
-      return NextResponse.redirect(redirectUrl);
-      if (redirectUrl) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-        return NextResponse.redirect(`${origin}${next}`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}${next}`);
-      }
-    }
+  if (!code) {
+    // no code, redirect to error page
+    return NextResponse.redirect(`/auth/auth-code-error`);
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  const supabase = await supabaseServer();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (error) {
+    // exchange failed, redirect to error page
+    return NextResponse.redirect(`/auth/auth-code-error`);
+  }
+
+  // determine redirect URL based on environment
+  const redirectUrl =
+    process.env.NODE_ENV === "development"
+      ? `http://localhost:3000${next}`
+      : `https://job-board-all.vercel.app${next}`;
+
+  return NextResponse.redirect(redirectUrl);
 }

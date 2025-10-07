@@ -5,58 +5,44 @@ import { prisma } from "@/lib/Prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.formData();
-    const socketId = body.get("socket_id") as string;
-    const channel = body.get("channel_name") as string;
+    const formData = await req.formData();
+    const socketId = formData.get("socket_id") as string;
+    const channel = formData.get("channel_name") as string;
 
     const user = await getCachedUser();
-    if (!user) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    // ✅ Check based on channel type
+    // ✅ Channel authorization
     if (channel.startsWith("private-chat-")) {
       const chatId = channel.replace("private-chat-", "");
       const participant = await prisma.chatParticipant.findFirst({
         where: { chatId, userId: user.id },
       });
-      if (!participant) {
-        return new NextResponse("Forbidden", { status: 403 });
-      }
+      if (!participant)
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    if (channel.startsWith("private-follow-")) {
-      const targetUserId = channel.replace("private-follow-", "");
-      // only allow subscribing to your own follow channel
-      if (targetUserId !== user.id) {
-        return new NextResponse("Forbidden", { status: 403 });
-      }
+    if (
+      channel.startsWith("private-follow-") ||
+      channel.startsWith("private-user-notification-") ||
+      channel.startsWith("private-job-notification-")
+    ) {
+      const targetUserId = channel.split("-").pop();
+      if (targetUserId !== user.id)
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    if (channel.startsWith("private-user-notification-")) {
-      const targetUserId = channel.replace("private-user-notification-", "");
-      // only allow subscribing to your own notification channel
-      if (targetUserId !== user.id) {
-        return new NextResponse("Forbidden", { status: 403 });
-      }
-    }
-    if (channel.startsWith("private-job-notification-")) {
-      const targetUserId = channel.replace("private-job-notification-", "");
-      // only allow subscribing to your own notification channel
-      if (targetUserId !== user.id) {
-        return new NextResponse("Forbidden", { status: 403 });
-      }
-    }
-
-    // 🎯 You can add more channel types here later...
-
-    // ✅ Authorize with Pusher
     const authResponse = pusherServer.authorizeChannel(socketId, channel, {
       user_id: user.id,
     });
-    return new NextResponse(JSON.stringify(authResponse), { status: 200 });
+
+    return NextResponse.json(authResponse, { status: 200 });
   } catch (err) {
     console.error(err);
-    return new NextResponse("Internal Error", { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
