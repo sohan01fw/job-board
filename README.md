@@ -76,7 +76,7 @@ Open a PR, suggest a feature, or report a bug — every bit helps this project g
 
 ### 🧑‍💻 Author
 
-**Sohan CW** — Full Stack Developer (Next.js, MERN, PostgreSQL)
+**Sohan shiwakoti** — Full Stack Developer (Next.js, MERN, PostgreSQL)
 Building AI-driven and realtime web experiences.
 
 ---
