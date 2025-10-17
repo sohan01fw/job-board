@@ -54,7 +54,7 @@ export default function HeroSection() {
         </div>
 
         {/* Floating Profile Cards */}
-        <div className="absolute top-80 left-48 hidden xl:block animate-float">
+        <div className="absolute top-80 left-48 hidden lg:block animate-float">
           <div className="absolute top-[-15rem] transform -translate-x-1/2 -translate-y-1/2 hidden xl:block animate-float">
             <div className="bg-white/30 backdrop-blur-sm text-gray-900 flex items-center rounded-2xl shadow-lg px-5 py-4 max-w-xs border border-white/40 gap-3">
               <div className="flex-shrink-0">
@@ -76,7 +76,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-4 max-w-xs">
+          <div className="bg-white rounded-2xl shadow-lg p-4 max-w-xs hidden xl:block">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold">
                 MA
@@ -145,7 +145,7 @@ export default function HeroSection() {
 
         {/* Salary Card */}
 
-        <div className="absolute top-10 right-80 transform -translate-x-1/2 -translate-y-1/2 hidden xl:block animate-float">
+        <div className="absolute top-10 right-80 transform -translate-x-1/2 -translate-y-1/2 hidden lg:block animate-float">
           <div className="bg-white/30 backdrop-blur-sm text-gray-900 flex items-center gap-4 rounded-2xl shadow-lg p-6 max-w-xs border border-white/40">
             <Image
               src={googlelogo}

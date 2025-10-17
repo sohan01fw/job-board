@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePostedJobs } from "@/features/dashboard/recruiter/hooks/useGetPostedJobs";
 import { useJobStore } from "../../lib/stores/JobStore";
 import { useGetUserPostsWithJobs } from "../../hooks/usePost";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AttachJobDialogProps {
   userId: string;
@@ -62,7 +63,7 @@ export function AttachJobDialog({
     fetchJobs();
   }, [open, userId, data, getPost]);
 
-  if (isLoadingPost) return <div>Loading...</div>;
+  if (isLoadingPost) return <Skeleton className="h-9 w-24 rounded-md" />;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

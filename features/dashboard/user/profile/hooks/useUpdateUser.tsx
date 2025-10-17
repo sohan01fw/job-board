@@ -40,12 +40,10 @@ export function useUpdateStatus({ email }: { email: string }) {
   const mutation = useMutation({
     mutationFn: ({ status }: { status: Status }) =>
       updateUserProfileAction({ email, data: { status } }),
-    onMutate: ({ status }) => {
-      // Optimistic update
-      updateStatusLocal(status);
-    },
-    onSuccess: () => {
+
+    onSuccess: ({ status }) => {
       toast.success("Status updated!", { duration: 1500 });
+      updateStatusLocal(status);
     },
     onError: (err: any) => {
       toast.error(err.message || "Failed to update");
