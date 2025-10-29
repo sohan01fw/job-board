@@ -1,12 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
 import Image from "next/image";
 import googlelogo from "@/app/assets/google.png";
 import notionlogo from "@/app/assets/notion.png";
 import { useEffect, useRef } from "react";
 import { useScrollStore } from "../stores/scrollStore";
 import { useRouter } from "next/navigation";
+import { WatchDemoDialog } from "./DemoDialog";
 
 export default function HeroSection() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function HeroSection() {
     register("home", ref.current);
     return () => register("home", null);
   }, [register]);
+
   return (
     <section
       ref={ref}
@@ -44,13 +45,7 @@ export default function HeroSection() {
           >
             Get Started
           </Button>
-          <Button
-            variant="outline"
-            className="text-gray-900 hover:bg-gray-900 hover:text-white px-8 py-5 text-lg font-semibold rounded-full flex items-center gap-2 shadow-md"
-          >
-            <Play className="h-5 w-5" />
-            Watch Demo
-          </Button>
+          <WatchDemoDialog />
         </div>
 
         {/* Floating Profile Cards */}
