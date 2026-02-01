@@ -3,7 +3,7 @@ import { UserData } from "@/types/Forms";
 import { redis } from "@/lib/redis"; // <- your redis client
 import { computeJobsRecommendation } from "./computeRecommendation";
 
-const CACHE_TTL = 60 * 10; // 10 minutes
+const CACHE_TTL = 60 * 60; // 60 minutes (1 hour)
 
 export async function RecommendJobsAI({
   user,

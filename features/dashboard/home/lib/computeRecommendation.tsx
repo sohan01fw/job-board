@@ -11,89 +11,84 @@ export async function computeJobsRecommendation({
   user: UserData;
   topN: number;
 }) {
-  const userEmbedding = await getUserEmbedding(user.id);
-  const jobs = await getJobsWithEmbeddings({ userId: user.id });
+  try {
+    const userEmbedding = await getUserEmbedding(user.id);
+    const jobs = await getJobsWithEmbeddings({ userId: user.id });
 
-  // 1. Compute similarity locally
-  const scoredJobs = jobs
-    .map((job) => {
-      const score = cosineSimilarity(userEmbedding, job.embedding);
-      return {
-        ...job,
-        score,
-        matchPercent: Math.round(score * 100),
-      };
-    })
-    .filter((j) => j.matchPercent >= 50) // filter out low matches
-    .sort((a, b) => b.matchPercent - a.matchPercent); // sort by match %
+    // 1. Compute similarity locally
+    const scoredJobs = jobs
+      .map((job) => {
+        const score = cosineSimilarity(userEmbedding, job.embedding);
+        return {
+          ...job,
+          score,
+          matchPercent: Math.round(score * 100),
+        };
+      })
+      .filter((j) => j.matchPercent >= 40)
+      .sort((a, b) => b.matchPercent - a.matchPercent);
 
-  if (scoredJobs.length === 0) return []; // no suitable jobs
+    if (scoredJobs.length === 0) return [];
 
-  // 2. Take top 20 for AI rerank
-  const topCandidates = scoredJobs.slice(0, 20);
+    // 2. Take top 10 for AI rerank (reduced from 20 to save quota)
+    const topCandidates = scoredJobs.slice(0, 10);
 
-  // 3. Send to Gemini for rerank
-  const model = google("gemini-2.0-flash");
-  const { text } = await generateText({
-    model,
-    prompt: `
-You are a job recommendation engine.
-User profile:
+    // 3. Send to Gemini for rerank
+    const model = google("gemini-2.0-flash");
+    const { text } = await generateText({
+      model,
+      prompt: `
+Rank 10 jobs for this user profile. Return ONLY a JSON array of job IDs.
+
+User Profile:
 - Title: ${user.title}
-- Description: ${user.description}
-- Location: ${user.location}
-- Experience: ${user.experience}
-- Education: ${user.education}
-- Skills: ${JSON.stringify(user.skills)}
-- Preferred Job Types: ${JSON.stringify(user.jobType)}
-- Salary Range: ${user.salaryRange}
-- Requirements: ${JSON.stringify(user.requirements)}
-- Benefits: ${JSON.stringify(user.benefits)}
-- Remote: ${user.remote}
-- Willing to Relocate: ${user.relocate}
+- Skills: ${user.skills?.slice(0, 10).join(", ")}
+- Prefers: ${user.remote ? "Remote" : "On-site/Hybrid"}, ${user.jobType?.join(", ")}
 
-User embedding: ${JSON.stringify(userEmbedding)}
-
-Jobs: ${JSON.stringify(
-      topCandidates.map((j) => ({
-        id: j.id,
-        title: j.title,
-        description: j.description || null,
-        company: j.company,
-        createdAt: j.createdAt,
-        experience: j.experience || null,
-        benifits: j.benefits || [],
-        currency: j.currency,
-        location: j.location || null,
-        jobType: j.jobType || null,
-        maxSalary: j.maxSalary || null,
-        minSalary: j.minSalary || null,
-        workType: j.workType || null,
-        skills: j.skills || [],
-        matchPercent: j.matchPercent,
-      })),
-    )}
-
-Rank these jobs based on the best fit for the user, considering both embedding similarity and profile filters.
-Return only a JSON array of job IDs in order.
+Jobs:
+${topCandidates
+  .map(
+    (j, i) => `
+[${i}] ID: ${j.id} | ${j.title} at ${j.company}
+- Match: ${j.matchPercent}%
+- Skills: ${j.skills?.slice(0, 5).join(", ")}
+- Description snippet: ${j.description?.slice(0, 160)}...
+`
+  )
+  .join("\n")}
     `,
-    temperature: 0,
-  });
+      temperature: 0,
+    });
 
-  // 4. Parse Gemini output safely
-  let rankedJobIds = safeParseJSON(text);
-  if (!rankedJobIds || rankedJobIds.length === 0) {
-    rankedJobIds = topCandidates.map((j) => j.id); // fallback
+    // 4. Parse Gemini output safely
+    const rankedJobIds = safeParseJSON(text);
+    if (!rankedJobIds || rankedJobIds.length === 0) {
+      return scoredJobs.slice(0, topN);
+    }
+
+    // 5. Return final ranked jobs
+    const rankedJobs = rankedJobIds
+      .map((id) => topCandidates.find((j) => j.id === id))
+      .filter((j): j is (typeof topCandidates)[0] => !!j);
+
+    const seenIds = new Set(rankedJobs.map((j) => j.id));
+    const remaining = scoredJobs.filter((j) => !seenIds.has(j.id));
+    
+    return [...rankedJobs, ...remaining].slice(0, topN);
+  } catch (error) {
+    console.error("AI Recommendation Error (Quota/Rate Limit):", error);
+    // Fallback to local embedding search
+    const userEmbedding = await getUserEmbedding(user.id).catch(() => null);
+    if (!userEmbedding) return [];
+    const jobs = await getJobsWithEmbeddings({ userId: user.id }).catch(() => []);
+    return jobs
+      .map((job) => ({
+        ...job,
+        matchPercent: Math.round(cosineSimilarity(userEmbedding, job.embedding) * 100),
+      }))
+      .sort((a, b) => b.matchPercent - a.matchPercent)
+      .slice(0, topN);
   }
-
-  // 5. Return final ranked jobs
-  const rankedJobs = rankedJobIds
-    .map((id) => topCandidates.find((j) => j.id === id))
-    .filter(Boolean);
-
-  // 6. If still less than topN, append other scoredJobs
-  const remaining = scoredJobs.filter((j) => !rankedJobs.includes(j));
-  return [...rankedJobs, ...remaining].slice(0, topN);
 }
 
 function safeParseJSON(text: string): string[] {
