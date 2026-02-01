@@ -45,31 +45,38 @@ export function JobList({ user }: { user: CachedUser }) {
 
   if (isLoading)
     return (
-      <>
+      <div className="space-y-4 px-1">
         <JobCardSkeleton />
         <JobCardSkeleton />
         <JobCardSkeleton />
-      </>
+      </div>
     );
 
-  // ✅ Fix typing: assert `data` as InfiniteData<JobsResponse>
   const jobs = (data as any)?.pages.flatMap((page: any) => page.jobs) ?? [];
-
   const filtered = jobs.filter((job: any) => job.applied === false);
 
-  if (filtered.length === 0) return <div>No jobs found</div>;
+  if (filtered.length === 0) return (
+    <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed rounded-3xl">
+      <p className="text-muted-foreground">No jobs found matching your criteria.</p>
+    </div>
+  );
 
   return (
-    <div ref={scrollRef} className="space-y-4 h-[28rem] overflow-auto">
+    <div ref={scrollRef} className="space-y-4 h-[calc(100vh-280px)] overflow-y-auto px-1 pr-2 no-scrollbar">
       {filtered.map((job: any) => (
         <JobCard key={job.id} job={job} user={user} />
       ))}
 
-      <div ref={loadMoreRef} className="h-10 flex justify-center items-center">
-        {isFetchingNextPage && <p>Loading...</p>}
-        {!hasNextPage && (
-          <p className="text-muted-foreground text-sm">No more jobs</p>
-        )}
+      <div ref={loadMoreRef} className="py-8 flex justify-center items-center">
+        {isFetchingNextPage ? (
+          <div className="flex items-center gap-2 text-primary">
+            <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <span className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+          </div>
+        ) : !hasNextPage ? (
+          <p className="text-muted-foreground text-sm font-medium">✨ You&apos;ve reached the end of the list</p>
+        ) : null}
       </div>
     </div>
   );

@@ -55,7 +55,7 @@ export function useGetAllJob() {
         filter,
         search,
         cursor: pageParam,
-        limit: 2,
+        limit: 10,
       });
       return res;
     },
