@@ -13,7 +13,7 @@ import { toast } from "sonner";
 // --------------------
 
 // Get friends / followers / following
-export function useFriendsAndFollowers(userId: string) {
+export function useFriendsAndFollowers(userId: string, initialData?: any) {
   return useQuery({
     queryKey: ["friendsAndFollowers", userId],
     queryFn: async (): Promise<{
@@ -24,6 +24,7 @@ export function useFriendsAndFollowers(userId: string) {
       return await getFriendsAndFollowersAction({ userId });
     },
     enabled: !!userId,
+    initialData,
   });
 }
 

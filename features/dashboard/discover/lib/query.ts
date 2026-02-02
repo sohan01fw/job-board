@@ -223,77 +223,80 @@ export const getAllUsersExceptQuery = async (
 
 export async function getFriendsAndFollowers(userId: string) {
   return withTryCatch(async () => {
-    // Mutual friends
-
-    const friends = await prisma.follow.findMany({
+    // Fetch all active follows where the user is either the follower or the following
+    const allFollows = await prisma.follow.findMany({
       where: {
-        followerId: userId, // I follow them
+        OR: [{ followerId: userId }, { followingId: userId }],
         deletedAt: null,
-        followingId: {
-          // AND they follow me
-          in: await prisma.follow
-            .findMany({
-              where: {
-                followerId: { not: userId },
-                followingId: userId,
-                deletedAt: null,
-              },
-              select: { followerId: true },
-            })
-            .then((rows) => rows.map((r) => r.followerId)),
+      },
+      include: {
+        follower: true,
+        following: true,
+      },
+    });
+
+    // Segregate follows into following (users I follow) and followers (users who follow me)
+    const following = allFollows.filter((f) => f.followerId === userId);
+    const followers = allFollows.filter((f) => f.followingId === userId);
+
+    const followerIds = new Set(followers.map((f) => f.followerId));
+    const followingIds = new Set(following.map((f) => f.followingId));
+
+    // Mutual friends: I follow them AND they follow me
+    const mutualFriendUsers = following
+      .filter((f) => followerIds.has(f.followingId))
+      .map((f) => f.following);
+
+    // Fetch all chats for the user to map friends to chatIds
+    const userChats = await prisma.chatParticipant.findMany({
+      where: { userId },
+      select: {
+        chatId: true,
+        chat: {
+          select: {
+            participants: {
+              where: { userId: { not: userId } },
+              select: { userId: true },
+            },
+          },
         },
       },
-      include: { following: true },
     });
+
+    const friendToChatId = new Map<string, string>();
+    userChats.forEach((cp) => {
+      const otherParticipant = cp.chat.participants[0];
+      if (otherParticipant) {
+        friendToChatId.set(otherParticipant.userId, cp.chatId);
+      }
+    });
+
+    const friends = mutualFriendUsers.map((f) => ({
+      ...f,
+      chatId: friendToChatId.get(f.id),
+    }));
 
     // Following only: I follow them but they don't follow me
-
-    const followingOnly = await prisma.follow.findMany({
-      where: {
-        followerId: userId, // I follow them
-        deletedAt: null,
-        followingId: {
-          notIn: await prisma.follow
-            .findMany({
-              where: {
-                followerId: { not: userId },
-                followingId: userId,
-                deletedAt: null,
-              }, // people who follow me
-              select: { followerId: true },
-            })
-            .then((rows) => rows.map((r) => r.followerId)),
-        },
-      },
-      include: { following: true },
-    });
+    const followingOnly = following
+      .filter((f) => !followerIds.has(f.followingId))
+      .map((f) => f.following);
 
     // Followers only: They follow me but I don't follow them
-    const followersOnly = await prisma.follow.findMany({
-      where: {
-        followingId: userId, // they follow me
-        deletedAt: null,
-        followerId: {
-          notIn: await prisma.follow
-            .findMany({
-              where: { followerId: userId, deletedAt: null }, // people I follow
-              select: { followingId: true },
-            })
-            .then((rows) => rows.map((r) => r.followingId)),
-        },
-      },
-      include: { follower: true },
-    });
-    const followerCount = followersOnly.length;
+    const followersOnly = followers
+      .filter((f) => !followingIds.has(f.followerId))
+      .map((f) => f.follower);
 
-    // Example: calculate change (you can replace with real logic)
+    const followerCount = followers.length;
+
+    // calculate change (you can replace with real logic)
     const previousCount = followerCount > 0 ? followerCount - 1 : 0; // placeholder
     const change = followerCount - previousCount;
     const trend = change >= 0 ? "up" : "down";
+
     return {
-      friends: friends.map((f) => f.following),
-      followingOnly: followingOnly.map((f) => f.following),
-      followersOnly: followersOnly.map((f) => f.follower),
+      friends,
+      followingOnly,
+      followersOnly,
       followerCount: {
         value: followerCount.toString(),
         change: change,

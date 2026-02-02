@@ -1,4 +1,5 @@
 import { MessagingInterface } from "@/features/dashboard/messages/components/MessagingInterface";
+import { getMessagesActions } from "@/features/dashboard/messages/action";
 import { getCachedUser } from "@/lib/redis";
 
 export default async function Messages({
@@ -6,7 +7,13 @@ export default async function Messages({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params; // ✅ await it
+  const { id } = await params;
   const user = await getCachedUser();
-  return <MessagingInterface id={id} user={user} />;
+
+  // Fetch initial messages on the server
+  const initialMessages = await getMessagesActions({ chatId: id });
+
+  return (
+    <MessagingInterface id={id} user={user} initialMessages={initialMessages} />
+  );
 }

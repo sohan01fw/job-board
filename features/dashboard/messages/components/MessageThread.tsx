@@ -18,6 +18,7 @@ import ChatLoading from "./ui/ChatLoading";
 interface ExtendedProps extends MessageThreadProps {
   setMessagesRef: RefObject<Dispatch<SetStateAction<Message[]>> | undefined>;
   scrollRef: RefObject<() => void>;
+  initialMessages?: any[];
 }
 
 export function MessageThread({
@@ -25,12 +26,14 @@ export function MessageThread({
   currentUser,
   setMessagesRef,
   scrollRef,
+  initialMessages,
 }: ExtendedProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const { data: msgData, isLoading: isLoadingMessages } = useMessages({
     chatId,
+    initialData: initialMessages,
   });
 
   // 🔽 Scroll to bottom function
@@ -71,7 +74,7 @@ export function MessageThread({
   // 🧩 Initial load
   useEffect(() => {
     if (msgData) {
-      const mappedMessages: Message[] = msgData.map((msg) => ({
+      const mappedMessages: Message[] = msgData.map((msg: any) => ({
         id: msg.id,
         text: msg.content,
         content: msg.content,
@@ -88,7 +91,7 @@ export function MessageThread({
     }
   }, [msgData]);
 
-  if (isLoadingMessages)
+  if (isLoadingMessages && !messages.length)
     return (
       <div>
         <ChatLoading />

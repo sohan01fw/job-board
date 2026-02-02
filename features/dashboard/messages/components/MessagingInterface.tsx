@@ -14,9 +14,11 @@ import { EmojiPicker } from "../../discover/components/ui/EmojiPicker";
 export function MessagingInterface({
   user,
   id,
+  initialMessages,
 }: {
   user: CachedUser;
   id: string;
+  initialMessages?: any[];
 }) {
   // const { loading } = useChatStore();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -75,6 +77,7 @@ export function MessagingInterface({
           currentUser={user}
           setMessagesRef={messagesRef}
           scrollRef={scrollRef}
+          initialMessages={initialMessages}
         />
       </div>
 

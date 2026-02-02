@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 import { ConfirmDialog } from "@/components/confirmDialog";
+import { User } from "@prisma/client";
+import Link from "next/link";
 
 export default function MyMutualFriends({
   currentUser,
@@ -27,7 +29,7 @@ export default function MyMutualFriends({
 
   return (
     <div className="space-y-4">
-      {mutualFriends.map((user) => (
+      {mutualFriends.map((user: User) => (
         <Card key={user.id} className="hover:shadow-md transition rounded-xl">
           <CardHeader>
             <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -54,15 +56,29 @@ export default function MyMutualFriends({
 
               {/* Right: Message Button with Icon */}
               <div className="flex flex-row gap-4">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="shrink-0 h-8 text-xs flex items-center gap-1"
-                  onClick={() => router.push(`/dashboard/messages`)}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Message
-                </Button>
+                {/* Right: Message Button with Icon */}
+                {(user as any).chatId ? (
+                  <Link href={`/dashboard/messages/${(user as any).chatId}`}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="shrink-0 h-8 text-xs flex items-center gap-1"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Message
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 h-8 text-xs flex items-center gap-1"
+                    onClick={() => router.push(`/dashboard/messages`)}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Message
+                  </Button>
+                )}
                 <ConfirmDialog
                   title="Unfollow"
                   description="Are you sure you want to unfollow? This might remove conversations with this user."

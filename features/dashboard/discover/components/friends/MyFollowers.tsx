@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useFollowUser, useFriendsAndFollowers } from "../../hooks/useFollow";
 import { CachedUser } from "@/types/global";
 import { ConfirmDialog } from "@/components/confirmDialog";
+import { User } from "@prisma/client";
 
 export default function MyFollowers({
   currentUser,
@@ -25,7 +26,7 @@ export default function MyFollowers({
 
   return (
     <div className="space-y-4">
-      {followers.map((user) => (
+      {followers.map((user: User) => (
         <Card key={user.id} className="hover:shadow-md transition">
           <CardHeader>
             <div className="flex items-center justify-between gap-4 flex-wrap">

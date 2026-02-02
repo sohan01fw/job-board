@@ -17,12 +17,19 @@ export function useOrCreateChat({
   });
 }
 
-export function useMessages({ chatId }: { chatId: string }) {
+export function useMessages({
+  chatId,
+  initialData,
+}: {
+  chatId: string;
+  initialData?: any;
+}) {
   return useQuery({
     queryKey: ["messages", chatId],
     queryFn: async () => {
       return await getMessagesActions({ chatId });
     },
     enabled: !!chatId,
+    initialData,
   });
 }

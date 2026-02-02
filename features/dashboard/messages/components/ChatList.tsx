@@ -10,19 +10,28 @@ import { getOrCreateChatAction } from "../action";
 import { useChatStore } from "../lib/store/chat";
 import ChatListLoading from "./ui/ChatListLoading";
 import Link from "next/link";
+import { User } from "@prisma/client";
 
 interface ChatListProps {
   user: CachedUser;
+  initialData?: {
+    friends: User[];
+    followingOnly: User[];
+    followersOnly: User[];
+  };
 }
 
-export function ChatList({ user }: ChatListProps) {
-  const { data, isLoading } = useFriendsAndFollowers(user?.id || "");
+export function ChatList({ user, initialData }: ChatListProps) {
+  const { data, isLoading } = useFriendsAndFollowers(
+    user?.id || "",
+    initialData,
+  );
   const { setLoading } = useChatStore();
 
   const router = useRouter();
   const { id } = useParams();
 
-  if (isLoading)
+  if (isLoading && !data)
     return (
       <div>
         <ChatListLoading />
@@ -45,7 +54,18 @@ export function ChatList({ user }: ChatListProps) {
 
   const mutualFriends = data.friends;
 
-  const handleChatClick = async ({ friendId }: { friendId: string }) => {
+  const handleChatClick = async ({
+    friendId,
+    chatId,
+  }: {
+    friendId: string;
+    chatId?: string;
+  }) => {
+    if (chatId) {
+      router.push(`/dashboard/messages/${chatId}`);
+      return;
+    }
+
     setLoading(true);
     try {
       const chat = await getOrCreateChatAction({
@@ -91,32 +111,55 @@ export function ChatList({ user }: ChatListProps) {
 
       {/* Chat List */}
       <div className="flex-1 overflow-y-auto">
-        {mutualFriends.map((friend) => (
-          <div
-            key={friend.id}
-            onClick={() => handleChatClick({ friendId: friend.id })}
-            className={`flex items-center p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
-              id === friend.id
-                ? "bg-green-50 dark:bg-gray-700 border-r-2 border-green-600"
-                : ""
-            }`}
-          >
-            <Avatar className="w-12 h-12">
-              <AvatarImage
-                src={friend.img || "/placeholder.svg"}
-                alt="Friend Avatar"
-              />
-              <AvatarFallback className="bg-green-600 text-white">
-                {friend?.name?.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="ml-3 flex-1 min-w-0">
-              <h3 className="text-gray-900 dark:text-gray-100 font-medium truncate">
-                {friend.name}
-              </h3>
+        {mutualFriends.map((friend: any) => {
+          const isActive = id === friend.chatId || id === friend.id;
+          const chatLink = friend.chatId
+            ? `/dashboard/messages/${friend.chatId}`
+            : null;
+
+          const content = (
+            <>
+              <Avatar className="w-12 h-12">
+                <AvatarImage
+                  src={friend.img || "/placeholder.svg"}
+                  alt="Friend Avatar"
+                />
+                <AvatarFallback className="bg-green-600 text-white">
+                  {friend?.name?.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="ml-3 flex-1 min-w-0">
+                <h3 className="text-gray-900 dark:text-gray-100 font-medium truncate">
+                  {friend.name}
+                </h3>
+              </div>
+            </>
+          );
+
+          const className = `flex items-center p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
+            isActive
+              ? "bg-green-50 dark:bg-gray-700 border-r-2 border-green-600"
+              : ""
+          }`;
+
+          if (chatLink) {
+            return (
+              <Link key={friend.id} href={chatLink} className={className}>
+                {content}
+              </Link>
+            );
+          }
+
+          return (
+            <div
+              key={friend.id}
+              onClick={() => handleChatClick({ friendId: friend.id })}
+              className={className}
+            >
+              {content}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
