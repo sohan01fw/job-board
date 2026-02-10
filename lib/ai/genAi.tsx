@@ -70,7 +70,7 @@ export async function genAi(prompt: string) {
 
   (async () => {
     const { partialObjectStream } = streamObject({
-      model: google("gemini-2.0-flash"),
+      model: google("gemini-2.5-flash"),
       system: "Only generate valid job post data strictly matching the schema.",
       prompt,
       schema: jobPostSchema,

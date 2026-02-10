@@ -6,17 +6,41 @@ import { ReactQueryProvider } from "@/lib/ReactQueryProvider";
 import { getCachedUser } from "@/lib/redis";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Dashboard",
 };
 
-export default async function RootLayout({
+async function HeaderWrapper() {
+  const user = await getCachedUser();
+  return (
+    <Header
+      email={user?.email}
+      img={user?.img || ""}
+      uId={user?.id}
+    />
+  );
+}
+
+function HeaderSkeleton() {
+  return (
+    <div className="h-16 border-b border-border bg-background px-6 flex items-center justify-between">
+      <Skeleton className="h-8 w-48" />
+      <div className="flex items-center gap-4">
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-8 w-8 rounded-full" />
+      </div>
+    </div>
+  );
+}
+
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getCachedUser();
   return (
     <ThemeProviderWrapper>
       <ReactQueryProvider>
@@ -31,15 +55,15 @@ export default async function RootLayout({
             <div className="flex flex-col min-h-screen">
               {/* Header sticky top */}
               <header className="sticky top-0 z-40 bg-white">
-                <Header
-                  email={user?.email}
-                  img={user?.img || ""}
-                  uId={user?.id}
-                />
+                <Suspense fallback={<HeaderSkeleton />}>
+                  <HeaderWrapper />
+                </Suspense>
               </header>
 
               {/* Children */}
-              <main className="flex-1">{children}</main>
+              <main className="flex-1">
+                {children}
+              </main>
               <Toaster richColors />
             </div>
           </div>

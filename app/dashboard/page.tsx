@@ -1,14 +1,18 @@
-// import { DashboardLayout } from "@/features/dashboard/components/DashboardLayout";
 import DashboardHome from "@/features/dashboard/home/components/Home";
-import { ensureUserInDB, getCachedUser } from "@/lib/redis";
+import { getCachedUser } from "@/lib/redis";
+import { Suspense } from "react";
+import HomeSkeleton from "@/features/dashboard/home/components/ui/HomeSkeleton";
 
-export default async function page() {
-  await ensureUserInDB();
+export default async function Page() {
   const user = await getCachedUser();
 
+  if (!user) {
+    return null; // Should be handled by layout/middleware
+  }
+
   return (
-    <div>
+    <Suspense fallback={<HomeSkeleton />}>
       <DashboardHome user={user} />
-    </div>
+    </Suspense>
   );
 }

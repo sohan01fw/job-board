@@ -9,7 +9,7 @@ import Link from "next/link";
 import { StatusSelect } from "../ui/StatusDropdown";
 import { Applicant } from "../../types";
 import { useApplicants } from "../../hooks/useGetAllApplicants";
-import SpinnerLoading from "@/components/spinnerLoading";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Applicants({ jobId }: { jobId: string }) {
   const { data: applicants, isLoading, isError } = useApplicants(jobId);
@@ -17,8 +17,18 @@ export default function Applicants({ jobId }: { jobId: string }) {
 
   if (isLoading)
     return (
-      <div>
-        <SpinnerLoading />
+      <div className="flex flex-col md:flex-row h-screen border rounded-lg overflow-hidden">
+        <div className="w-full md:w-1/3 border-r p-4 space-y-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} className="h-16 w-full rounded-xl" />
+          ))}
+        </div>
+        <div className="flex-1 p-6 space-y-6">
+          <Skeleton className="h-8 w-1/3" />
+          <Skeleton className="h-4 w-1/2" />
+          <Separator />
+          <Skeleton className="h-32 w-full" />
+        </div>
       </div>
     );
   if (isError) return <div>Error loading applicants.</div>;

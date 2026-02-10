@@ -5,8 +5,10 @@ import { prisma } from "../Prisma";
 import { createServerSupabaseClient } from "../supabase/supabase_server";
 import { withTryCatch } from "../tryCatch";
 
+import { cache } from "react";
+
 // supabase user
-export async function authUser(): Promise<any> {
+export const authUser = cache(async (): Promise<any> => {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase.auth.getUser();
 
@@ -16,14 +18,14 @@ export async function authUser(): Promise<any> {
     name: data.user?.user_metadata.name || "",
     img: data.user?.user_metadata.avatar_url || "",
   };
-}
+});
 // check user in db
-export async function CheckUser(userEmail: string) {
+export const CheckUser = cache(async (userEmail: string) => {
   return withTryCatch(async () => {
     const user = await prisma.user.findUnique({ where: { email: userEmail } });
     return user;
   }, "Error while checking user");
-}
+});
 
 export async function getUser() {
   const user = await authUser();

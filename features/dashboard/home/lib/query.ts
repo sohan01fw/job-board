@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/Prisma";
+import { withRedisCache } from "@/lib/redis";
 import { withTryCatch } from "@/lib/tryCatch";
 import { startOfMonth, addMonths, startOfWeek, addWeeks } from "date-fns";
 
@@ -47,89 +48,111 @@ async function getUserEmbedding(userId: string) {
 
 async function getJobStats() {
   return withTryCatch(async () => {
-    const now = new Date();
+    return withRedisCache(
+      "global:jobStats",
+      async () => {
+        const now = new Date();
 
-    const startOfThisMonth = startOfMonth(now);
-    const startOfNextMonth = addMonths(startOfThisMonth, 1);
-    const startOfLastMonth = addMonths(startOfThisMonth, -1);
+        const startOfThisMonth = startOfMonth(now);
+        const startOfNextMonth = addMonths(startOfThisMonth, 1);
+        const startOfLastMonth = addMonths(startOfThisMonth, -1);
 
-    const [thisMonth, lastMonth] = await Promise.all([
-      prisma.jobPost.count({
-        where: { createdAt: { gte: startOfThisMonth, lt: startOfNextMonth } },
-      }),
-      prisma.jobPost.count({
-        where: { createdAt: { gte: startOfLastMonth, lt: startOfThisMonth } },
-      }),
-    ]);
+        const [thisMonth, lastMonth] = await Promise.all([
+          prisma.jobPost.count({
+            where: {
+              createdAt: { gte: startOfThisMonth, lt: startOfNextMonth },
+            },
+          }),
+          prisma.jobPost.count({
+            where: {
+              createdAt: { gte: startOfLastMonth, lt: startOfThisMonth },
+            },
+          }),
+        ]);
 
-    const rawChange = ((thisMonth - lastMonth) / (lastMonth || 1)) * 100;
-    const change = Math.min(rawChange, 100);
-    const trend = change >= 0 ? "up" : "down";
+        const rawChange = ((thisMonth - lastMonth) / (lastMonth || 1)) * 100;
+        const change = Math.min(rawChange, 100);
+        const trend = change >= 0 ? "up" : "down";
 
-    return { value: thisMonth, change: `${change.toFixed(0)}%`, trend };
+        return { value: thisMonth, change: `${change.toFixed(0)}%`, trend };
+      },
+      300, // 5 minutes
+    );
   }, "Error while fetching job stats");
 }
 
 async function getUserApplicationStats({ userId }: { userId: string }) {
   return withTryCatch(async () => {
-    const now = new Date();
+    return withRedisCache(
+      `user:${userId}:applicationStats`,
+      async () => {
+        const now = new Date();
 
-    const startOfThisWeek = startOfWeek(now);
-    const startOfNextWeek = addWeeks(startOfThisWeek, 1);
-    const startOfLastWeek = addWeeks(startOfThisWeek, -1);
+        const startOfThisWeek = startOfWeek(now);
+        const startOfNextWeek = addWeeks(startOfThisWeek, 1);
+        const startOfLastWeek = addWeeks(startOfThisWeek, -1);
 
-    const [thisWeek, lastWeek] = await Promise.all([
-      prisma.jobApplication.count({
-        where: {
-          userId,
-          createdAt: { gte: startOfThisWeek, lt: startOfNextWeek },
-        },
-      }),
-      prisma.jobApplication.count({
-        where: {
-          userId,
-          createdAt: { gte: startOfLastWeek, lt: startOfThisWeek },
-        },
-      }),
-    ]);
+        const [thisWeek, lastWeek] = await Promise.all([
+          prisma.jobApplication.count({
+            where: {
+              userId,
+              createdAt: { gte: startOfThisWeek, lt: startOfNextWeek },
+            },
+          }),
+          prisma.jobApplication.count({
+            where: {
+              userId,
+              createdAt: { gte: startOfLastWeek, lt: startOfThisWeek },
+            },
+          }),
+        ]);
 
-    const rawChange = ((thisWeek - lastWeek) / (lastWeek || 1)) * 100;
-    const change = Math.min(rawChange, 100);
-    const trend = change >= 0 ? "up" : "down";
+        const rawChange = ((thisWeek - lastWeek) / (lastWeek || 1)) * 100;
+        const change = Math.min(rawChange, 100);
+        const trend = change >= 0 ? "up" : "down";
 
-    return { value: thisWeek, change: `${change.toFixed(0)}%`, trend };
+        return { value: thisWeek, change: `${change.toFixed(0)}%`, trend };
+      },
+      300,
+    );
   }, "Error while fetching user application stats");
 }
 
 async function getAcceptedJobsCount({ userId }: { userId: string }) {
   return withTryCatch(async () => {
-    const now = new Date();
-    const startOfThisWeek = startOfWeek(now);
-    const startOfNextWeek = addWeeks(startOfThisWeek, 1);
-    const startOfLastWeek = addWeeks(startOfThisWeek, -1);
+    return withRedisCache(
+      `user:${userId}:acceptedJobsCount`,
+      async () => {
+        const now = new Date();
+        const startOfThisWeek = startOfWeek(now);
+        const startOfNextWeek = addWeeks(startOfThisWeek, 1);
+        const startOfLastWeek = addWeeks(startOfThisWeek, -1);
 
-    const [thisWeek, lastWeek] = await Promise.all([
-      prisma.jobApplication.count({
-        where: {
-          userId,
-          status: "ACCEPTED",
-          createdAt: { gte: startOfThisWeek, lt: startOfNextWeek },
-        },
-      }),
-      prisma.jobApplication.count({
-        where: {
-          userId,
-          status: "ACCEPTED",
-          createdAt: { gte: startOfLastWeek, lt: startOfThisWeek },
-        },
-      }),
-    ]);
+        const [thisWeek, lastWeek] = await Promise.all([
+          prisma.jobApplication.count({
+            where: {
+              userId,
+              status: "ACCEPTED",
+              createdAt: { gte: startOfThisWeek, lt: startOfNextWeek },
+            },
+          }),
+          prisma.jobApplication.count({
+            where: {
+              userId,
+              status: "ACCEPTED",
+              createdAt: { gte: startOfLastWeek, lt: startOfThisWeek },
+            },
+          }),
+        ]);
 
-    const rawChange = ((thisWeek - lastWeek) / (lastWeek || 1)) * 100;
-    const change = Math.min(rawChange, 100);
-    const trend = change >= 0 ? "up" : "down";
+        const rawChange = ((thisWeek - lastWeek) / (lastWeek || 1)) * 100;
+        const change = Math.min(rawChange, 100);
+        const trend = change >= 0 ? "up" : "down";
 
-    return { value: thisWeek, change: `${change.toFixed(0)}%`, trend };
+        return { value: thisWeek, change: `${change.toFixed(0)}%`, trend };
+      },
+      300,
+    );
   }, "Error while fetching accepted jobs count");
 }
 
@@ -182,28 +205,30 @@ async function getUserActivities({
 }
 
 export async function getProfileViews(userId: string) {
-  // Fetch current views
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { views: true, createdAt: true },
-  });
+  return withRedisCache(
+    `user:${userId}:profileViews`,
+    async () => {
+      // Fetch current views
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { views: true, createdAt: true },
+      });
 
-  if (!user) return null;
+      if (!user) return null;
 
-  // Example logic to calculate change %
-  // You can store previous views in DB or calculate based on timestamp
-  // Example logic to calculate change %
-
-  const previousViews = user.views - 1; // assume one less before
-  const change = user.views - previousViews;
-  const trend = change >= 0 ? "up" : "down";
-  const percentChange =
-    previousViews > 0 ? ((change / previousViews) * 100).toFixed(0) : "0";
-  return {
-    value: user.views.toLocaleString(), // "1,247"
-    change: percentChange,
-    trend, // "up" or "down"
-  };
+      const previousViews = user.views - 1; // assume one less before
+      const change = user.views - previousViews;
+      const trend = change >= 0 ? "up" : "down";
+      const percentChange =
+        previousViews > 0 ? ((change / previousViews) * 100).toFixed(0) : "0";
+      return {
+        value: user.views.toLocaleString(), // "1,247"
+        change: percentChange,
+        trend, // "up" or "down"
+      };
+    },
+    300,
+  );
 }
 export {
   getJobsWithEmbeddings,

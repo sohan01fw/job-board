@@ -50,14 +50,16 @@ export async function initUserCache(): Promise<CachedUser> {
   return userToCache;
 }
 
+import { cache } from "react";
+
 // Combined function
-export async function getCachedUser(): Promise<CachedUser> {
+export const getCachedUser = cache(async (): Promise<CachedUser> => {
   const cached = await getOrInitUserCache();
   if (cached) return cached;
 
   // If not in cache, initialize
   return await initUserCache();
-}
+});
 
 export async function ensureUserInDB() {
   const User = await authUser();
@@ -73,5 +75,28 @@ export async function ensureUserInDB() {
       console.error("Create user error:", err);
       throw err;
     }
+  }
+}
+
+export async function withRedisCache<T>(
+  key: string,
+  fetcher: () => Promise<T>,
+  ex: number = 300 // default 5 minutes
+): Promise<T> {
+  try {
+    const cached = await redis.get<T>(key);
+    if (cached) {
+      // Upstash Redis might return the object directly or as a string depending on how it was set
+      return typeof cached === "string" ? JSON.parse(cached) : cached;
+    }
+
+    const fresh = await fetcher();
+    if (fresh !== undefined && fresh !== null) {
+      await redis.set(key, JSON.stringify(fresh), { ex });
+    }
+    return fresh;
+  } catch (error) {
+    console.error(`Redis cache error for key ${key}:`, error);
+    return fetcher(); // Fallback to fresh data on error
   }
 }

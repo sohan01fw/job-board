@@ -1,10 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/Prisma";
+import { redis } from "@/lib/redis"; // Import redis client
 import { withTryCatch } from "@/lib/tryCatch";
 import { Post, Prisma, User } from "@prisma/client";
 import { PostUser, UserCmts } from "../types";
 import { pusherServer } from "@/lib/pusher";
+import { withRedisCache } from "@/lib/redis";
 
 // ---------------------
 // CREATE POST
@@ -44,35 +46,42 @@ export async function getFeed({
   cursor?: string | null;
 }) {
   return withTryCatch(async () => {
-    const posts = await prisma.post.findMany({
-      take: limit + 1, // get one extra to check if there’s more
-      ...(cursor ? { cursor: { id: cursor } } : {}),
-      orderBy: { createdAt: "desc" },
-      include: {
-        author: true,
-        comments: true,
-        postlikes: true,
-        jobs: {
+    const cacheKey = `feed:${limit}:${cursor || "first"}`;
+    return withRedisCache(
+      cacheKey,
+      async () => {
+        const posts = await prisma.post.findMany({
+          take: limit + 1, // get one extra to check if there’s more
+          ...(cursor ? { cursor: { id: cursor } } : {}),
+          orderBy: { createdAt: "desc" },
           include: {
-            _count: {
-              select: { jobApplications: true },
+            author: true,
+            comments: true,
+            postlikes: true,
+            jobs: {
+              include: {
+                _count: {
+                  select: { jobApplications: true },
+                },
+              },
             },
           },
-        },
+        });
+
+        // Determine if there’s another page
+        let nextCursor: string | null = null;
+        if (posts.length > limit) {
+          const nextItem = posts.pop(); // remove extra item
+          nextCursor = nextItem!.id;
+        }
+
+        return {
+          posts,
+          nextCursor,
+        };
       },
-    });
-
-    // Determine if there’s another page
-    let nextCursor: string | null = null;
-    if (posts.length > limit) {
-      const nextItem = posts.pop(); // remove extra item
-      nextCursor = nextItem!.id;
-    }
-
-    return {
-      posts,
-      nextCursor,
-    };
+      60, // Cache feed for 1 minute
+    );
   }, "Error while fetching feed");
 }
 
@@ -223,86 +232,93 @@ export const getAllUsersExceptQuery = async (
 
 export async function getFriendsAndFollowers(userId: string) {
   return withTryCatch(async () => {
-    // Fetch all active follows where the user is either the follower or the following
-    const allFollows = await prisma.follow.findMany({
-      where: {
-        OR: [{ followerId: userId }, { followingId: userId }],
-        deletedAt: null,
-      },
-      include: {
-        follower: true,
-        following: true,
-      },
-    });
+    const cacheKey = `friendsAndFollowers:${userId}`;
+    return withRedisCache(
+      cacheKey,
+      async () => {
+        // Fetch all active follows where the user is either the follower or the following
+        const allFollows = await prisma.follow.findMany({
+          where: {
+            OR: [{ followerId: userId }, { followingId: userId }],
+            deletedAt: null,
+          },
+          include: {
+            follower: true,
+            following: true,
+          },
+        });
 
-    // Segregate follows into following (users I follow) and followers (users who follow me)
-    const following = allFollows.filter((f) => f.followerId === userId);
-    const followers = allFollows.filter((f) => f.followingId === userId);
+        // Segregate follows into following (users I follow) and followers (users who follow me)
+        const following = allFollows.filter((f) => f.followerId === userId);
+        const followers = allFollows.filter((f) => f.followingId === userId);
 
-    const followerIds = new Set(followers.map((f) => f.followerId));
-    const followingIds = new Set(following.map((f) => f.followingId));
+        const followerIds = new Set(followers.map((f) => f.followerId));
+        const followingIds = new Set(following.map((f) => f.followingId));
 
-    // Mutual friends: I follow them AND they follow me
-    const mutualFriendUsers = following
-      .filter((f) => followerIds.has(f.followingId))
-      .map((f) => f.following);
+        // Mutual friends: I follow them AND they follow me
+        const mutualFriendUsers = following
+          .filter((f) => followerIds.has(f.followingId))
+          .map((f) => f.following);
 
-    // Fetch all chats for the user to map friends to chatIds
-    const userChats = await prisma.chatParticipant.findMany({
-      where: { userId },
-      select: {
-        chatId: true,
-        chat: {
+        // Fetch all chats for the user to map friends to chatIds
+        const userChats = await prisma.chatParticipant.findMany({
+          where: { userId },
           select: {
-            participants: {
-              where: { userId: { not: userId } },
-              select: { userId: true },
+            chatId: true,
+            chat: {
+              select: {
+                participants: {
+                  where: { userId: { not: userId } },
+                  select: { userId: true },
+                },
+              },
             },
           },
-        },
+        });
+
+        const friendToChatId = new Map<string, string>();
+        userChats.forEach((cp) => {
+          const otherParticipant = cp.chat.participants[0];
+          if (otherParticipant) {
+            friendToChatId.set(otherParticipant.userId, cp.chatId);
+          }
+        });
+
+        const friends = mutualFriendUsers.map((f) => ({
+          ...f,
+          chatId: friendToChatId.get(f.id),
+        }));
+
+        // Following only: I follow them but they don't follow me
+        const followingOnly = following
+          .filter((f) => !followerIds.has(f.followingId))
+          .map((f) => f.following);
+
+        // Followers only: They follow me but I don't follow them
+        const followersOnly = followers
+          .filter((f) => !followingIds.has(f.followerId))
+          .map((f) => f.follower);
+
+        const followerCount = followers.length;
+
+        // calculate change (you can replace with real logic)
+        const previousCount = followerCount > 0 ? followerCount - 1 : 0; // placeholder
+        const change = followerCount - previousCount;
+        const trend = change >= 0 ? "up" : "down";
+
+        return {
+          friends,
+          followingOnly,
+          followersOnly,
+          followerCount: {
+            value: followerCount.toString(),
+            change: change,
+            trend,
+          },
+        };
       },
-    });
-
-    const friendToChatId = new Map<string, string>();
-    userChats.forEach((cp) => {
-      const otherParticipant = cp.chat.participants[0];
-      if (otherParticipant) {
-        friendToChatId.set(otherParticipant.userId, cp.chatId);
-      }
-    });
-
-    const friends = mutualFriendUsers.map((f) => ({
-      ...f,
-      chatId: friendToChatId.get(f.id),
-    }));
-
-    // Following only: I follow them but they don't follow me
-    const followingOnly = following
-      .filter((f) => !followerIds.has(f.followingId))
-      .map((f) => f.following);
-
-    // Followers only: They follow me but I don't follow them
-    const followersOnly = followers
-      .filter((f) => !followingIds.has(f.followerId))
-      .map((f) => f.follower);
-
-    const followerCount = followers.length;
-
-    // calculate change (you can replace with real logic)
-    const previousCount = followerCount > 0 ? followerCount - 1 : 0; // placeholder
-    const change = followerCount - previousCount;
-    const trend = change >= 0 ? "up" : "down";
-
-    return {
-      friends,
-      followingOnly,
-      followersOnly,
-      followerCount: {
-        value: followerCount.toString(),
-        change: change,
-        trend,
-      },
-    };
+      300, // Cache for 5 minutes
+    );
   }, "Error fetching friends and followers");
 }
 
@@ -316,6 +332,10 @@ export async function followUser({
   followingId: string;
 }) {
   return withTryCatch(async () => {
+    // Invalidate cache for both users
+    await redis.del(`friendsAndFollowers:${followerId}`);
+    await redis.del(`friendsAndFollowers:${followingId}`);
+
     // 1️⃣ Check if follow exists
     let follow = await prisma.follow.findUnique({
       where: { followerId_followingId: { followerId, followingId } },
@@ -474,6 +494,10 @@ export async function unfollowUser({
   followingId: string;
 }) {
   return withTryCatch(async () => {
+    // Invalidate cache for both users
+    await redis.del(`friendsAndFollowers:${followerId}`);
+    await redis.del(`friendsAndFollowers:${followingId}`);
+
     const follow = await prisma.follow.findUnique({
       where: { followerId_followingId: { followerId, followingId } },
       include: { follower: true, following: true },

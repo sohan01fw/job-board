@@ -6,7 +6,6 @@ import { useFeed } from "../hooks/usePost";
 import { PostCard } from "./PostCard";
 import { CachedUser } from "@/types/global";
 import PostsLoadingSkeleton from "./ui/PostLoading";
-import { Loader2 } from "lucide-react";
 
 export function PostList({ userData }: { userData: CachedUser }) {
   const {
@@ -56,9 +55,11 @@ export function PostList({ userData }: { userData: CachedUser }) {
 
       <div ref={loadMoreRef} className="h-5 flex justify-center items-center">
         {isFetchingNextPage ? (
-          <span className="mt-3">
-            <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
-          </span>
+          <div className="flex items-center gap-2 text-primary mt-3">
+            <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <span className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+          </div>
         ) : hasNextPage ? (
           <span>Scroll to load more</span>
         ) : (

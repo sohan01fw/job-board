@@ -34,7 +34,7 @@ export async function computeJobsRecommendation({
     const topCandidates = scoredJobs.slice(0, 10);
 
     // 3. Send to Gemini for rerank
-    const model = google("gemini-2.0-flash");
+    const model = google("gemini-2.5-flash");
     const { text } = await generateText({
       model,
       prompt: `

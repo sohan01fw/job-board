@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "AI powered job board",
 };
 
+import NextTopLoader from "nextjs-toploader";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NextTopLoader color="#2563eb" showSpinner={false} shadow="0 0 10px #2563eb,0 0 5px #2563eb" />
         {children}
       </body>
     </html>

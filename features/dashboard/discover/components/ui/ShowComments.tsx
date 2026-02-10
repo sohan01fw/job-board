@@ -2,16 +2,24 @@ import { useComments } from "../../hooks/useComment";
 import { formatDistanceToNow } from "date-fns";
 import { UserCmts } from "../../types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import SpinnerLoading from "@/components/spinnerLoading";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function ShowComments({ postId }: { postId: string }) {
   const { data: comments, isLoading } = useComments({ postId });
 
   if (isLoading)
     return (
-      <p className="flex justify-center py-4">
-        <SpinnerLoading />
-      </p>
+      <div className="space-y-4 mt-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex items-start space-x-3 p-3">
+            <Skeleton className="w-12 h-12 rounded-full" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+          </div>
+        ))}
+      </div>
     );
 
   if (!comments || comments.length === 0)
