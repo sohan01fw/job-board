@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { CheckCircle, Menu, X } from "lucide-react";
+import { CheckCircle, Menu, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useScrollStore } from "../stores/scrollStore";
@@ -9,9 +9,11 @@ import { UserData } from "@/types/Forms";
 
 export function Navbar({ user }: { user: UserData }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
+    setLoading(true);
     router.push("/dashboard");
   };
 
@@ -38,21 +40,14 @@ export function Navbar({ user }: { user: UserData }) {
 
             {/* right: actions */}
             <div className="flex items-center gap-3">
-              {user.email ? (
-                <Button
-                  onClick={handleLogin}
-                  className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium"
-                >
-                  Dashboard
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleLogin}
-                  className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium"
-                >
-                  Log In
-                </Button>
-              )}
+              <Button
+                onClick={handleLogin}
+                disabled={loading}
+                className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {user.email ? "Dashboard" : "Log In"}
+              </Button>
               {/* mobile toggle */}
               <button
                 className="md:hidden p-2"

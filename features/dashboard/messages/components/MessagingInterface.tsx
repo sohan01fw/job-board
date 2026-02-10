@@ -69,7 +69,7 @@ export function MessagingInterface({
   }, [id, user]);
 
   return (
-    <div className="flex flex-col w-[90vw] h-[80vh] lg:h-[90vh] lg:w-[67vw] bg-gray-50 dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+    <div className="flex flex-col w-full h-full bg-gray-50 dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
       {/* 💬 Message Thread */}
       <div className="flex-1 overflow-hidden">
         <MessageThread
