@@ -46,7 +46,7 @@ export const useJobPostStore = create<JobPostStore>((set) => ({
     set((state) => ({
       jobData: {
         ...state.jobData,
-        salaryMin: value,
+        minSalary: value,
       },
     })),
 
@@ -54,14 +54,14 @@ export const useJobPostStore = create<JobPostStore>((set) => ({
     set((state) => ({
       jobData: {
         ...state.jobData,
-        salaryMax: value,
+        maxSalary: value,
       },
     })),
-  updateCurrency: () =>
+  updateCurrency: (currency) =>
     set((state) => ({
       jobData: {
         ...state.jobData,
-        currency: "USD",
+        currency,
       },
     })),
 

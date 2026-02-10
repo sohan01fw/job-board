@@ -16,7 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, Building, DollarSign, Calendar, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useJobPostStore } from "../stores/postJobStore";
 import { AiInputModel } from "./ui/AiInputModel";
 import { useCreateJobPost } from "../hooks/useJobPost";
@@ -31,8 +31,8 @@ const jobPostSchema = z.object({
   workType: z.enum(["remote", "hybrid", "onsite"]),
   jobType: z.enum(["fulltime", "parttime", "contract", "internship"]),
   experience: z.enum(["entry", "mid", "senior", "executive"]),
-  minSalary: z.number().min(1, "Minimum salary is required"),
-  maxSalary: z.number().min(1, "Maximum salary is required"),
+  minSalary: z.coerce.number().min(1, "Minimum salary is required"),
+  maxSalary: z.coerce.number().min(1, "Maximum salary is required"),
   currency: z.string().default("USD"),
   description: z.string().min(50, "Description must be at least 50 characters"),
   applicationDeadline: z.string().min(1, "Application deadline is required"),
@@ -94,18 +94,16 @@ export function PostJobForm({ user }: { user: UserData }) {
     },
   });
 
+  // Sync array fields from store to react-hook-form
+  useEffect(() => {
+    setValue("requirements", jobData.requirements);
+    setValue("benefits", jobData.benefits);
+    setValue("skills", jobData.skills);
+  }, [jobData.requirements, jobData.benefits, jobData.skills, setValue]);
+
   const handleFieldChange = (field: keyof typeof jobData, value: any) => {
     updateField(field, value);
-    if (
-      field === "title" ||
-      field === "company" ||
-      field === "location" ||
-      field === "description" ||
-      field === "applicationDeadline" ||
-      field === "contactEmail"
-    ) {
-      setValue(field, value);
-    }
+    setValue(field as any, value);
   };
 
   const handleMinSalaryChange = (value: number) => {
@@ -249,7 +247,7 @@ export function PostJobForm({ user }: { user: UserData }) {
                     <SelectItem value="fulltime">fulltime</SelectItem>
                     <SelectItem value="parttime">parttime</SelectItem>
                     <SelectItem value="contract">contract</SelectItem>
-                    <SelectItem value="internship">cnternship</SelectItem>
+                    <SelectItem value="internship">internship</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -294,7 +292,7 @@ export function PostJobForm({ user }: { user: UserData }) {
                   Min Salary <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  {...register("minSalary")}
+                  {...register("minSalary", { valueAsNumber: true })}
                   placeholder="50000"
                   type="number"
                   onChange={(e) =>
@@ -313,7 +311,7 @@ export function PostJobForm({ user }: { user: UserData }) {
                   Max Salary <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  {...register("maxSalary")}
+                  {...register("maxSalary", { valueAsNumber: true })}
                   placeholder="80000"
                   type="number"
                   onChange={(e) =>
