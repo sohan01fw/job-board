@@ -48,19 +48,19 @@ const navigationItems = [
 export function Sidebar() {
   const pathname = usePathname();
   return (
-    <div className="w-20 lg:w-64 h-screen bg-sidebar border-r border-sidebar-border p-4 flex flex-col">
+    <div className="w-20 lg:w-64 h-screen bg-background border-r border-border p-4 flex flex-col transition-all duration-300">
       {/* Logo */}
-      <div className="flex flex-col lg:flex-row items-center gap-2 mb-8">
-        <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-          <CheckCircle className="w-5 h-5 text-primary-foreground" />
+      <div className="flex flex-col lg:flex-row items-center gap-3 mb-8 lg:px-2 mt-2">
+        <div className="w-10 h-10 bg-green-500/15 dark:bg-green-500/20 rounded-xl flex items-center justify-center shadow-sm border border-green-500/20">
+          <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-500" />
         </div>
-        <span className="text-xl font-bold text-sidebar-foreground">
+        <span className="text-xl font-bold text-foreground tracking-tight hidden lg:block">
           JobBoard
         </span>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 sm:space-y-2">
+      <nav className="flex-1 space-y-1.5 sm:space-y-2">
         {navigationItems.map((item) => {
           const isActive = pathname === item.path;
           return (
@@ -68,17 +68,22 @@ export function Sidebar() {
               href={item.path}
               key={item.label}
               className={cn(
-                "flex items-center w-full gap-3 h-12 px-4 rounded-lg transition-colors duration-200",
+                "group flex items-center w-full gap-3 h-11 px-3 lg:px-4 rounded-xl transition-all duration-200",
                 isActive
-                  ? "bg-gray-800 text-white  font-medium"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-black",
+                  ? "bg-green-500/15 dark:bg-green-500/20 text-green-700 dark:text-green-400 font-medium border border-green-500/20"
+                  : "text-muted-foreground hover:bg-green-500/10 hover:text-green-700 dark:hover:text-green-400",
                 !item.active && "opacity-50 cursor-not-allowed",
               )}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon 
+                className={cn(
+                  "w-5 h-5",
+                  !isActive && "group-hover:scale-110 transition-transform duration-200"
+                )} 
+              />
               <span className="truncate hidden lg:inline">{item.label}</span>
-              <div className=" items-center gap-2 hidden lg:flex">
-                {!item.active && <Lock className="w-4 h-4" />}
+              <div className="items-center gap-2 hidden lg:flex ml-auto">
+                {!item.active && <Lock className="w-4 h-4 opacity-50" />}
               </div>
             </Link>
           );
@@ -102,7 +107,7 @@ export function Sidebar() {
             size="sm"
             className="w-full bg-white/20 hover:bg-white/30 text-white border-0"
           >
-            Join To Workshop
+            Join Workshop
           </Button>
         </CardContent>
       </Card>
