@@ -12,19 +12,32 @@ export const redis = new Redis({
 // Read-only cache
 export async function getOrInitUserCache(): Promise<CachedUser | null> {
   const User = await authUser();
+  if (!User?.id) return null;
   const cacheKey = `user:${User.id}`;
 
-  const cached = await redis.get<CachedUser>(cacheKey);
-  return cached || null;
+  try {
+    const cached = await redis.get<CachedUser>(cacheKey);
+    return cached || null;
+  } catch (err) {
+    console.error("Redis read error, falling back to DB:", err);
+    return null;
+  }
 }
 
 // Initialize cache + DB if missing
 export async function initUserCache(): Promise<CachedUser> {
   const User = await authUser();
+  if (!User?.id) {
+    return { name: null, id: "", email: "", phone: null, location: null, img: null, resume: null };
+  }
   const cacheKey = `user:${User.id}`;
 
   // Remove any existing cache
-  await redis.del(cacheKey);
+  try {
+    await redis.del(cacheKey);
+  } catch (err) {
+    console.error("Redis del error (ignored):", err);
+  }
 
   // Check DB
   let dbUser = await CheckUser(User.email);
@@ -45,7 +58,11 @@ export async function initUserCache(): Promise<CachedUser> {
   const userToCache = pickUser(dbUser);
 
   // Save to Redis
-  await redis.set(cacheKey, userToCache);
+  try {
+    await redis.set(cacheKey, userToCache);
+  } catch (err) {
+    console.error("Redis set error (ignored):", err);
+  }
 
   return userToCache;
 }
@@ -56,6 +73,11 @@ import { cache } from "react";
 export const getCachedUser = cache(async (): Promise<CachedUser> => {
   const cached = await getOrInitUserCache();
   if (cached) return cached;
+
+  const User = await authUser();
+  if (!User?.id) {
+    return { name: null, id: "", email: "", phone: null, location: null, img: null, resume: null };
+  }
 
   // If not in cache, initialize
   return await initUserCache();
