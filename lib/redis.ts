@@ -9,7 +9,14 @@ export const redis = process.env.UPSTASH_REDIS_REST_URL
       url: process.env.UPSTASH_REDIS_REST_URL,
       token: process.env.UPSTASH_REDIS_REST_TOKEN!,
     })
-  : ({ get: async () => null, set: async () => {}, del: async () => 0 } as any);
+  : ({
+      get: async <T = any>(key: string): Promise<T | null> => {
+        void key;
+        return null;
+      },
+      set: async () => {},
+      del: async () => 0,
+    } as any);
 
 // Read-only cache
 export async function getOrInitUserCache(): Promise<CachedUser | null> {
@@ -18,7 +25,7 @@ export async function getOrInitUserCache(): Promise<CachedUser | null> {
   const cacheKey = `user:${User.id}`;
 
   try {
-    const cached = await redis.get<CachedUser>(cacheKey);
+    const cached = await redis.get(cacheKey) as CachedUser | null;
     return cached || null;
   } catch (err) {
     console.error("Redis read error, falling back to DB:", err);
@@ -108,7 +115,7 @@ export async function withRedisCache<T>(
   ex: number = 300 // default 5 minutes
 ): Promise<T> {
   try {
-    const cached = await redis.get<T>(key);
+    const cached = await redis.get(key) as T | null;
     if (cached) {
       // Upstash Redis might return the object directly or as a string depending on how it was set
       return typeof cached === "string" ? JSON.parse(cached) : cached;
