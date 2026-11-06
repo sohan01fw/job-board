@@ -4,10 +4,12 @@ import { pickUser } from "./pickUser";
 import { CachedUser } from "@/types/global";
 import { createUser } from "@/features/dashboard/home/lib/createUser";
 
-export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+export const redis = process.env.UPSTASH_REDIS_REST_URL
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
+  : ({ get: async () => null, set: async () => {}, del: async () => 0 } as any);
 
 // Read-only cache
 export async function getOrInitUserCache(): Promise<CachedUser | null> {
